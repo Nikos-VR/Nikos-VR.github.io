@@ -2,12 +2,12 @@
 
 <head>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js">
-    </script>
     <script src="https://unpkg.com/@croquet/croquet"></script>
     <script
         src="https://cdn.jsdelivr.net/gh/NikolaySuslov/aframe-croquet-component/public/lib/aframe-croquet-component.js">
         </script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js">
+    </script>
     <script>
         AFRAME.registerComponent('dispel', {
             init: function () {
@@ -31,8 +31,8 @@
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
     </a-scene>
     <template id="avatarTemplate">
-        <a-sphere position="0 -1 0" scale="0.5 0.5 0.5" color="gray"></a-sphere>
-        <a-sphere position="0 -0.25 0" scale="0.25 0.25 0.25" color="black"></a-sphere>
+        <a-sphere position="0 -1 0" scale="0.5 0.5 0.5"></a-sphere>
+        <a-sphere position="0 -0.25 0" scale="0.25 0.25 0.25"></a-sphere>
     </template>
     <script>
         var scene1 = document.getElementById('s1');
