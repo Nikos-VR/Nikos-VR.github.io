@@ -24,19 +24,10 @@
             }
         });
     </script>
-    <style>
-        a-scene {
-            width: 30%;
-            height: 30%;
-            margin: 1%;
-            border: dotted silver 1px;
-            float: left;
-        }
-    </style>
 </head>
 
 <body>
-    <a-scene id="s1" background="color: cadetblue" physics cursor="rayOrigin: mouse" embedded croquet>
+    <a-scene id="s1" background="color: cadetblue" physics cursor="rayOrigin: mouse" croquet>
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
     </a-scene>
     <template id="avatarTemplate">
