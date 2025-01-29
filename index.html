@@ -8,10 +8,13 @@
         AFRAME.registerComponent('dispel', {
             init: function () {
                 var el = this.el;
-                el.addEventListener('mousedown', function () {
+                el.addEventListener('mouseenter', function () {
                     el.setAttribute('color', 'red');
                 });
-                el.addEventListener('mouseup', function () {
+                el.addEventListener('mouseleave', function () {
+                    el.setAttribute('color', 'firebrick');
+                });
+                el.addEventListener('click', function () {
                     el.remove();
                 });
             }
