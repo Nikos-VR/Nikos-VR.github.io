@@ -41,10 +41,10 @@
         var scene1 = document.getElementById('s1');
         for (var i = 0; i < 10; i++) {
             var tree = document.createElement('a-entity');
-            var x = Math.random() * 100, z = Math.random() * 100;
+            var x = Math.random() * 100 - 50, z = Math.random() * 100 - 50;
             tree.setAttribute('gltf-model', '#t1');
             tree.setAttribute('position', x + ' 0 ' + z);
-            tree.setAttribute('scale', '0.001 0.001 0.001');
+            tree.setAttribute('scale', '0.01 0.01 0.01');
             scene1.appendChild(tree);
         }
     </script>
