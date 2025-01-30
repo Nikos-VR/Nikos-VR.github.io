@@ -27,9 +27,8 @@
 </head>
 
 <body>
-    <a-scene id="s1" physics cursor="rayOrigin: mouse" croquet>
-        <a-plane id="p1" static-body height="100" width="100" position="0 0 0" rotation="-90 0 0" color="white" multiuser></a-plane>
-        <a-sky color="cadetblue"></a-sky>
+    <a-scene id="s1" background="color: cadetblue" physics cursor="rayOrigin: mouse" croquet>
+        <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
     </a-scene>
     <template id="avatarTemplate">
         <a-entity>
@@ -49,7 +48,7 @@
                 box.setAttribute('color', 'firebrick');
                 box.setAttribute('scale', (4 * o + 1) + ' 1 ' + (4 * e + 1));
                 box.setAttribute('id', 'b_' + i + '_' + j);
-                box.setAttribute('multiuser', '');
+                box.setAttribute('multiuser', {anim: true;});
                 scene1.appendChild(box);
             }
         }
