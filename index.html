@@ -29,7 +29,7 @@
         <a-assets>
             <a-asset-item id="t1" src="tree1/scene.gltf"></a-asset-item>
         </a-assets>
-        <a-plane height="100" width="100" rotation="-90 0 0" color="forestgreen"></a-plane>
+        <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
     </a-scene>
     <template id="avatarTemplate">
         <a-entity>
@@ -39,12 +39,15 @@
     </template>
     <script>
         var scene1 = document.getElementById('s1');
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < 1000; i++) {
             var tree = document.createElement('a-entity');
-            var x = Math.random() * 100 - 50, z = Math.random() * 100 - 50;
+            var x = Math.random() * 1000 - 500;
+            var z = Math.random() * 1000 - 500;
+            var r = Math.random() * 180 - 90;
             tree.setAttribute('gltf-model', '#t1');
             tree.setAttribute('position', x + ' 0 ' + z);
             tree.setAttribute('scale', '0.01 0.01 0.01');
+            tree.setAttribute('rotation', '0 ' + r + ' 0');
             scene1.appendChild(tree);
         }
     </script>
