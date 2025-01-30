@@ -5,8 +5,7 @@
     <script src="https://unpkg.com/@croquet/croquet"></script>
     <script
         src="https://cdn.jsdelivr.net/gh/NikolaySuslov/aframe-croquet-component/public/lib/aframe-croquet-component.js">
-        </script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js">
+    </script>
     </script>
     <script>
         AFRAME.registerComponent('dispel', {
@@ -27,8 +26,8 @@
 </head>
 
 <body>
-    <a-scene id="s1" background="color: cadetblue" physics cursor="rayOrigin: mouse" croquet>
-        <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
+    <a-scene id="s1" background="color: cadetblue" croquet>
+        <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
     </a-scene>
     <template id="avatarTemplate">
         <a-entity>
@@ -38,19 +37,10 @@
     </template>
     <script>
         var scene1 = document.getElementById('s1');
-        for (var i = 0; i < 9; i++) {
-            var e = i % 2, o = !e;
-            for (var j = 0; j < 5; j++) {
+        for (var i = 0; i < 100; i++) {
                 var box = document.createElement('a-box');
-                box.setAttribute('dynamic-body', '');
-                box.setAttribute('dispel', '');
-                box.setAttribute('position', e * (j - 2) + ' ' + (i + 0.5) + ' ' + (-12 - (j - 2) * o));
-                box.setAttribute('color', 'firebrick');
-                box.setAttribute('scale', (4 * o + 1) + ' 1 ' + (4 * e + 1));
-                box.setAttribute('id', 'b_' + i + '_' + j);
                 box.setAttribute('multiuser', {anim: true;});
                 scene1.appendChild(box);
-            }
         }
     </script>
 </body>
