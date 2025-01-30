@@ -30,9 +30,9 @@
             <a-asset-item id="t1" src="tree1/scene.gltf"></a-asset-item>
         </a-assets>
         <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
-        <a-light type="ambient" intensity="0.01"></a-light>
+        <a-light id="l1" type="ambient" intensity="0.01"></a-light>
         <a-camera position="0 1.5 0">
-            <a-light type="spot" distance="100" angle="15" decay="2" multiuser></a-light>            
+            <a-light id="l2" type="spot" distance="100" angle="15" decay="2" multiuser></a-light>            
         </a-camera>
     </a-scene>
     <template id="avatarTemplate">
