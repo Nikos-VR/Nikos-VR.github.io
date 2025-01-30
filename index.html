@@ -33,12 +33,12 @@
             <a-asset-item id="t1" src="tree1/scene.gltf"></a-asset-item>
             <a-asset-item id="a1" src="bunny/scene.gltf"></a-asset-item>
         </a-assets>
+        <a-sky src="eso0932a.jpg"></a-sky>
         <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
         <a-light id="l1" type="ambient" intensity="0.01"></a-light>
         <a-camera id="c1" position="0 1.5 0">
             <a-light id="l2" type="spot" distance="100" angle="15" decay="2"></a-light>            
         </a-camera>
-        <a-sky src="eso0932a.jpg"></a-sky>
     </a-scene>
     <template id="avatarTemplate">
         <a-entity gltf-model="#a1" scale="0.1 0.1 0.1"></a-entity>
