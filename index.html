@@ -28,9 +28,10 @@
 <body>
     <a-scene id="s1" background="color: cadetblue">
         <a-assets>
-            <a-asset-item id="cityModel" src="https://cdn.aframe.io/test-models/models/glTF-2.0/virtualcity/VC.gltf"></a-asset-item>
+            <a-asset-item id="t1" src="assets/tree1.gltf"></a-asset-item>
+            <a-asset-item id="t2" src="assets/tree2.gltf"></a-asset-item>
+            <a-asset-item id="t3" src="assets/tree3.gltf"></a-asset-item>
         </a-assets>
-        <a-entity gltf-model="#cityModel"></a-entity>
         <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
     </a-scene>
     <template id="avatarTemplate">
@@ -41,10 +42,10 @@
     </template>
     <script>
         var scene1 = document.getElementById('s1');
-        for (var i = 0; i < 100; i++) {
-                var box = document.createElement('a-box');
-                box.setAttribute('multiuser', {anim: true;});
-                scene1.appendChild(box);
+        for (var i = 0; i < 10; i++) {
+                var tree = document.createElement('a-entity');
+                box.setAttribute('gltf-model', '#t1');
+                scene1.appendChild(tree);
         }
     </script>
 </body>
