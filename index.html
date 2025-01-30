@@ -27,6 +27,10 @@
 
 <body>
     <a-scene id="s1" background="color: cadetblue" croquet>
+        <a-assets>
+            <a-asset-item id="cityModel" src="https://cdn.aframe.io/test-models/models/glTF-2.0/virtualcity/VC.gltf"></a-asset-item>
+        </a-assets>
+        <a-entity gltf-model="#cityModel"></a-entity>
         <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
     </a-scene>
     <template id="avatarTemplate">
