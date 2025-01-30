@@ -1,0 +1,8 @@
+Model Information:
+* title:	Round Bunny
+* source:	https://sketchfab.com/3d-models/round-bunny-b395223d8cee468eaa0eff4a1e185e90
+* author:	99 NAMES (https://sketchfab.com/99-names)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
