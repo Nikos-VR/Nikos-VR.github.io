@@ -29,6 +29,7 @@
     <a-scene id="s1" background="color:#111" croquet embedded>
         <a-assets>
             <a-asset-item id="t1" src="tree1/scene.gltf"></a-asset-item>
+            <a-asset-item id="a1" src="avatar1/scene.gltf"></a-asset-item>
         </a-assets>
         <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
         <a-light id="l1" type="ambient" intensity="0.01"></a-light>
@@ -37,10 +38,7 @@
         </a-camera>
     </a-scene>
     <template id="avatarTemplate">
-        <a-entity>
-            <a-sphere position="0 -1 -1" scale="0.5 0.5 0.5" color="silver"></a-sphere>
-            <a-sphere position="0 -0.25 -1" scale="0.25 0.25 0.25" color="black"></a-sphere>
-        </a-entity>
+        <a-entity gltf-model="#a1"></a-entity>
     </template>
     <script>
         var scene1 = document.getElementById('s1');
