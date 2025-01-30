@@ -33,14 +33,10 @@
         <a-light id="l1" type="ambient" intensity="0.01"></a-light>
         <a-camera id="c1" position="0 1.5 0">
             <a-light id="l2" type="spot" distance="100" angle="15" decay="2"></a-light>            
-        </a-camera>
-    </a-scene>
-    <template id="avatarTemplate">
-        <a-entity>
             <a-sphere position="0 -1 0" scale="0.5 0.5 0.5" color="silver"></a-sphere>
             <a-sphere position="0 -0.25 0" scale="0.25 0.25 0.25" color="black"></a-sphere>
-        </a-entity>
-    </template>
+        </a-camera>
+    </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
         for (var i = 0; i < 1000; i++) {
