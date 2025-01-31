@@ -59,8 +59,10 @@
                 var ghost = document.createElement('a-entity');
                 x = Math.random() * 1000 - 500;
                 z = Math.random() * 1000 - 500;
+                r = Math.random() * 180 - 90;
                 ghost.setAttribute('gltf-model', '#g1');
                 ghost.setAttribute('position', x + ' 1 ' + z);
+                ghost.setAttribute('rotation', '0 ' + r + ' 0');
                 scene1.appendChild(ghost);
             }
         }
