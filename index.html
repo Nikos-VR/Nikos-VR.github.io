@@ -56,15 +56,23 @@
                 scene1.appendChild(ghost);
             }
         }
+        var cow = document.createElement('a-entity');
+        cow.setAttribute('gltf-model', '#c1');
+        cow.setAttribute('position', '0 0 -3');
+        cow.setAttribute('scale', '1 1 1');
+        cow.setAttribute('sound', 'src: url(Cow_Moo-Mike_Koenig-42670858.mp3); autoplay: true; loop: true');
+        scene1.appendChild(cow);
         var bird1 = document.createElement('a-entity');
         bird1.setAttribute('gltf-model', '#b1');
-        bird1.setAttribute('animation', 'property: position; from: -10 25 -500; to: -10 25 500; dur: 25000; loop: true');
+        bird1.setAttribute('scale', '3 3 3');
+        bird1.setAttribute('animation', 'property: position; from: -10 50 -500; to: -10 50 500; dur: 25000; loop: true');
         bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true');
         scene1.appendChild(bird1);
         var bird2 = document.createElement('a-entity');
         bird2.setAttribute('gltf-model', '#b1');
+        bird2.setAttribute('scale', '3 3 3');
         bird2.setAttribute('rotation', '0 180 0');
-        bird2.setAttribute('animation', 'property: position; from: 10 25 500; to: 10 25 -500; dur: 33000; loop: true');
+        bird2.setAttribute('animation', 'property: position; from: 10 50 500; to: 10 50 -500; dur: 33000; loop: true');
         bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true');
         scene1.appendChild(bird2);
     </script>
