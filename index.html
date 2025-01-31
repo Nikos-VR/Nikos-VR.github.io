@@ -32,7 +32,7 @@
             <a-asset-item id="g1" src="ghost.gltf"></a-asset-item>
         </a-assets>
         <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
-        <a-entity gltf-model="#b1" scale="0.1 0.1 0.1" position="0 5 -500" animation="property: position; to: 0 5 500; dur: 100000; easing: linear; loop: true"></a-entity>
+        <a-entity gltf-model="#b1" scale="0.1 0.1 0.1" position="0 5 -500" animation="property: position; from: 0 5 -500; to: 0 5 500; dur: 100000; loop: true"></a-entity>
         <a-light id="l1" type="ambient" intensity="1"></a-light>
         <a-camera id="c1" position="0 1.5 0">
             <a-light id="l2" type="spot" distance="100" angle="15" decay="2"></a-light>            
