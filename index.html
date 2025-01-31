@@ -9,7 +9,7 @@
     <script>
         AFRAME.registerComponent('flying', {
             tick: function () {
-                if (Math.random() < 0.9) return;
+                if (Math.random() < 0.95) return;
                 var el = this.el;
                 var x = Math.random() * 1000 - 500;
                 var z = Math.random() * 1000 - 500;
@@ -54,13 +54,13 @@
                 var ghost = document.createElement('a-entity');
                 ghost.setAttribute('gltf-model', '#g1');
                 ghost.setAttribute('flying', '');
+                ghost.setAttribute('scale', '3 3 3');
                 scene1.appendChild(ghost);
             }
         }
         var cow = document.createElement('a-entity');
         cow.setAttribute('gltf-model', '#c1');
         cow.setAttribute('position', '0 0 -3');
-        cow.setAttribute('scale', '1 1 1');
         cow.setAttribute('sound', 'src: url(Cow_Moo-Mike_Koenig-42670858.mp3); autoplay: true; loop: true');
         scene1.appendChild(cow);
         var bird1 = document.createElement('a-entity');
