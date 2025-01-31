@@ -7,7 +7,7 @@
         src="https://cdn.jsdelivr.net/gh/NikolaySuslov/aframe-croquet-component/public/lib/aframe-croquet-component.js">
     </script>
     <script>
-        AFRAME.registerComponent('ghost', {
+        AFRAME.registerComponent('flying', {
             tick: function () {
                 var el = this.el;
                 var x = Math.random() * 1000 - 500;
@@ -50,13 +50,8 @@
             scene1.appendChild(tree);
             if (i % 10 == 0) {
                 var ghost = document.createElement('a-entity');
-                x = Math.random() * 1000 - 500;
-                z = Math.random() * 1000 - 500;
-                r = Math.random() * 180 - 90;
                 ghost.setAttribute('gltf-model', '#g1');
-                ghost.setAttribute('ghost', '');
-                ghost.setAttribute('position', x + ' 1 ' + z);
-                ghost.setAttribute('rotation', '0 ' + r + ' 0');
+                ghost.setAttribute('flying', '');
                 scene1.appendChild(ghost);
             }
         }
