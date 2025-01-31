@@ -64,9 +64,11 @@
             scene1.appendChild(tree);
             if (i % 100 == 0) {
                 var ghost = document.createElement('a-entity');
+                r = Math.random() * 180 - 90;
                 ghost.setAttribute('gltf-model', '#g1');
                 ghost.setAttribute('flying', '');
                 ghost.setAttribute('scale', '3 3 3');
+                ghost.setAttribute('rotation', '0 ' + r + ' 0');
                 scene1.appendChild(ghost);
             }
         }
