@@ -13,11 +13,7 @@
                 var x = Math.random() * 1000 - 500;
                 var z = Math.random() * 1000 - 500;
                 var d = Math.random() * 10000 + 5000;
-                el.setAttribute('animation', {
-                  property: 'position',
-                  to: x + ' 0 ' + z,
-                  dur: d + ''
-                });
+                el.setAttribute('animation', 'property: position; to: ' + x + ' 0 ' + z + ';dur: ' + d);
             }
         });
     </script>
