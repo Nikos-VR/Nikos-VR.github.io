@@ -31,8 +31,8 @@
             <a-asset-item id="b1" src="bird.gltf"></a-asset-item>
             <a-asset-item id="g1" src="ghost.gltf"></a-asset-item>
         </a-assets>
-        <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
-        <a-entity gltf-model="#b1" scale="0.25 0.25 0.25" position="0 5 -500" animation="property: position; from: 0 5 -500; to: 0 5 500; dur: 100000; loop: true"></a-entity>
+        <a-plane height="100" width="100" rotation="-90 0 0" color="forestgreen"></a-plane>
+        <a-entity gltf-model="#b1" scale="0.5 0.5 0.5" position="0 5 -500" animation="property: position; from: 0 5 -500; to: 0 5 500; dur: 100000; loop: true"></a-entity>
         <a-light id="l1" type="ambient" intensity="1"></a-light>
         <a-camera id="c1" position="0 1.5 0">
             <a-light id="l2" type="spot" distance="100" angle="15" decay="2"></a-light>            
@@ -43,10 +43,10 @@
     </template>
     <script>
         var scene1 = document.getElementById('s1');
-        for (var i = 0; i < 1000; i++) {
+        for (var i = 0; i < 100; i++) {
             var tree = document.createElement('a-entity');
-            var x = Math.random() * 1000 - 500;
-            var z = Math.random() * 1000 - 500;
+            var x = Math.random() * 100 - 50;
+            var z = Math.random() * 100 - 50;
             var s = Math.random() / 100 + 0.01;
             var r = Math.random() * 180 - 90;
             tree.setAttribute('gltf-model', '#t1');
