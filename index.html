@@ -13,7 +13,7 @@
                 var x = Math.random() * 1000 - 500;
                 var z = Math.random() * 1000 - 500;
                 var d = Math.random() * 10000 + 5000;
-                el.setAttribute('animation', 'property: position; to: ' + x + ' 0 ' + z + ';dur: ' + d);
+                el.setAttribute('animation', 'property: position; to: ' + x + ' 2 ' + z + '; dur: ' + d);
             }
         });
     </script>
@@ -57,7 +57,7 @@
         }
         var bird1 = document.createElement('a-entity');
         bird1.setAttribute('gltf-model', '#b1');
-        bird1.setAttribute('animation', 'property: position; from: -10 20 -500; to: -10 20 500; dur: 25000; loop: true');
+        bird1.setAttribute('animation', 'property: position; from: -10 25 -500; to: -10 25 500; dur: 25000; loop: true');
         bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true');
         scene1.appendChild(bird1);
         var bird2 = document.createElement('a-entity');
