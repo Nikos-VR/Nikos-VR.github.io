@@ -55,6 +55,14 @@
             tree.setAttribute('scale', s + ' ' + s + ' ' + s);
             tree.setAttribute('rotation', '0 ' + r + ' 0');
             scene1.appendChild(tree);
+            if (i % 10 == 0) {
+                var ghost = document.createElement('a-entity');
+                x = Math.random() * 1000 - 500;
+                z = Math.random() * 1000 - 500;
+                ghost.setAttribute('gltf-model', '#g1');
+                ghost.setAttribute('position', x + ' 1 ' + z);
+                scene1.appendChild(ghost);
+            }
         }
     </script>
 </body>
