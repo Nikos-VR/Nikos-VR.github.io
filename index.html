@@ -9,6 +9,7 @@
     <script>
         AFRAME.registerComponent('flying', {
             tick: function () {
+                if (Math.random() < 0.5) return;
                 var el = this.el;
                 var x = Math.random() * 1000 - 500;
                 var z = Math.random() * 1000 - 500;
@@ -48,7 +49,7 @@
             tree.setAttribute('scale', s + ' ' + s + ' ' + s);
             tree.setAttribute('rotation', '0 ' + r + ' 0');
             scene1.appendChild(tree);
-            if (i % 10 == 0) {
+            if (i % 100 == 0) {
                 var ghost = document.createElement('a-entity');
                 ghost.setAttribute('gltf-model', '#g1');
                 ghost.setAttribute('flying', '');
