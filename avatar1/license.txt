@@ -1,8 +1,0 @@
-Model Information:
-* title:	Junimo (Stardew Valley)
-* source:	https://sketchfab.com/3d-models/junimo-stardew-valley-7847f76c859342148fca69324733f44c
-* author:	mayyye (https://sketchfab.com/mayyye1152)
-
-Model License:
-* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
-* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
