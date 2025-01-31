@@ -66,8 +66,10 @@
             }
         }
         var cow = document.createElement('a-entity');
+        x = Math.random() * 1000 - 500;
+        z = Math.random() * 1000 - 500;
         cow.setAttribute('gltf-model', '#c1');
-        cow.setAttribute('position', '0 0 -3');
+        cow.setAttribute('position', x + ' 0 ' + z);
         cow.setAttribute('sound', 'src: url(Cow_Moo-Mike_Koenig-42670858.mp3); autoplay: true; loop: true');
         scene1.appendChild(cow);
         var bird1 = document.createElement('a-entity');
