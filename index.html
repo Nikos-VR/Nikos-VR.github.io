@@ -17,11 +17,17 @@
                 el.setAttribute('animation', 'property: position; to: ' + x + ' 2 ' + z + '; easing: easeInOutQuad; dur: ' + d);
             }
         });
+        AFRAME.registerComponent('button', {
+            init: function () {
+                var el = this.el;
+                el.addEventListener('click', { el.remove(); });
+            }
+        });
     </script>
 </head>
 
 <body>
-    <a-scene id="s1" background="color:cadetblue">
+    <a-scene id="s1" background="color:cadetblue" cursor="rayOrigin: mouse">
         <a-assets>
             <a-asset-item id="t1" src="tree.gltf"></a-asset-item>
             <a-asset-item id="b1" src="bird.gltf"></a-asset-item>
@@ -29,6 +35,7 @@
             <a-asset-item id="c1" src="cow.gltf"></a-asset-item>
         </a-assets>
         <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
+        <a-entity geometry="primitive: plane; height: 0; width: 0" material="color: blue" text="width: 4; value: This text will be 4 units wide." button></a-entity>
         <a-light id="l1" type="ambient" intensity="1"></a-light>
         <a-camera id="c1" position="0 1.5 0">
             <a-light id="l2" type="spot" distance="100" angle="15" decay="2"></a-light>            
