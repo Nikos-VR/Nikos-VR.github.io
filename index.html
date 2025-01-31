@@ -20,7 +20,12 @@
         AFRAME.registerComponent('key', {
             init: function () {
                 var el = this.el;
-                el.addEventListener('click', function () { el.remove(); });
+                el.addEventListener('click', function () {
+                    var sound = new Audio();
+                    sound.src = "Cow_Moo-Mike_Koenig-42670858.mp3";
+                    sound.play();
+                    el.remove();
+                });
             }
         });
     </script>
