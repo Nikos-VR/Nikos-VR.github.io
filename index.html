@@ -7,14 +7,16 @@
         src="https://cdn.jsdelivr.net/gh/NikolaySuslov/aframe-croquet-component/public/lib/aframe-croquet-component.js">
     </script>
     <script>
-        AFRAME.registerComponent('dispel', {
-            init: function () {
+        AFRAME.registerComponent('ghost', {
+            tick: function () {
                 var el = this.el;
-                el.addEventListener('mouseenter', function () {
-                    el.setAttribute('color', 'red');
-                });
-                el.addEventListener('mouseleave', function () {
-                    el.setAttribute('color', 'firebrick');
+                var x = Math.random() * 1000 - 500;
+                var z = Math.random() * 1000 - 500;
+                var d = Math.random() * 10000 + 5000;
+                el.setAttribute('animation', {
+                  property: 'position',
+                  to: x 0 z,
+                  dur: d
                 });
                 el.addEventListener('click', function () {
                     el.remove();
@@ -61,6 +63,7 @@
                 z = Math.random() * 1000 - 500;
                 r = Math.random() * 180 - 90;
                 ghost.setAttribute('gltf-model', '#g1');
+                ghost.setAttribute('ghost', '');
                 ghost.setAttribute('position', x + ' 1 ' + z);
                 ghost.setAttribute('rotation', '0 ' + r + ' 0');
                 scene1.appendChild(ghost);
