@@ -57,8 +57,7 @@
         <a-assets>
             <a-asset-item id="t1" src="tree.gltf"></a-asset-item>
             <a-asset-item id="b1" src="bird.gltf"></a-asset-item>
-            <a-asset-item id="g1" src="ghost.gltf"></a-asset-item>
-            <a-asset-item id="c1" src="cow.gltf"></a-asset-item>
+            <a-asset-item id="b2" src="bee.gltf"></a-asset-item>
         </a-assets>
         <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
         <a-entity text="value: ENTER" geometry="primitive: circle; radius: 0.25" position="0 1.5 -1" start></a-text>
@@ -79,16 +78,15 @@
             tree.setAttribute('scale', s + ' ' + s + ' ' + s);
             tree.setAttribute('rotation', '0 ' + r + ' 0');
             scene1.appendChild(tree);
-        }
-        for (var i = 0; i < 100; i++) {
-            var ghost = document.createElement('a-entity');
+
+            var bee = document.createElement('a-entity');
             r = Math.random() * 180 - 90;
-            ghost.setAttribute('gltf-model', '#g1');
+            ghost.setAttribute('gltf-model', '#b2');
             ghost.setAttribute('flying', '');
             ghost.setAttribute('position', x + ' 2 ' + z);
-            ghost.setAttribute('scale', '3 3 3');
+            ghost.setAttribute('scale', '0.1 0.1 0.1');
             ghost.setAttribute('rotation', '0 ' + r + ' 0');
-            ghost.setAttribute('opacity', '0.25');
+            ghost.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; autoplay: true; loop: true');
             scene1.appendChild(ghost);
         }
     </script>
