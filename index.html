@@ -22,35 +22,14 @@
                 var el = this.el;
                 el.addEventListener('click', function () {
                     el.remove();
-
-                    var scene1 = document.getElementById('s1');
                     for (var i = 0; i < 10; i++) {
-                        var bee = document.createElement('a-entity');
-                        var x = Math.random() * 100 - 50;
-                        var y = Math.random() * 5;
-                        var z = Math.random() * 100 - 50;
-                        var r = Math.random() * 180 - 90;
-                        bee.setAttribute('gltf-model', '#bee');
-                        bee.setAttribute('flying', '');
-                        bee.setAttribute('position', x + ' ' + y + ' ' + z);
-                        bee.setAttribute('rotation', '0 ' + r + ' 0');
+                        var bee = document.getElementById('b' + i);
                         bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.25; autoplay: true; loop: true');
-                        scene1.appendChild(bee);
                     }
-                    var bird1 = document.createElement('a-entity');
-                    bird1.setAttribute('gltf-model', '#bird');
-                    bird1.setAttribute('scale', '3 3 3');
-                    bird1.setAttribute('animation', 'property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true');
+                    var bird1 = document.getElementById('bird1');
                     bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true');
-                    scene1.appendChild(bird1);
-        
-                    var bird2 = document.createElement('a-entity');
-                    bird2.setAttribute('gltf-model', '#bird');
-                    bird2.setAttribute('scale', '3 3 3');
-                    bird2.setAttribute('rotation', '0 180 0');
-                    bird2.setAttribute('animation', 'property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true');
+                    var bird2 = document.getElementById('bird2');
                     bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true');
-                    scene1.appendChild(bird2);
                 });
             }
         });
@@ -85,6 +64,31 @@
             tree.setAttribute('rotation', '0 ' + r + ' 0');
             scene1.appendChild(tree);
         }
+        for (var i = 0; i < 10; i++) {
+            var bee = document.createElement('a-entity');
+            var x = Math.random() * 100 - 50;
+            var y = Math.random() * 5;
+            var z = Math.random() * 100 - 50;
+            var r = Math.random() * 180 - 90;
+            bee.setAttribute('id', 'b' + i);
+            bee.setAttribute('gltf-model', '#bee');
+            bee.setAttribute('flying', '');
+            bee.setAttribute('position', x + ' ' + y + ' ' + z);
+            bee.setAttribute('rotation', '0 ' + r + ' 0');
+            scene1.appendChild(bee);
+         }
+         var bird1 = document.createElement('a-entity');
+         bird1.setAttribute('gltf-model', '#bird');
+         bird1.setAttribute('scale', '3 3 3');
+         bird1.setAttribute('animation', 'property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true');
+         scene1.appendChild(bird1);
+        
+         var bird2 = document.createElement('a-entity');
+         bird2.setAttribute('gltf-model', '#bird');
+         bird2.setAttribute('scale', '3 3 3');
+         bird2.setAttribute('rotation', '0 180 0');
+         bird2.setAttribute('animation', 'property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true');
+         scene1.appendChild(bird2);
     </script>
 </body>
 
