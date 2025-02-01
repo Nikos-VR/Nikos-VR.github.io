@@ -24,12 +24,12 @@
                     el.remove();
                     for (var i = 0; i < 10; i++) {
                         var bee = document.getElementById('bee' + i);
-                        bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; autoplay: true; loop: true; poolSize: 10');
+                        bee.setAttribute('sound', 'src: #noise; volume: 0.1; autoplay: true; loop: true; poolSize: 10');
                     }
                     var bird1 = document.getElementById('b1');
-                    bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true; poolSize: 2');
+                    bird1.setAttribute('sound', 'src: #hawk; autoplay: true; loop: true; poolSize: 2');
                     var bird2 = document.getElementById('b2');
-                    bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true; poolSize: 2');
+                    bird2.setAttribute('sound', 'src: #hawk; autoplay: true; loop: true; poolSize: 2');
                 });
             }
         });
@@ -43,9 +43,11 @@
             <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
             <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
             <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
+            <audio id="hawk" src="Hawk Call 2x-SoundBible.com-1697796838.mp3" preload="auto"></audio>
+            <audio id="noise" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
         </a-assets>
         <a-plane id="p1" height="1000" width="1000" rotation="-90 0 0" color="forestgreen" multiuser></a-plane>
-        <a-text value="Into the Wild!\n(click to ENTER)" geometry="primitive: plane; width: 0; height: 1" position="0 1.5 1" start></a-text>
+        <a-text value="Into the Wild!\n(click to ENTER)" geometry="primitive: plane; width: 0; height: 1" position="0 1.5 -1" start></a-text>
         <a-entity id="b1" gltf-model="#bird" scale="3 3 3" animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true"></a-entity>
         <a-entity id="b2" gltf-model="#bird" scale="3 3 3" rotation="0 180 0" animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true"></a-entity>
     </a-scene>
