@@ -25,14 +25,6 @@
                 var el = this.el;
                 el.addEventListener('click', function () {
                     el.remove();
-                    for (var i = 0; i < 10; i++) {
-                        var bee = document.getElementById('bee' + i);
-                        bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1');
-                    }
-                    var bird1 = document.getElementById('b1');
-                    bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3)');
-                    var bird2 = document.getElementById('b2');
-                    bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3)');
                 });
             }
         });
@@ -48,8 +40,8 @@
         </a-assets>
         <a-plane width="1000" height="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
         <a-text value="Into the Wild!\n\n(click to ENTER)" align="center" geometry="primitive: plane; width: 0; height: 1" position="0 1.5 -2" start></a-text>
-        <a-entity id="b1" gltf-model="#bird" scale="3 3 3" animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true" crowing></a-entity>
-        <a-entity id="b2" gltf-model="#bird" scale="3 3 3" rotation="0 180 0" animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" crowing></a-entity>
+        <a-entity id="b1" gltf-model="#bird" scale="3 3 3" animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true" sound="src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3)" crowing></a-entity>
+        <a-entity id="b2" gltf-model="#bird" scale="3 3 3" rotation="0 180 0" animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" sound="src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3)" crowing></a-entity>
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
@@ -77,6 +69,7 @@
             bee.setAttribute('crowing', '');
             bee.setAttribute('position', x + ' ' + y + ' ' + z);
             bee.setAttribute('rotation', '0 ' + r + ' 0');
+            bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1');
             scene1.appendChild(bee);
          }
     </script>
