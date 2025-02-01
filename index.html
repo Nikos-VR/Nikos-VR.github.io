@@ -29,7 +29,7 @@
                         var x = Math.random() * 1000 - 500;
                         var z = Math.random() * 1000 - 500;
                         var r = Math.random() * 180 - 90;
-                        bee.setAttribute('gltf-model', '#b2');
+                        bee.setAttribute('gltf-model', '#bee');
                         bee.setAttribute('flying', '');
                         bee.setAttribute('position', x + ' 2 ' + z);
                         bee.setAttribute('scale', '1 1 1');
@@ -38,14 +38,14 @@
                         scene1.appendChild(bee);
                     }
                     var bird1 = document.createElement('a-entity');
-                    bird1.setAttribute('gltf-model', '#b1');
+                    bird1.setAttribute('gltf-model', '#bird');
                     bird1.setAttribute('scale', '3 3 3');
                     bird1.setAttribute('animation', 'property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true');
                     bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true');
                     scene1.appendChild(bird1);
         
                     var bird2 = document.createElement('a-entity');
-                    bird2.setAttribute('gltf-model', '#b1');
+                    bird2.setAttribute('gltf-model', '#bird');
                     bird2.setAttribute('scale', '3 3 3');
                     bird2.setAttribute('rotation', '0 180 0');
                     bird2.setAttribute('animation', 'property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true');
@@ -60,16 +60,16 @@
 <body>
     <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse">
         <a-assets>
-            <a-asset-item id="t1" src="tree.gltf"></a-asset-item>
-            <a-asset-item id="b1" src="bird.gltf"></a-asset-item>
-            <a-asset-item id="b2" src="bee.gltf"></a-asset-item>
-            <a-asset-item id="e1" src="emoji.gltf"></a-asset-item>
+            <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
+            <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
+            <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
+            <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
         </a-assets>
         <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
         <a-entity text="width: 5; value: ENTER" geometry="primitive: circle; width: 0; height: 0" position="0 1.5 -1" start></a-text>
     </a-scene>
     <template id="avatarTemplate">
-        <a-entity gltf-model="#e1" scale="0.1 0.1 0.1"></a-entity>
+        <a-entity gltf-model="#emoji" scale="0.1 0.1 0.1"></a-entity>
     </template>
     <script>
         var scene1 = document.getElementById('s1');
@@ -79,7 +79,7 @@
             var z = Math.random() * 1000 - 500;
             var s = Math.random() / 100 + 0.01;
             var r = Math.random() * 180 - 90;
-            tree.setAttribute('gltf-model', '#t1');
+            tree.setAttribute('gltf-model', '#tree');
             tree.setAttribute('position', x + ' 0 ' + z);
             tree.setAttribute('scale', s + ' ' + s + ' ' + s);
             tree.setAttribute('rotation', '0 ' + r + ' 0');
