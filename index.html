@@ -15,7 +15,7 @@
         });
         AFRAME.registerComponent('crowing', {
             tick: function () {
-                if (Math.random() < 0.5) return;
+                if (Math.random() < 0.95) return;
                 var sound = this.el.components.sound;
                 if (sound) sound.playSound();
             }
