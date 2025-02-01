@@ -17,7 +17,7 @@
             tick: function () {
                 if (Math.random() < 0.99) return;
                 var sound = this.el.components.sound;
-                sound.playSound();
+                if (sound) sound.playSound();
             }
         });
         AFRAME.registerComponent('start', {
