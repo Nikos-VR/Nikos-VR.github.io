@@ -70,15 +70,17 @@
             tree.setAttribute('rotation', '0 ' + r + ' 0');
             scene1.appendChild(tree);
 
-            var bee = document.createElement('a-entity');
-            r = Math.random() * 180 - 90;
-            bee.setAttribute('gltf-model', '#b2');
-            bee.setAttribute('flying', '');
-            bee.setAttribute('position', x + ' 2 ' + z);
-            bee.setAttribute('scale', '0.1 0.1 0.1');
-            bee.setAttribute('rotation', '0 ' + r + ' 0');
-            bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; autoplay: true; loop: true');
-            scene1.appendChild(bee);
+            if (i % 100 == 0) {
+                var bee = document.createElement('a-entity');
+                r = Math.random() * 180 - 90;
+                bee.setAttribute('gltf-model', '#b2');
+                bee.setAttribute('flying', '');
+                bee.setAttribute('position', x + ' 2 ' + z);
+                bee.setAttribute('scale', '0.1 0.1 0.1');
+                bee.setAttribute('rotation', '0 ' + r + ' 0');
+                bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; autoplay: true; loop: true');
+                scene1.appendChild(bee);
+            }
         }
     </script>
 </body>
