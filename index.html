@@ -5,13 +5,15 @@
     <script>
         AFRAME.registerComponent('flying', {
             tick: function () {
-                if (Math.random() < 0.95) return;
+                if (Math.random() < 0.5) return;
                 var el = this.el;
                 var x = Math.random() * 100 - 50;
                 var y = Math.random() * 5 + 1;
                 var z = Math.random() * 100 - 50;
-                var d = Math.random() * 1000 + 500;
+                var d = Math.random() * 100 + 50;
                 el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z + '; dur: ' + d);
+                var sound = this.el.components.sound;
+                if (sound) sound.playSound();
             }
         });
         AFRAME.registerComponent('crowing', {
@@ -75,7 +77,6 @@
             bee.setAttribute('id', 'bee' + i);
             bee.setAttribute('gltf-model', '#bee');
             bee.setAttribute('flying', '');
-            bee.setAttribute('crowing', '');
             bee.setAttribute('position', x + ' ' + y + ' ' + z);
             bee.setAttribute('rotation', '0 ' + r + ' 0');
             scene1.appendChild(bee);
