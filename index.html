@@ -20,13 +20,13 @@
                     el.remove();
                     for (var i = 0; i < 10; i++) {
                         var bee = document.getElementById('bee' + i);
-                        bee.setAttribute('sound', 'src: #noise; volume: 0.1; autoplay: true; loop: true');
+                        bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; autoplay: true; loop: true');
                     }
                     var bird1 = document.getElementById('b1');
-                    bird1.setAttribute('sound', 'src: #hawk; autoplay: true; loop: true');
+                    bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true');
                     var bird2 = document.getElementById('b2');
                     setTimeout(function () {
-                    bird2.setAttribute('sound', 'src: #hawk; autoplay: true; loop: true'); }, 500);
+                    bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true'); }, 500);
                 });
             }
         });
@@ -40,8 +40,6 @@
             <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
             <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
             <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
-            <audio id="hawk" src="Hawk Call 2x-SoundBible.com-1697796838.mp3" preload="auto"></audio>
-            <audio id="noise" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
         </a-assets>
         <a-plane width="1000" height="1000" rotation="-90 0 0" color="forestgreen"></a-box>
         <a-text value="Into the Wild!\n\n(click to ENTER)" align="center" geometry="primitive: plane; width: 0; height: 1" position="0 1.5 -2" start multiuser></a-text>
