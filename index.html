@@ -46,14 +46,14 @@
 </head>
 
 <body>
-    <a-scene id="s1" background="color: darkslategrey" cursor="rayOrigin: mouse">
+    <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse">
         <a-assets>
             <a-asset-item id="t1" src="tree.gltf"></a-asset-item>
             <a-asset-item id="b1" src="bird.gltf"></a-asset-item>
             <a-asset-item id="b2" src="bee.gltf"></a-asset-item>
         </a-assets>
         <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
-        <a-entity text="value: ENTER" geometry="primitive: circle; radius: 0.25" position="0 1.5 -1" start></a-text>
+        <a-entity text="width: 5; value: ENTER" geometry="primitive: circle; radius: 0" position="0 1.5 -1" start></a-text>
     </a-scene>
     <template id="avatarTemplate">
         <a-entity gltf-model="#c1" scale="0.1 0.1 0.1"></a-entity>
