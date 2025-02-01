@@ -24,12 +24,12 @@
                     el.remove();
                     for (var i = 0; i < 10; i++) {
                         var bee = document.getElementById('bee' + i);
-                        bee.setAttribute('sound', 'src: #noise; volume: 0.1; autoplay: true; loop: true');
+                        bee.setAttribute('sound', 'src: #noise' + i + '; volume: 0.1; autoplay: true; loop: true');
                     }
                     var bird1 = document.getElementById('b1');
-                    bird1.setAttribute('sound', 'src: #hawk; autoplay: true; loop: true');
+                    bird1.setAttribute('sound', 'src: #hawk1; autoplay: true; loop: true');
                     var bird2 = document.getElementById('b2');
-                    bird2.setAttribute('sound', 'src: #hawk; autoplay: true; loop: true');
+                    bird2.setAttribute('sound', 'src: #hawk2; autoplay: true; loop: true');
                 });
             }
         });
@@ -43,8 +43,18 @@
             <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
             <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
             <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
-            <audio id="hawk" src="Hawk Call 2x-SoundBible.com-1697796838.mp3" preload="auto"></audio>
-            <audio id="noise" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
+            <audio id="hawk1" src="Hawk Call 2x-SoundBible.com-1697796838.mp3" preload="auto"></audio>
+            <audio id="hawk2" src="Hawk Call 2x-SoundBible.com-1697796838.mp3" preload="auto"></audio>
+            <audio id="noise0" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
+            <audio id="noise1" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
+            <audio id="noise2" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
+            <audio id="noise3" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
+            <audio id="noise4" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
+            <audio id="noise5" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
+            <audio id="noise6" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
+            <audio id="noise7" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
+            <audio id="noise8" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
+            <audio id="noise9" src="Bee-SoundBible.com-914644763.mp3" preload="auto"></audio>
         </a-assets>
         <a-plane id="p1" height="1000" width="1000" rotation="-90 0 0" color="forestgreen" multiuser></a-plane>
         <a-text value="Into the Wild!\n\n(click to ENTER)" align="center" geometry="primitive: plane; width: 0; height: 1" position="0 1.5 -1" start></a-text>
