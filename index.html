@@ -25,6 +25,10 @@
                 var el = this.el;
                 el.addEventListener('click', function () {
                     el.remove();
+                    for (var i = 0; i < 10; i++) {
+                        var bee = document.getElementById('bee' + i);
+                        bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1');
+                    }
                     var bird1 = document.getElementById('b1');
                     bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3)');
                     var bird2 = document.getElementById('b2');
@@ -64,12 +68,13 @@
         for (var i = 0; i < 10; i++) {
             var bee = document.createElement('a-entity');
             var x = Math.random() * 10 - 5;
-            var y = Math.random() * 5;
+            var y = Math.random() * 5 + 1;
             var z = Math.random() * 10 - 5;
             var r = Math.random() * 180 - 90;
             bee.setAttribute('id', 'bee' + i);
             bee.setAttribute('gltf-model', '#bee');
             bee.setAttribute('flying', '');
+            bee.setAttribute('crowing', '');
             bee.setAttribute('position', x + ' ' + y + ' ' + z);
             bee.setAttribute('rotation', '0 ' + r + ' 0');
             scene1.appendChild(bee);
