@@ -23,10 +23,10 @@
                         bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; autoplay: true; loop: true');
                     }
                     var bird1 = document.getElementById('b1');
-                    bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true');
+                    bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true; poolSize: 2');
                     var bird2 = document.getElementById('b2');
                     setTimeout(function () {
-                    bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true'); }, 500);
+                    bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); autoplay: true; loop: true; poolSize: 2'); }, 500);
                 });
             }
         });
