@@ -28,12 +28,12 @@
                     el.remove();
                     for (var i = 0; i < 10; i++) {
                         var bee = document.getElementById('bee' + i);
-                        bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1');
+                        bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; poolSize: 10');
                     }
                     var bird1 = document.getElementById('b1');
-                    bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3)');
+                    bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
                     var bird2 = document.getElementById('b2');
-                    bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3)');
+                    bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
                 });
             }
         });
