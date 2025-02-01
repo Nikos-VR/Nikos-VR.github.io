@@ -62,13 +62,9 @@
         </a-assets>
         <a-plane height="1000" width="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
         <a-text value="ENTER" geometry="primitive: circle" position="0 1.5 -3" start></a-text>
-        <a-light id="l1" type="ambient" intensity="0.025"></a-light>
-        <a-camera id="cam" position="0 1.5 0">
-            <a-light id="l2" type="spot" distance="100" angle="15" decay="2"></a-light>            
-        </a-camera>
     </a-scene>
     <template id="avatarTemplate">
-        <a-entity gltf-model="#t1" scale="0.1 0.1 0.1"></a-entity>
+        <a-entity gltf-model="#c1" scale="0.1 0.1 0.1"></a-entity>
     </template>
     <script>
         var scene1 = document.getElementById('s1');
