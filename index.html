@@ -13,6 +13,29 @@
                 el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z);
             }
         });
+        AFRAME.registerComponent('start', {
+            init: function () {
+                var el = this.el;
+                el.addEventListener('click', function () {
+                    el.remove();
+                    for (var i = 0; i < 10; i++) {
+                        var bee = document.getElementById('bee' + i);
+                        bee.setAttribute('sound', 'src: url(assets/Bee-SoundBible.com-914644763.mp3); volume: 0.1; poolSize: 10');
+                    }
+                    var bird1 = document.getElementById('b1');
+                    bird1.setAttribute('sound', 'src: url(assets/Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
+                    var bird2 = document.getElementById('b2');
+                    bird2.setAttribute('sound', 'src: url(assets/Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
+                });
+            }
+        });
+        AFRAME.registerComponent('sounding', {
+            tick: function () {
+                if (Math.random() < 0.99) return;
+                var sound = this.el.components.sound;
+                if (sound) sound.playSound();
+            }
+        });
     </script>
 </head>
 <body>
