@@ -51,14 +51,14 @@
             <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
         </a-assets>
         <a-plane id="plane1" width="1000" height="1000" rotation="-90 0 0" color="#00ff00" multiuser></a-plane>
-        <a-entity id="b1" gltf-model="#emoji" scale="5 5 5" animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true" crowing animation-mixer></a-entity>
-        <a-entity id="b2" gltf-model="#emoji" scale="5 5 5" rotation="0 180 0" animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" crowing animation-mixer></a-entity>
+        <a-entity id="b1" gltf-model="#bird" scale="5 5 5" animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true" crowing animation-mixer></a-entity>
+        <a-entity id="b2" gltf-model="#bird" scale="5 5 5" rotation="0 180 0" animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" crowing animation-mixer></a-entity>
         <a-camera position="0 1.5 0">
             <a-text value="Into the Wild!\n\n(click to ENTER)" align="center" geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start></a-text>
         </a-camera>
     </a-scene>
     <template id="avatarTemplate">
-        <a-entity gltf-model="#emoji" scale="0.1 0.1 0.1"></a-entity>
+        <a-entity gltf-model="#emoji" scale="0.5 0.5 0.5"></a-entity>
     </template>
     <script>
         var scene1 = document.getElementById('s1');
