@@ -50,7 +50,7 @@
             <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
             <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
         </a-assets>
-        <a-plane width="1000" height="1000" position="0 0 -3" rotation="-90 0 0" color="#0f0" multiuser></a-plane>
+        <a-plane width="1000" height="1000" position="0 0 -3" rotation="-90 0 0" color="#0f0"></a-plane>
         <a-entity id="b1" gltf-model="#bird" scale="5 5 5" animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true" crowing animation-mixer></a-entity>
         <a-entity id="b2" gltf-model="#bird" scale="5 5 5" rotation="0 180 0" animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" crowing animation-mixer></a-entity>
         <a-camera position="0 1.5 0">
@@ -58,9 +58,7 @@
         </a-camera>
     </a-scene>
     <template id="avatarTemplate">
-        <a-entity>
-            <a-entity gltf-model="#emoji" position="0 -.30 0" rotation="0 90 0"></a-entity>
-        </a-entity>
+        <a-entity gltf-model="#emoji" position="0 -3 0" rotation="0 90 0"></a-entity>
     </template>
     <script>
         var scene1 = document.getElementById('s1');
