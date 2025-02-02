@@ -58,7 +58,7 @@ AFRAME.registerComponent('start', {
       <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
       <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
     </a-assets>
-    <a-sky color="cadetblue" radius="5000" theta-length="90"></a-sky>
+    <a-sky id="sky" color="cadetblue" radius="5000" theta-length="90"></a-sky>
     <a-entity id="b1" gltf-model="#bird" scale="5 5 5"
         animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true"
         animation-mixer sounding></a-entity>
@@ -75,6 +75,7 @@ AFRAME.registerComponent('start', {
             var s = Math.random() / 100 + 0.01;
             var r = Math.random() * 180 - 90;
             tree.setAttribute('gltf-model', '#tree');
+            bee.setAttribute('id', 'tree' + i);
             tree.setAttribute('position', x + ' 0 ' + z);
             tree.setAttribute('scale', s + ' ' + s + ' ' + s);
             tree.setAttribute('rotation', '0 ' + r + ' 0');
