@@ -42,11 +42,13 @@ AFRAME.registerComponent('start', {
 </head>
 <body>
   <a-scene id="s1" background="color: forestgreen" cursor="rayOrigin: mouse" croquet>
-    <a-camera id="camera1" position="0 2 0">
+   <a-entity id="rig" movement-controls="setViaAttribute: true">
+   <a-camera id="camera1" position="0 2 0">
       <a-text value="Into the Wild!\n\n(click to ENTER)" align="center"
         geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start>
       </a-text>
     </a-camera>
+    </a-entity>
     <a-assets>
       <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
       <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
