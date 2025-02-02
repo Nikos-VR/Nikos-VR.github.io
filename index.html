@@ -45,11 +45,9 @@ AFRAME.registerComponent('start', {
     <a-entity gltf-model="#emoji" scale="0.5 0.5 0.5"></a-entity>
   </template>
   <a-scene id="s1" background="color: forestgreen" cursor="rayOrigin: mouse" croquet>
-    <a-camera position="0 2 0">
       <a-text value="Into the Wild!\n\n(click to ENTER)" align="center"
         geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start>
       </a-text>
-    </a-camera>
     <a-assets>
       <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
       <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
@@ -76,7 +74,6 @@ AFRAME.registerComponent('start', {
             tree.setAttribute('position', x + ' 0 ' + z);
             tree.setAttribute('scale', s + ' ' + s + ' ' + s);
             tree.setAttribute('rotation', '0 ' + r + ' 0');
-            tree.setAttribute('multiuser', '');
             scene1.appendChild(tree);
         }
         for (var i = 0; i < 10; i++) {
