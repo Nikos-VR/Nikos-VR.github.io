@@ -73,7 +73,7 @@ AFRAME.registerComponent('start', {
             var s = Math.random() / 100 + 0.01;
             var r = Math.random() * 180 - 90;
             tree.setAttribute('gltf-model', '#tree');
-            tree.setAttribute('position', x + ' 0 ' + z);
+            tree.setAttribute('position', x + ' -3 ' + z);
             tree.setAttribute('scale', s + ' ' + s + ' ' + s);
             tree.setAttribute('rotation', '0 ' + r + ' 0');
             scene1.appendChild(tree);
