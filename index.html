@@ -2,6 +2,7 @@
 
 <head>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://github.com/c-frame/aframe-extras/blob/master/src/loaders/animation-mixer.js"></script>
     <script>
         AFRAME.registerComponent('flying', {
             tick: function () {
@@ -48,8 +49,8 @@
         </a-assets>
         <a-plane width="1000" height="1000" rotation="-90 0 0" color="forestgreen"></a-plane>
         <a-text value="Into the Wild!\n\n(click to ENTER)" align="center" geometry="primitive: plane; width: 0; height: 1" position="0 1.5 -2" start></a-text>
-        <a-entity id="b1" gltf-model="#bird" scale="3 3 3" animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true" crowing></a-entity>
-        <a-entity id="b2" gltf-model="#bird" scale="3 3 3" rotation="0 180 0" animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" crowing></a-entity>
+        <a-entity id="b1" gltf-model="#bird" scale="5 5 5" animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true" crowing animation-mixer></a-entity>
+        <a-entity id="b2" gltf-model="#bird" scale="5 5 5" rotation="0 180 0" animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" crowing animation-mixer></a-entity>
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
