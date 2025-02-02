@@ -1,9 +1,9 @@
 <html>
 
 <head>
-    <script src="https://unpkg.com/@croquet/croquet"></script>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
+    <script src="https://unpkg.com/@croquet/croquet"></script>
     <script src="https://unpkg.com/aframe-croquet-component/public/lib/aframe-croquet-component.js"></script>
     <script>
         AFRAME.registerComponent('flying', {
@@ -43,7 +43,7 @@
 </head>
 
 <body>
-    <a-scene id="s1" cursor="rayOrigin: mouse" croquet>
+    <a-scene id="s1" background="color: forestgreen" cursor="rayOrigin: mouse" croquet>
         <a-assets>
             <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
             <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
@@ -51,7 +51,6 @@
             <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
         </a-assets>
         <a-sky src="potw1405a.jpg" phi-start="180"></a-sky>
-        <a-plane width="1000" height="1000" rotation="-90 0 0" color="#00ff00"></a-plane>
         <a-entity id="b1" gltf-model="#bird" scale="5 5 5" animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true" crowing animation-mixer></a-entity>
         <a-entity id="b2" gltf-model="#bird" scale="5 5 5" rotation="0 180 0" animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" crowing animation-mixer></a-entity>
         <a-camera position="0 1.5 0">
