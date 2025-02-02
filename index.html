@@ -1,8 +1,8 @@
 <html>
 
 <head>
-    <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://unpkg.com/@croquet/croquet"></script>
     <script src="https://unpkg.com/aframe-croquet-component/public/lib/aframe-croquet-component.js"></script>
     <script>
@@ -50,7 +50,7 @@
             <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
             <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
         </a-assets>
-        <a-plane id="p1" width="1000" height="1000" position="0 0 -3" rotation="-90 0 0" color="#0f0" multiuser></a-plane>
+        <a-plane id="p1" width="1000" height="1000" rotation="-90 0 0" color="#00ff00" multiuser></a-plane>
         <a-entity id="b1" gltf-model="#bird" scale="5 5 5" animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true" crowing animation-mixer></a-entity>
         <a-entity id="b2" gltf-model="#bird" scale="5 5 5" rotation="0 180 0" animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" crowing animation-mixer></a-entity>
         <a-camera position="0 1.5 0">
@@ -58,7 +58,7 @@
         </a-camera>
     </a-scene>
     <template id="avatarTemplate">
-        <a-entity gltf-model="#emoji" position="0 0 -3" scale="0.1 0.1 0.1" rotation="0 90 0"></a-entity>
+        <a-entity gltf-model="#emoji" scale="0.1 0.1 0.1"></a-entity>
     </template>
     <script>
         var scene1 = document.getElementById('s1');
