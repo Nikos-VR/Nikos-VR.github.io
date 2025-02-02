@@ -12,9 +12,12 @@
       <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
     </a-assets>
     <a-sky color="cadetblue" radius="5000" theta-length="90"></a-sky>
-    <a-entity id="b1" gltf-model="#bird" scale="5 5 5" position="-50 50 -100" animation-mixer></a-entity>
-    <a-entity id="b2" gltf-model="#bird" scale="5 5 5" position="50 50 -100" rotation="0 180 0" animation-mixer>
-    </a-entity>
+    <a-entity id="b1" gltf-model="#bird" scale="5 5 5"
+        animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true"
+        animation-mixer sounding></a-entity>
+    <a-entity id="b2" gltf-model="#bird" scale="5 5 5" rotation="0 180 0"
+        animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true"
+        animation-mixer sounding></a-entity>
   </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
