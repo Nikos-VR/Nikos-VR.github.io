@@ -30,6 +30,20 @@
             tree.setAttribute('rotation', '0 ' + r + ' 0');
             scene1.appendChild(tree);
         }
+        for (var i = 0; i < 10; i++) {
+            var bee = document.createElement('a-entity');
+            var x = Math.random() * 10 - 5;
+            var y = Math.random() * 3 + 1;
+            var z = Math.random() * 10 - 5;
+            var r = Math.random() * 180 - 90;
+            bee.setAttribute('id', 'bee' + i);
+            bee.setAttribute('gltf-model', '#bee');
+            bee.setAttribute('position', x + ' ' + y + ' ' + z);
+            bee.setAttribute('rotation', '0 ' + r + ' 0');
+            bee.setAttribute('flying', '');
+            bee.setAttribute('sounding', '');
+            scene1.appendChild(bee);
+        }
     </script>
 </body>
 </html>
