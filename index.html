@@ -2,6 +2,8 @@
 <head>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
+  <script src="https://unpkg.com/@croquet/croquet"></script>
+  <script src="https://unpkg.com/aframe-croquet-component/public/lib/aframe-croquet-component.js"></script>
     <script>
         AFRAME.registerComponent('flying', {
             tick: function () {
@@ -37,17 +39,10 @@ AFRAME.registerComponent('start', {
             }
         });
     </script>
-  <script src="https://unpkg.com/@croquet/croquet"></script>
-  <script src="https://unpkg.com/aframe-croquet-component/public/lib/aframe-croquet-component.js"></script>
 </head>
 <body>
-  <template id="avatarTemplate">
-    <a-entity>
-      <a-entity gltf-model="#emoji" position="0 20 0" scale="0.5 0.5 0.5"></a-entity>
-    </a-entity>
-  </template>
   <a-scene id="s1" background="color: forestgreen" cursor="rayOrigin: mouse" croquet>
-    <a-camera position="0 2 0">
+    <a-camera id="camera1" position="0 2 0">
       <a-text value="Into the Wild!\n\n(click to ENTER)" align="center"
         geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start>
       </a-text>
@@ -66,6 +61,11 @@ AFRAME.registerComponent('start', {
         animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true"
         animation-mixer sounding></a-entity>
   </a-scene>
+  <template id="avatarTemplate">
+    <a-entity>
+      <a-entity gltf-model="#emoji" position="0 20 0" scale="0.5 0.5 0.5"></a-entity>
+    </a-entity>
+  </template>
     <script>
         var scene1 = document.getElementById('s1');
         for (var i = 0; i < 1000; i++) {
@@ -75,7 +75,6 @@ AFRAME.registerComponent('start', {
             var s = Math.random() / 100 + 0.01;
             var r = Math.random() * 180 - 90;
             tree.setAttribute('gltf-model', '#tree');
-            tree.setAttribute('id', 'tree' + i);
             tree.setAttribute('position', x + ' 0 ' + z);
             tree.setAttribute('scale', s + ' ' + s + ' ' + s);
             tree.setAttribute('rotation', '0 ' + r + ' 0');
