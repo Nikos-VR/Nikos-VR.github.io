@@ -21,7 +21,8 @@
         <a-plane id="p5" static-body width="20" height="20" position="0 0 0" rotation="-90 0 0"></a-plane>
         <a-plane id="p6" static-body width="20" height="20" position="0 4 0" rotation="90 0 0"></a-plane>
         <a-camera position="0 1.5 0" walls>
-            <a-box dynamic-body scale="1 2 1" position="0 0 -3"></a-box>
+            <a-cone static-body radius-bottom="2" radius-top="0.5" position="0 0 -3"></a-cone>
+            <a-torus dynamic-body arc="270" radius="5" radius-tubular="0.1" position="0 3 -3"></a-torus>
             <a-entity light="angle: 60; distance: 20; intensity: 0.5; type: spot"></a-entity>
         </a-camera>
     </a-scene>
