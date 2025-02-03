@@ -12,12 +12,14 @@
                 var z = Math.random() * 100 - 50;
                 el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z);
             }
-        });
+        });animation="property: position; to: 0 50 0; dur: 5000"
 AFRAME.registerComponent('start', {
   init: function () {
     var el = this.el;
     el.addEventListener('click', function () {
       el.remove();
+      var cam = document.getElementById('camera1');
+      cam.setAttribute('position', '0 50 0');
       for (var i = 0; i < 10; i++) {
         var bee = document.getElementById('bee' + i);
         bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; poolSize: 10');
@@ -47,6 +49,11 @@ AFRAME.registerComponent('start', {
     </a-entity>
   </template>
   <a-scene id="s1" background="color: forestgreen" cursor="rayOrigin: mouse" croquet>
+    <a-camera id="camera1" position="0 2 0">
+      <a-text value="Into the Wild!\n\n(click to ENTER)" align="center"
+        geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start>
+      </a-text>
+    </a-camera>
     <a-assets>
       <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
       <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
