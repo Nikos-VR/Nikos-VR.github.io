@@ -42,12 +42,12 @@ AFRAME.registerComponent('start', {
 </head>
 <body>
   <template id="avatarTemplate" position="0 2 0">
-    <a-entity>
-      <a-entity gltf-model="#emoji"></a-entity>
+    <a-entity position="0 2 0">
+      <a-entity gltf-model="#emoji" position="0 2 0"></a-entity>
     </a-entity>
   </template>
   <a-scene id="s1" background="color: forestgreen" cursor="rayOrigin: mouse" croquet>
-    <a-camera position="0 2 0">
+    <a-camera id="camera1" position="0 2 0">
       <a-text value="Into the Wild!\n\n(click to ENTER)" align="center"
         geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start>
       </a-text>
