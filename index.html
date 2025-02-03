@@ -78,6 +78,7 @@ AFRAME.registerComponent('start', {
             tree.setAttribute('position', x + ' 0 ' + z);
             tree.setAttribute('scale', s + ' ' + s + ' ' + s);
             tree.setAttribute('rotation', '0 ' + r + ' 0');
+            tree.setAttribute('multiuser', '');
             scene1.appendChild(tree);
         }
         for (var i = 0; i < 10; i++) {
