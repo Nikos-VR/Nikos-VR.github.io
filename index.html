@@ -19,7 +19,7 @@ AFRAME.registerComponent('start', {
     el.addEventListener('click', function () {
       el.remove();
       var cam = document.getElementById('camera1');
-      cam.setAttribute('position', '0 50 0');
+      cam.setAttribute('animation', 'property: position; to: 0 50 0');
       for (var i = 0; i < 10; i++) {
         var bee = document.getElementById('bee' + i);
         bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; poolSize: 10');
