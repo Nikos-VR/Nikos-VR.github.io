@@ -29,7 +29,7 @@ AFRAME.registerComponent('start', {
       var pos = document.getElementById('baloon1').getAttribute('position');
       console.log(pos);
       var cam = document.getElementById('camera1');
-      cam.setAttribute('animation', 'property: position; to: ' + pos);
+      cam.setAttribute('animation', 'property: position; to: ' + pos._x + ' ' + pos._y + ' ' + pos._z);
     });
   }
 });
