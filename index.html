@@ -26,7 +26,7 @@ AFRAME.registerComponent('start', {
       bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
       var bird2 = document.getElementById('b2');
       bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
-      var cam = document.querySelector('a-camera');
+      var cam = document.getElementById('camera1');
       cam.setAttribute('animation', 'property: position; to: 0 30 0');
     });
   }
@@ -49,7 +49,7 @@ AFRAME.registerComponent('start', {
     </a-entity>
   </template>
   <a-scene id="s1" background="color: forestgreen" cursor="rayOrigin: mouse" croquet>
-    <a-camera position="0 2 0">
+    <a-camera id="camera1" position="0 2 0">
       <a-text value="Into the Wild!\n\n(click to ENTER)" align="center"
         geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start>
       </a-text>
