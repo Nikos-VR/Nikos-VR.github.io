@@ -27,6 +27,7 @@ AFRAME.registerComponent('start', {
       var bird2 = document.getElementById('b2');
       bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
       var pos = document.getElementById('baloon1').getAttribute('position');
+      console.log(pos);
       var cam = document.getElementById('camera1');
       cam.setAttribute('animation', 'property: position; to: ' + pos);
     });
