@@ -43,7 +43,7 @@ AFRAME.registerComponent('start', {
 <body>
   <template id="avatarTemplate">
     <a-entity>
-      <a-entity gltf-model="#emoji" position="0 5 0"></a-entity>
+      <a-entity gltf-model="#emoji"></a-entity>
     </a-entity>
   </template>
   <a-scene id="s1" background="color: forestgreen" cursor="rayOrigin: mouse" croquet>
@@ -75,7 +75,7 @@ AFRAME.registerComponent('start', {
             var s = Math.random() / 100 + 0.01;
             var r = Math.random() * 180 - 90;
             tree.setAttribute('gltf-model', '#tree');
-            tree.setAttribute('position', x + ' 0 ' + z);
+            tree.setAttribute('position', x + ' -2 ' + z);
             tree.setAttribute('scale', s + ' ' + s + ' ' + s);
             tree.setAttribute('rotation', '0 ' + r + ' 0');
             scene1.appendChild(tree);
