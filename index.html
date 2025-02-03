@@ -26,8 +26,9 @@ AFRAME.registerComponent('start', {
       bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
       var bird2 = document.getElementById('b2');
       bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
+      var pos = document.getElementById('baloon1').getAttribute('position');
       var cam = document.getElementById('camera1');
-      cam.setAttribute('animation', 'property: position; to: 0 10 0');
+      cam.setAttribute('animation', 'property: position; to: ' + pos);
     });
   }
 });
@@ -45,7 +46,7 @@ AFRAME.registerComponent('start', {
 <body>
   <template id="avatarTemplate">
     <a-entity>
-      <a-entity gltf-model="#emoji" position="0 10 0"></a-entity>
+      <a-entity id="baloon1" gltf-model="#emoji" position="0 10 0"></a-entity>
     </a-entity>
   </template>
   <a-scene id="s1" background="color: forestgreen" cursor="rayOrigin: mouse" croquet>
