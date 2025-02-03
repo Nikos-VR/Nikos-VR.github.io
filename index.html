@@ -4,9 +4,8 @@
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
     <script>
         AFRAME.registerComponent('walls', {
-            var el = this.el;
             init: function () {
-                el.addEventListener('collide', function (e) {
+                this.el.addEventListener('collide', function (e) {
                     console.log('Player has collided with body #' + e.detail.body.id);
 
                     e.detail.target.el;  // Original entity (playerEl).
@@ -16,12 +15,12 @@
                 });
             }
             tick: function () {
-                var pos = el.getAttribute('position');
+                var pos = this.el.getAttribute('position');
                 if (pos.x < -9) pos.x = -9;
                 if (pos.x > 9) pos.x = 9;
                 if (pos.z < -9) pos.z = -9;
                 if (pos.z > 9) pos.z = 9;
-                el.setAttribute('position', pos);
+                this.el.setAttribute('position', pos);
             }
         });
   </script>
