@@ -47,7 +47,7 @@ AFRAME.registerComponent('start', {
     </a-entity>
   </template>
   <a-scene id="s1" background="color: forestgreen" cursor="rayOrigin: mouse" croquet>
-    <a-camera>
+    <a-camera position="0 5 0">
       <a-text value="Into the Wild!\n\n(click to ENTER)" align="center"
         geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start>
       </a-text>
@@ -75,7 +75,7 @@ AFRAME.registerComponent('start', {
             var s = Math.random() / 100 + 0.01;
             var r = Math.random() * 180 - 90;
             tree.setAttribute('gltf-model', '#tree');
-            tree.setAttribute('position', x + ' -2 ' + z);
+            tree.setAttribute('position', x + ' 0 ' + z);
             tree.setAttribute('scale', s + ' ' + s + ' ' + s);
             tree.setAttribute('rotation', '0 ' + r + ' 0');
             scene1.appendChild(tree);
