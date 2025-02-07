@@ -1,42 +1,100 @@
 <html>
 <head>
-    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-    <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script>
-        AFRAME.registerComponent('walls', {
-            init: function () {
-                this.el.addEventListener('collide', function (e) {
-                    console.log('Player has collided with body #' + e.detail.body.el.id);
-                });
+        AFRAME.registerComponent('flying', {
+            tick: function () {
+                if (Math.random() < 0.5) return;
+                var el = this.el;
+                var x = Math.random() * 100 - 50;
+                var y = Math.random() * 3 + 1;
+                var z = Math.random() * 100 - 50;
+                el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z);
             }
         });
-  </script>
+AFRAME.registerComponent('start', {
+  init: function () {
+    var el = this.el;
+    el.addEventListener('click', function () {
+      el.remove();
+      for (var i = 0; i < 10; i++) {
+        var bee = document.getElementById('bee' + i);
+        bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; poolSize: 10');
+      }
+      var bird1 = document.getElementById('b1');
+      bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
+      var bird2 = document.getElementById('b2');
+      bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
+      var cam = document.getElementById('camera1');
+      cam.setAttribute('animation', 'property: position; to: 0 30 0');
+    });
+  }
+});
+        AFRAME.registerComponent('sounding', {
+            tick: function () {
+                if (Math.random() < 0.99) return;
+                var sound = this.el.components.sound;
+                if (sound) sound.playSound();
+            }
+        });
+    </script>
+  <script src="https://unpkg.com/@croquet/croquet"></script>
+  <script src="https://unpkg.com/aframe-croquet-component/public/lib/aframe-croquet-component.js"></script>
 </head>
 <body>
-    <a-scene id="s1" physics>
-        <a-plane id="p1" static-body width="20" height="4" position="-10 2 0" rotation="0 90 0"></a-plane>
-        <a-plane id="p2" static-body width="20" height="4" position="10 2 0" rotation="0 -90 0"></a-plane>
-        <a-plane id="p3" static-body width="20" height="4" position="0 2 10" material="side:back"></a-plane>
-        <a-plane id="p4" static-body width="20" height="4" position="0 2 -10"></a-plane>
-        <a-plane id="p5" static-body width="20" height="20" position="0 0 0" rotation="-90 0 0"></a-plane>
-        <a-plane id="p6" static-body width="20" height="20" position="0 4 0" rotation="90 0 0"></a-plane>
-        <a-camera position="0 1.5 0" walls>
-            <a-cone static-body height="2" position="0 -1.5 -3"></a-cone>
-            <a-torus dynamic-body radius="1" radius-tubular="0.01" position="0 -1 -3" rotation="-90 0 0"></a-torus>
-            <a-entity light="angle: 60; distance: 20; intensity: 0.5; type: spot"></a-entity>
-        </a-camera>
-    </a-scene>
+  <template id="avatarTemplate">
+    <a-entity>
+      <a-entity gltf-model="#emoji"></a-entity>
+    </a-entity>
+  </template>
+  <a-scene id="s1" background="color: forestgreen" cursor="rayOrigin: mouse" croquet>
+    <a-camera id="camera1" position="0 2 0">
+      <a-text value="Into the Wild!\n\n(click to ENTER)" align="center"
+        geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start>
+      </a-text>
+    </a-camera>
+    <a-assets>
+      <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
+      <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
+      <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
+      <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
+    </a-assets>
+    <a-sky id="sky" color="cadetblue" radius="5000" theta-length="90"></a-sky>
+    <a-entity id="b1" gltf-model="#bird" scale="5 5 5"
+        animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true"
+        animation-mixer sounding></a-entity>
+    <a-entity id="b2" gltf-model="#bird" scale="5 5 5" rotation="0 180 0"
+        animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true"
+        animation-mixer sounding></a-entity>
+  </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
+        for (var i = 0; i < 1000; i++) {
+            var tree = document.createElement('a-entity');
+            var x = Math.random() * 1000 - 500;
+            var z = Math.random() * 1000 - 500;
+            var s = Math.random() / 100 + 0.01;
+            var r = Math.random() * 180 - 90;
+            tree.setAttribute('gltf-model', '#tree');
+            tree.setAttribute('position', x + ' 0 ' + z);
+            tree.setAttribute('scale', s + ' ' + s + ' ' + s);
+            tree.setAttribute('rotation', '0 ' + r + ' 0');
+            scene1.appendChild(tree);
+        }
         for (var i = 0; i < 10; i++) {
-            var box = document.createElement('a-box');
-            var x = Math.random() * 15 - 8;
-            var y = Math.random() * 2 + 1;
-            var z = Math.random() * 15 - 8;
-            box.setAttribute('dynamic-body', '');
-            box.setAttribute('id', 'box' + i);
-            box.setAttribute('position', x + ' ' + y + ' ' + z);
-            scene1.appendChild(box);
+            var bee = document.createElement('a-entity');
+            var x = Math.random() * 10 - 5;
+            var y = Math.random() * 3 + 1;
+            var z = Math.random() * 10 - 5;
+            var r = Math.random() * 180 - 90;
+            bee.setAttribute('id', 'bee' + i);
+            bee.setAttribute('gltf-model', '#bee');
+            bee.setAttribute('position', x + ' ' + y + ' ' + z);
+            bee.setAttribute('rotation', '0 ' + r + ' 0');
+            bee.setAttribute('flying', '');
+            bee.setAttribute('sounding', '');
+            scene1.appendChild(bee);
         }
     </script>
 </body>
