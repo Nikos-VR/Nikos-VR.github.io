@@ -9,7 +9,7 @@
                 this.el.addEventListener('collide', function (e) {
                     console.log('Player has collided with body #' + e.detail.body.el.id);
                 });
-            }
+            },
             tick: function () {
                 var pos = this.el.getAttribute('position');
                 if (pos.x < -9) pos.x = -9;
