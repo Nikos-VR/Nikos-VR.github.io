@@ -5,6 +5,7 @@
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://unpkg.com/@croquet/croquet"></script>
     <script src="https://unpkg.com/aframe-croquet-component/public/lib/aframe-croquet-component.js"></script>
+    <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
         AFRAME.registerComponent('flying', {
             tick: function () {
@@ -57,10 +58,13 @@
         <a-entity id="b2" gltf-model="#bird" scale="5 5 5" rotation="0 180 0"
             animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" sounding
             animation-mixer></a-entity>
-        <a-camera position="0 2 0">
-            <a-text value="Into the Wild!\n\n(click to ENTER)" align="center"
-                geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start></a-text>
-        </a-camera>
+        <a-entity id="rig">
+            <a-camera position="0 2 0">
+                <a-text value="Into the Wild!" align="center"
+                    geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start></a-text>
+            </a-camera>
+            <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
+        </a-entity>
     </a-scene>
     <template id="avatarTemplate">
         <a-entity gltf-model="#emoji" scale="0.5 0.5 0.5"></a-entity>
