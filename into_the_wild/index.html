@@ -72,10 +72,10 @@
     </template>
     <script>
         var scene1 = document.getElementById('s1');
-        for (var i = 0; i < 1000; i++) {
+        for (var i = 0; i < 100; i++) {
             var tree = document.createElement('a-entity');
-            var x = Math.random() * 1000 - 500;
-            var z = Math.random() * 1000 - 500;
+            var x = Math.random() * 100 - 50;
+            var z = Math.random() * 100 - 50;
             var s = Math.random() / 100 + 0.01;
             var r = Math.random() * 180 - 90;
             tree.setAttribute('gltf-model', '#tree');
