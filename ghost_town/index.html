@@ -11,7 +11,7 @@
                 el.addEventListener('click', function () {
                     el.remove();
                 });
-                var cam = document.querySelector('[camera]');
+                var cam = document.getElementById('cam');
                 cam.setAttribute('animation', { property: position, to: 0 1 0, dur: 5000, easing: linear });
             }
         });
@@ -25,7 +25,7 @@
         <a-plane height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-light color="#BBB" intensity="0.25" type="ambient"></a-light>
         <a-entity id="rig">
-            <a-camera position="0 -1000 4000">
+            <a-camera id="cam" position="0 -1000 4000">
                 <a-text value="Ghost town..." align="center"
                     geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start></a-text>
                 <a-entity cursor="fuse: true; fuseTimeout: 1000"></a-entity>
