@@ -19,10 +19,10 @@
 <body>
     <a-scene id="s1">
         <a-sky radius="10000" src="eso0932a.jpg"></a-sky>
-        <a-sphere radius="1000" src="Equirectangular-projection.jpg"></a-sphere>
-        <a-plane height="100" width="100" position="0 0 1000"></a-plane>
+        <a-sphere radius="1000" src="Equirectangular-projection.jpg" position="0 -1000 0"></a-sphere>
+        <a-plane height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-entity id="rig">
-            <a-camera position="0 0 2500">
+            <a-camera position="0 1000 1500">
                 <a-text value="Ghost town..." align="center"
                     geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" start></a-text>
                 <a-entity cursor="fuse: true; fuseTimeout: 1000"></a-entity>
