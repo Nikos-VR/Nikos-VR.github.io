@@ -10,9 +10,9 @@
                 var el = this.el;
                 el.addEventListener('click', function () {
                     el.remove();
+                    var cam = document.getElementById('cam');
+                    cam.setAttribute('animation', { property: 'position', to: '0 1 0', dur: '5000', easing: 'linear' });
                 });
-                var cam = document.getElementById('cam');
-                cam.setAttribute('animation', { property: 'position', to: '0 1 0', dur: '5000', easing: 'linear' });
             }
         });
     </script>
