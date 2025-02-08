@@ -12,10 +12,10 @@
             }
             tick: function () {
                 var pos = this.el.getAttribute('position');
-                if (pos._x < -9) pos._x = -9;
-                if (pos._x > 9) pos._x = 9;
-                if (pos._z < -9) pos._z = -9;
-                if (pos._z > 9) pos._z = 9;
+                if (pos.x < -9) pos.x = -9;
+                if (pos.x > 9) pos.x = 9;
+                if (pos.z < -9) pos.z = -9;
+                if (pos.z > 9) pos.z = 9;
                 this.el.setAttribute('position', pos);
             }
         });
