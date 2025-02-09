@@ -8,15 +8,15 @@
 
 <body>
     <a-scene id="s1">
-        <a-sky radius="5000" src="eso0932a.jpg" rotation="90 90 0"></a-sky>
-        <a-sphere radius="1000" src="flat_earth03.jpg"
+        <a-sky radius="5000" src="eso0932a.jpg"></a-sky>
+        <a-sphere radius="1000" src="flat_earth03.jpg" position="0 1000 0"
             animation="property: rotation; to: 0 360 0; loop: true; dur: 30000">
         </a-sphere>
-        <a-ring radius-inner="0" radius-outer="1000" rotation="-90 0 0"></a-ring>
+        <a-ring radius-inner="0" radius-outer="1000" position="0 1000 0" rotation="-90 0 0"></a-ring>
         <a-light color="#BBB" intensity="0.25" type="ambient"></a-light>
         <a-entity id="rig">
             <a-camera id="cam" position="0 5 4500"
-                animation="property: position; to: 0 5 0; dur: 25000"
+                animation="property: position; to: 0 1005 0; dur: 25000"
             </a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
