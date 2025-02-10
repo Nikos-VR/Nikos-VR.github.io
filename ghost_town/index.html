@@ -10,7 +10,7 @@
     <a-scene id="s1">
         <a-sky radius="5000" src="eso0932a.jpg"></a-sky>
         <a-sphere radius="1000" src="flat_earth03.jpg" position="0 1000 0"
-            animation="property: rotation; to: 10 360 0; loop: true; dur: 25000">
+            animation="property: rotation; to: -10 360 0; loop: true; dur: 25000">
         </a-sphere>
         <a-ring color="#111" radius-inner="0" radius-outer="990" position="0 1000 0" rotation="-90 0 0"></a-ring>
         <a-light color="#BBB" intensity="0.1" type="ambient"></a-light>
@@ -29,7 +29,7 @@
                 var box = document.createElement('a-box');
                 box.setAttribute('position', i + ' 1000 ' + j);
                 box.setAttribute('scale', '3 ' + y + ' 3');
-                box.setAttribute('material', 'src: url(photos_2017_7_6_fst_building-facade-windows.jpg)');
+                box.setAttribute('material', 'src: url(djim-loic-Sq7WPOjHGDs-unsplash.jpg)');
                 scene1.appendChild(box);
             }
         }
