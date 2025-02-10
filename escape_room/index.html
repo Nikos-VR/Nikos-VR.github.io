@@ -44,10 +44,9 @@
         <a-plane static-body width="40" height="8" position="0 4 -20"></a-plane>
         <a-plane static-body width="40" height="40" position="0 0 0" rotation="-90 0 0"></a-plane>
         <a-plane static-body width="40" height="40" position="0 8 0" rotation="90 0 0"></a-plane>
-        <a-entity id="door" opening position="0 2 -20">
-            <a-plane height="4" width="2" color="indianred"></a-plane>
+        <a-plane height="4" width="2" color="indianred" position="0 2 -20" opening>
             <a-ring color="black" radius-inner="0.01" radius-outer="0.1" position="0.75 0 0.01"></a-ring>
-        </a-entity>
+        </a-plane>
         <a-entity id="rig">
             <a-camera position="0 2 0" walls>
                 <a-text id="txt" value="" align="center" geometry="primitive: plane; width: 0; height: 1" position="0 2 -2"></a-text>
