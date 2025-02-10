@@ -10,13 +10,13 @@
             init: function () {
                 var el = this.el;
                 el.addEventListener('mouseenter', function () {
-                    el.setAttribute('material', 'color: red');
+                    el.firstChild.setAttribute('color', 'red');
                 });
                 el.addEventListener('mouseleave', function () {
-                    el.setAttribute('material', 'color: indianred');
+                    el.firstChild.setAttribute('color', 'indianred');
                 });
                 el.addEventListener('click', function () {
-                    if (unlocked) el.setAttribute('material', 'color: cadetblue');
+                    if (unlocked) el.setAttribute('color', 'cadetblue');
                 });
             }
         });
