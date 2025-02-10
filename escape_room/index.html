@@ -18,7 +18,10 @@
             init: function () {
                 var el = this.el;
                 el.addEventListener('mouseenter', function () {
-                    if (unlocked) message = "You are free!";
+                    if (unlocked) {
+                        el.setAttribute('color', 'slategrey');
+                        message = "You are free!";
+                    }
                 });
             }
         });
@@ -52,7 +55,7 @@
         <a-plane static-body width="40" height="40" position="0 0 0" rotation="-90 0 0"></a-plane>
         <a-plane static-body width="40" height="40" position="0 8 0" rotation="90 0 0"></a-plane>
         <a-plane height="4" width="2" color="indianred" position="0 2 -19.9" opening>
-            <a-ring color="black" radius-inner="0.01" radius-outer="0.1" position="0.75 0 0.01"></a-ring>
+            <a-ring color="slategrey" radius-inner="0.01" radius-outer="0.1" position="0.75 0 0.01"></a-ring>
         </a-plane>
         <a-cylinder dynamic-body id="key" height="0.15" radius="0.01" finding>
             <a-box scale="0.04 0.03 0.02" position="0.02 0.04 0"></a-box>            
