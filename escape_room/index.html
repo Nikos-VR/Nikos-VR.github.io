@@ -4,7 +4,7 @@
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
-        var unlocked = true, message = "", time = 9999;
+        var unlocked = false, message = "", time = 9999;
         
         AFRAME.registerComponent('messaging', {
             tick: function () {
@@ -24,7 +24,7 @@
         AFRAME.registerComponent('colliding', {
             init: function () {
                 this.el.addEventListener('collide', function (e) {
-                    if (e.detail.body.el.id == "key") alert("bingo");
+                    if (e.detail.body.el.id == "key") unlocked = true;
                 });
             },
             tick: function () {
