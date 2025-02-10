@@ -11,7 +11,7 @@
                 if (time < 0) message = "Game over..."
                 if (message != "") this.el.setAttribute('value', message);
                 else this.el.setAttribute('value', '' + time--);
-                if (unlocked) this.el.setAttribute('color', 'cadetblue');
+                if (unlocked) this.el.setAttribute('color', 'darkolivegreen');
             }
         });
         AFRAME.registerComponent('opening', {
@@ -82,10 +82,9 @@
             scene1.appendChild(box);
         }
         var k = document.getElementById('key');
-        var x = Math.random() * 30 - 15;
-        var y = Math.random() * 6 + 1;
-        var z = Math.random() * 30 - 15;
-        k.setAttribute('position', x + ' ' + y + ' ' + z);
+        var x = Math.random() * 36 - 18;
+        var z = Math.random() * 36 - 18;
+        k.setAttribute('position', x + ' 7.5 ' + z);
     </script>
 </body>
 </html>
