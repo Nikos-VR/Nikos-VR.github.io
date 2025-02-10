@@ -26,8 +26,7 @@
                 this.el.addEventListener('collide', function (e) {
                     var el = e.detail.body.el;
                     if (el.id == "key") {
-                        el.removeAttribute('dynamic-body');
-                        el.setAttribute('position', '-10 2 -10');
+                        el.remove();
                         unlocked = true;
                     }
                 });
