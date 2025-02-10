@@ -5,7 +5,6 @@
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
         var unlocked = true, message = "", time = 60;
-        var status = document.getElementById('txt');
         
         AFRAME.registerComponent('opening', {
             init: function () {
@@ -16,8 +15,8 @@
             },
             tick: function () {
                 if (time < 0) message = "Game over..."
-                if (message !== "") status.el.setAttribute('value', message);
-                else status.el.setAttribute('value', '' + time--);
+                if (message !== "") document.getElementById('txt').el.setAttribute('value', message);
+                else document.getElementById('txt').el.setAttribute('value', '' + time--);
             }
         });
         AFRAME.registerComponent('walls', {
