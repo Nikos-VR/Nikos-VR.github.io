@@ -49,6 +49,10 @@
         <a-plane height="4" width="2" color="indianred" position="0 2 -19.9" opening>
             <a-ring color="black" radius-inner="0.01" radius-outer="0.1" position="0.75 0 0.01"></a-ring>
         </a-plane>
+        <a-cylinder dynamic-body height="0.5" radius="0.1" position="0 2 -2">
+            <a-ring radius-inner="0.05" radius-outer="0.1" position="-0.25 0 0"></a-ring>
+            <a-box scale="0.5" position="0.25 0 0"></a-box>            
+        </a-cylinder>
         <a-entity id="rig">
             <a-camera position="0 2 0" colliding>
                 <a-text value="" align="center" geometry="primitive: plane; width: 0; height: 1" position="0 1.5 -2" material="opacity: 0" messaging></a-text>
