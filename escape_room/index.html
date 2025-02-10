@@ -15,7 +15,7 @@
             },
             tick: function () {
                 if (time < 0) message = "Game over..."
-                if (message !== "") document.getElementById('txt').setAttribute('value', message);
+                if (message != "") document.getElementById('txt').setAttribute('value', message);
                 else document.getElementById('txt').setAttribute('value', '' + time--);
             }
         });
