@@ -12,11 +12,12 @@
                 el.addEventListener('click', function () {
                     if (unlocked) message = "You are free!";
                 });
+                var status = document.getElementById('txt');
             },
             tick: function () {
                 if (time < 0) message = "Game over..."
-                if (message !== "") document.getElementById('txt').setAttribute('value', message);
-                else document.getElementById('txt').setAttribute('value', '' + time--);
+                if (message !== "") status.setAttribute('value', message);
+                else status.setAttribute('value', '' + time--);
             }
         });
         AFRAME.registerComponent('walls', {
