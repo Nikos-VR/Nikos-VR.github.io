@@ -8,6 +8,9 @@
 
 <body>
     <a-scene id="s1">
+        <a-assets>
+            <a-asset-item id="b9" src="b9.gltf"></a-asset-item>
+        </a-assets>
         <a-sky radius="5000" src="eso0932a.jpg"></a-sky>
         <a-sphere radius="1000" src="flat_earth03.jpg" position="0 1000 0"
             animation="property: rotation; to: 180 360 90; dur: 25000">
@@ -25,12 +28,10 @@
         var scene1 = document.getElementById('s1');
         for (var i = -250; i < 250; i += 6) {
             for (var j = -250; j < 250; j += 6) {
-                var y = Math.random() * 25 + 10;
-                var box = document.createElement('a-box');
-                box.setAttribute('position', i + ' 1000 ' + j);
-                box.setAttribute('scale', '3 ' + y + ' 3');
-                box.setAttribute('material', 'src: url(djim-loic-Sq7WPOjHGDs-unsplash.jpg)');
-                scene1.appendChild(box);
+                var b = document.createElement('a-entity');
+                b.setAttribute('position', i + ' 1000 ' + j);
+                b.setAttribute('gltf-model', '#b9');
+                scene1.appendChild(b);
             }
         }
     </script>
