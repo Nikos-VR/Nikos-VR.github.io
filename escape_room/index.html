@@ -12,7 +12,7 @@
                 el.addEventListener('click', function () {
                     if (unlocked) message = "You are free!";
                 });
-            }
+            },
             tick: function () {
                 if (message < 0) message = "Game over..."
                 document.getElementById('txt').setAttribute('value', message);
