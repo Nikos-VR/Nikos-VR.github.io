@@ -23,15 +23,6 @@
             }
         });
         AFRAME.registerComponent('colliding', {
-            init: function () {
-                this.el.addEventListener('collide', function (e) {
-                    var el = e.detail.body.el;
-                    if (el.id == "key") {
-                        el.setAttribute('visible', 'false');
-                        unlocked = true;
-                    }
-                });
-            },
             tick: function () {
                 var pos = this.el.getAttribute('position');
                 if (pos.x < -19) pos.x = -19;
@@ -39,6 +30,15 @@
                 if (pos.z < -19) pos.z = -19;
                 if (pos.z > 19) pos.z = 19;
                 this.el.setAttribute('position', pos);
+            }
+        });
+        AFRAME.registerComponent('finding', {
+            init: function () {
+                var el = this.el;
+                el.addEventListener('click', function () {
+                    el.setAttribute('visible', 'false');
+                    unlocked = true;
+                });
             }
         });
   </script>
@@ -54,7 +54,7 @@
         <a-plane height="4" width="2" color="indianred" position="0 2 -19.9" opening>
             <a-ring color="black" radius-inner="0.01" radius-outer="0.1" position="0.75 0 0.01"></a-ring>
         </a-plane>
-        <a-cylinder dynamic-body id="key" height="0.08" radius="0.005">
+        <a-cylinder dynamic-body id="key" height="0.08" radius="0.005" finding>
             <a-torus radius="0.015" radius-tubular="0.0015" position="0 -0.05 0"></a-torus>
             <a-box scale="0.02 0.02 0.01" position="0.01 0.02 0"></a-box>            
         </a-cylinder>
