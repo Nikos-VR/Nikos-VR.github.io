@@ -26,8 +26,8 @@
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
-        for (var i = 0; i < 1; i += 1) {
-            for (var j = 0; j < 1; j += 1) {
+        for (var i = -100; i < 100; i += 50) {
+            for (var j = -100; j < 100; j += 50) {
                 var b = document.createElement('a-entity');
                 b.setAttribute('gltf-model', '#b9');
                 b.setAttribute('scale', '10 10 10');
