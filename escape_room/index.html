@@ -16,7 +16,7 @@
             tick: function () {
                 if (time < 0) message = "Game over..."
                 if (message !== "") document.getElementById('txt').setAttribute('value', message);
-                else document.getElementById('txt').setAttribute('value', time--);
+                else document.getElementById('txt').setAttribute('value', '' + time--);
             }
         });
         AFRAME.registerComponent('walls', {
