@@ -35,7 +35,7 @@
         AFRAME.registerComponent('finding', {
             init: function () {
                 var el = this.el;
-                el.addEventListener('click', function () {
+                el.addEventListener('hover', function () {
                     unlocked = true;
                     el.remove();
                 });
