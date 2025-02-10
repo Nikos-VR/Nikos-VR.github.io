@@ -4,7 +4,7 @@
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
-        var unlocked = true, message = 60;
+        var unlocked = true, message = "", time = 60;
         
         AFRAME.registerComponent('opening', {
             init: function () {
@@ -14,9 +14,9 @@
                 });
             },
             tick: function () {
-                if (message < 0) message = "Game over..."
-                document.getElementById('txt').setAttribute('value', message);
-                message--;
+                if (time < 0) message = "Game over..."
+                if (message !== "") document.getElementById('txt').setAttribute('value', message);
+                else document.getElementById('txt').setAttribute('value', time--);
             }
         });
         AFRAME.registerComponent('walls', {
