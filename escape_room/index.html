@@ -4,20 +4,19 @@
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
-        var unlocked = true;
+        var unlocked = true, message = 60;
         
         AFRAME.registerComponent('opening', {
             init: function () {
                 var el = this.el;
-                el.addEventListener('mouseenter', function () {
-                    el.firstChild.setAttribute('color', 'red');
-                });
-                el.addEventListener('mouseleave', function () {
-                    el.firstChild.setAttribute('color', 'indianred');
-                });
                 el.addEventListener('click', function () {
-                    if (unlocked) alert("CONGRATS!");
+                    if (unlocked) message = "You are free!";
                 });
+            }
+            tick: function () {
+                if (message < 0) message = "Game over..."
+                document.getElementById('txt').setAttribute('value', message);
+                message--;
             }
         });
         AFRAME.registerComponent('walls', {
@@ -38,7 +37,7 @@
   </script>
 </head>
 <body>
-    <a-scene id="s1" physics>
+    <a-scene id="s1" cursor="rayOrigin: mouse" physics>
         <a-plane static-body width="40" height="8" position="-20 4 0" rotation="0 90 0"></a-plane>
         <a-plane static-body width="40" height="8" position="20 4 0" rotation="0 -90 0"></a-plane>
         <a-plane static-body width="40" height="8" position="0 4 20" material="side:back"></a-plane>
@@ -51,6 +50,7 @@
         </a-entity>
         <a-entity id="rig">
             <a-camera position="0 2 0" walls>
+                <a-text id="txt" value="" align="center" geometry="primitive: plane; width: 0; height: 1" position="0 2 -2"></a-text>
                 <a-cone static-body height="2" position="0 -1 0"></a-cone>
                 <a-light angle="60" distance="20" intensity="0.5" type="spot"></a-light>
                 <a-cursor fuse="true"></a-cursor>
