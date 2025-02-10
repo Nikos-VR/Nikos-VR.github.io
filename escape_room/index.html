@@ -24,7 +24,8 @@
         AFRAME.registerComponent('colliding', {
             init: function () {
                 this.el.addEventListener('collide', function (e) {
-                    if (e.detail.body.el.id == "key") unlocked = true;
+                    var el = e.detail.body.el;
+                    if (el.id == "key") unlocked = true;
                 });
             },
             tick: function () {
