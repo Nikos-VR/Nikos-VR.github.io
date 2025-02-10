@@ -4,6 +4,22 @@
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
+        var unlocked = false;
+        
+        AFRAME.registerComponent('opening', {
+            init: function () {
+                var el = this.el;
+                el.addEventListener('mouseenter', function () {
+                    el.setAttribute('color', 'red');
+                });
+                el.addEventListener('mouseleave', function () {
+                    el.setAttribute('color', 'indianred');
+                });
+                el.addEventListener('click', function () {
+                    if (unlocked) el.setAttribute('color', 'cadetblue');
+                });
+            }
+        });
         AFRAME.registerComponent('walls', {
             init: function () {
                 this.el.addEventListener('collide', function (e) {
@@ -29,13 +45,15 @@
         <a-plane static-body width="40" height="8" position="0 4 -20"></a-plane>
         <a-plane static-body width="40" height="40" position="0 0 0" rotation="-90 0 0"></a-plane>
         <a-plane static-body width="40" height="40" position="0 8 0" rotation="90 0 0"></a-plane>
-        <a-plane id="door" width="2" height="4" position="0 2 -19.9" color="indianred" rotation="-90 0 0">
+        <a-plane id="door" width="2" height="4" position="0 2 -19.9" color="indianred" rotation="-90 0 0" opening>
             <a-ring color="black" radius-inner="0.1" radius-outer="0.25" position="-0.75 0 0"></a-ring>
         </a-plane>
         <a-entity id="rig">
             <a-camera position="0 2 0" walls>
                 <a-cone static-body height="2" position="0 -1 0"></a-cone>
                 <a-entity light="angle: 60; distance: 20; intensity: 0.5; type: spot"></a-entity>
+                <a-entity cursor="fuse: true; fuseTimeout: 5000" position="0 0 -1"
+                    geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"></a-entity>
             </a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
