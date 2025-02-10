@@ -51,8 +51,8 @@
         <a-entity id="rig">
             <a-camera position="0 2 0" walls>
                 <a-cone static-body height="2" position="0 -1 0"></a-cone>
-                <a-entity light="angle: 60; distance: 20; intensity: 0.5; type: spot"></a-entity>
-                <a-entity cursor="fuse: true; fuseTimeout: 500"></a-entity>
+                <a-light angle="60" distance="20" intensity="0.5" type="spot"></a-light>
+                <a-cursor fuse="true" fuseTimeout="500"></a-cursor>
             </a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
