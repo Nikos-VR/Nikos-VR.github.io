@@ -2,7 +2,18 @@
 
 <head>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
+    <script>
+        AFRAME.registerComponent('colliding', {
+            init: function () {
+                var el = this.el;
+                el.addEventListener('collide', function (e) {
+                    console.log('Player has collided with body #' + e.detail.body.id);
+                });
+            }
+        });
+    </script>
 </head>
 
 <body>
@@ -18,7 +29,8 @@
         <a-light color="#BBB" intensity="0.05" type="ambient"></a-light>
         <a-entity id="rig">
             <a-camera id="cam" position="0 1000 4500"
-                animation="property: position; to: 0 1005 0; dur: 25000">
+                animation="property: position; to: 0 1005 0; dur: 25000" colliding>
+                <a-sphere static-body></a-sphere>
             </a-camera>
             <a-cursor fuse="true" fuse-timeout="500"></a-cursor>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
@@ -30,6 +42,7 @@
             for (var j = -250; j < 250; j += 50) {
                 var b = document.createElement('a-entity');
                 b.setAttribute('gltf-model', '#b9');
+                b.setAttribute('dynamic-body', '');
                 b.setAttribute('scale', '25 25 25');
                 b.setAttribute('position', i + ' 1000 ' + j);
                 scene1.appendChild(b);
