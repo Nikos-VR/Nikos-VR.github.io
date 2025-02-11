@@ -20,19 +20,10 @@
             }
         });
     </script>
-    <style>
-        a-scene {
-            width: 30%;
-            height: 30%;
-            margin: 1%;
-            border: dotted silver 1px;
-            float: left;
-        }
-    </style>
 </head>
 
 <body>
-    <a-scene id="s1" background="color: cadetblue" physics cursor="rayOrigin: mouse" embedded>
+    <a-scene id="s1" background="color: cadetblue" physics cursor="rayOrigin: mouse">
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-camera position="0 1.6 0"><a-cursor fuse="true" fuseTimeout="5000"></a-cursor></a-camera>
     </a-scene>
