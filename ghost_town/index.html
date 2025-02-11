@@ -26,7 +26,7 @@
             animation="property: rotation; to: -60 300 0; dur: 25000">
         </a-sphere>
         <a-ring color="#111" radius-inner="0" radius-outer="990" position="0 1000 0" rotation="-90 0 0">
-            <a-plane static-body color="#fff" height="500" width="500"></a-plane>
+            <a-plane static-body color="#111" height="500" width="500"></a-plane>
         </a-ring>
         <a-light color="#BBB" intensity="0.05" type="ambient"></a-light>
         <a-entity id="rig">
@@ -46,7 +46,7 @@
                 b.setAttribute('gltf-model', '#b9');
                 b.setAttribute('dynamic-body', '');
                 b.setAttribute('scale', '25 25 25');
-                b.setAttribute('position', i + ' 1500 ' + j);
+                b.setAttribute('position', i + ' 900 ' + j);
                 scene1.appendChild(b);
             }
         }
