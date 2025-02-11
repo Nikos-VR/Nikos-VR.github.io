@@ -53,7 +53,8 @@
         <a-entity id="rig">
             <a-camera id="cam" position="0 1000 4500"
                 animation="property: position; to: 0 1010 300; dur: 25000">
-                <a-sphere static-body colliding collider-check raycaster="objects: .collidable; showLine:true; far: 100; lineColor: red; lineOpacity: 0.5; origin: 0 0 0"></a-sphere>
+                <a-sphere static-body colliding></a-sphere>
+                <a-entity collider-check raycaster="objects: .collidable; showLine:true; far: 100; lineColor: red; lineOpacity: 0.5; origin: 0 0 0"></a-entity>
             </a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
