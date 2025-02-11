@@ -17,22 +17,6 @@
                 el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z);
             }
         });
-        AFRAME.registerComponent('starting', {
-            init: function () {
-                var el = this.el;
-                el.addEventListener('click', function () {
-                    el.remove();
-                    for (var i = 0; i < 10; i++) {
-                        var bee = document.getElementById('bee' + i);
-                        bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; poolSize: 10');
-                    }
-                    var bird1 = document.getElementById('b1');
-                    bird1.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
-                    var bird2 = document.getElementById('b2');
-                    bird2.setAttribute('sound', 'src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2');
-                });
-            }
-        });
         AFRAME.registerComponent('sounding', {
             tick: function () {
                 if (Math.random() < 0.99) return;
@@ -52,20 +36,14 @@
             <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
         </a-assets>
         <a-plane color="forestgreen" height="1000" width="1000" rotation="-90 0 0"></a-plane>
-        <a-entity id="b1" gltf-model="#bird" scale="5 5 5"
-            animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true" sounding
+        <a-entity gltf-model="#bird" scale="5 5 5"
+            sound="src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2"
+            animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true"
             animation-mixer></a-entity>
-        <a-entity id="b2" gltf-model="#bird" scale="5 5 5" rotation="0 180 0"
+        <a-entity gltf-model="#bird" scale="5 5 5" rotation="0 180 0"
+            sound="src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2"
             animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" sounding
             animation-mixer></a-entity>
-        <a-entity id="rig">
-            <a-camera position="0 5 0">
-                <a-text value="Into the Wild!" align="center"
-                    geometry="primitive: plane; width: 0; height: 1" position="0 0 -2" starting></a-text>
-                <a-cursor fuse="true" fuse-timeout="5000" visible="false"></a-cursor>
-            </a-camera>
-            <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
-        </a-entity>
     </a-scene>
     <template id="avatarTemplate">
         <a-entity gltf-model="#emoji" scale="0.5 0.5 0.5"></a-entity>
@@ -90,12 +68,11 @@
             var y = Math.random() * 5 + 5;
             var z = Math.random() * 10 - 5;
             var r = Math.random() * 180 - 90;
-            bee.setAttribute('id', 'bee' + i);
             bee.setAttribute('gltf-model', '#bee');
             bee.setAttribute('position', x + ' ' + y + ' ' + z);
             bee.setAttribute('rotation', '0 ' + r + ' 0');
             bee.setAttribute('flying', '');
-            bee.setAttribute('sounding', '');
+            bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; poolSize: 10');
             scene1.appendChild(bee);
         }
     </script>
