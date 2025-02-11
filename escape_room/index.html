@@ -4,13 +4,13 @@
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
-        var unlocked = false, message = "", time = 999;
+        var unlocked = false, message = "", time = 999, icon = "";
         
         AFRAME.registerComponent('messaging', {
             tick: function () {
                 if (time < 0) message = "Game over..."
                 if (message != "") this.el.setAttribute('value', message);
-                else this.el.setAttribute('value', '' + time--);
+                else this.el.setAttribute('value', icon + ' ' + time--);
                 if (unlocked) this.el.setAttribute('color', 'slategrey');
             }
         });
@@ -40,6 +40,7 @@
                 var el = this.el;
                 el.addEventListener('mouseenter', function () {
                     unlocked = true;
+                    icon = "&#9919;";
                     el.remove();
                 });
             }
