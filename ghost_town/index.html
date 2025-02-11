@@ -3,6 +3,7 @@
 <head>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
+    <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
         var ghosts = 10;
         
@@ -55,6 +56,7 @@
                 <a-entity collider-check raycaster="objects: .collidable; showLine: true"></a-entity>
                 <a-sphere static-body colliding></a-sphere>
             </a-camera>
+            <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
     </a-scene>
     <script>
