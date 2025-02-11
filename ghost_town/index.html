@@ -17,7 +17,7 @@
 </head>
 
 <body>
-    <a-scene id="s1">
+    <a-scene id="s1" physics>
         <a-assets>
             <a-asset-item id="b9" src="b9.gltf"></a-asset-item>
         </a-assets>
@@ -29,8 +29,8 @@
         <a-light color="#BBB" intensity="0.05" type="ambient"></a-light>
         <a-entity id="rig">
             <a-camera id="cam" position="0 1000 4500"
-                animation="property: position; to: 0 1005 0; dur: 25000" colliding>
-                <a-sphere static-body></a-sphere>
+                animation="property: position; to: 0 1005 0; dur: 25000">
+                <a-sphere static-body colliding></a-sphere>
             </a-camera>
             <a-cursor fuse="true" fuse-timeout="500"></a-cursor>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
