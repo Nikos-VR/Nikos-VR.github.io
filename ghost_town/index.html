@@ -20,7 +20,7 @@
                 if (Math.random() < 0.5) return;
                 var el = this.el;
                 var x = Math.random() * 500 - 250;
-                var y = Math.random() * 1010 + 1;
+                var y = Math.random() * 10 + 1000;
                 var z = Math.random() * 500 - 250;
                 el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z);
             }
@@ -67,7 +67,7 @@
         for (var i = 0; i < 100; i++) {
             var ghost = document.createElement('a-entity');
             var x = Math.random() * 500 - 250;
-            var y = Math.random() * 1010 + 1;
+            var y = Math.random() * 10 + 1000;
             var z = Math.random() * 500 - 250;
             var r = Math.random() * 180 - 90;
             ghost.setAttribute('gltf-model', '#ghost');
