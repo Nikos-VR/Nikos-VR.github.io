@@ -10,7 +10,7 @@
             tick: function () {
                 if (time < 0) message = "Game over..."
                 if (message != "") this.el.setAttribute('value', message);
-                else this.el.setAttribute('value', time--);
+                else this.el.setAttribute('value', '' + time--);
                 if (unlocked) this.el.setAttribute('color', 'slategrey');
             }
         });
