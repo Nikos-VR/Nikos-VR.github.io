@@ -9,7 +9,7 @@
             init: function () {
                 var el = this.el;
                 el.addEventListener('collide', function (e) {
-                    console.log('Player has collided with body #' + e.detail.body.id);
+                    console.log(e.detail.body.id);
                 });
             }
         });
