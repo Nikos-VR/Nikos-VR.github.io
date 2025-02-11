@@ -5,7 +5,7 @@
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
-        var ghosts = 100;
+        var ghosts = 10;
         
         AFRAME.registerComponent('colliding', {
             init: function () {
@@ -64,14 +64,14 @@
                 scene1.appendChild(b);
             }
         }
-        for (var i = 0; i < 100; i++) {
+        for (var i = 0; i < 10; i++) {
             var ghost = document.createElement('a-entity');
             var x = Math.random() * 500 - 250;
             var y = Math.random() * 10 + 1000;
             var z = Math.random() * 500 - 250;
             var r = Math.random() * 180 - 90;
             ghost.setAttribute('gltf-model', '#ghost');
-            ghost.setAttribute('scale', '50 50 50');
+            ghost.setAttribute('scale', '250 250 250');
             ghost.setAttribute('position', x + ' ' + y + ' ' + z);
             ghost.setAttribute('rotation', '0 ' + r + ' 0');
             ghost.setAttribute('flying', '');
