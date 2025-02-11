@@ -15,12 +15,12 @@
         });
         AFRAME.registerComponent('flying', {
             tick: function () {
-                if (Math.random() < 0.5) return;
+                if (Math.random() < 0.99) return;
                 var el = this.el;
                 var x = Math.random() * 500 - 250;
                 var y = Math.random() * 25 + 1000;
                 var z = Math.random() * 500 - 250;
-                el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z + '; dur: 100');
+                el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z);
             }
         });
     </script>
