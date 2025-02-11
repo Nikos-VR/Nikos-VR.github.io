@@ -43,7 +43,7 @@
             <a-asset-item id="b9" src="b9.gltf"></a-asset-item>
         </a-assets>
         <a-sky radius="5000" src="eso0932a.jpg"></a-sky>
-        <a-sphere class="collidable" radius="1000" src="flat_earth03.jpg" position="0 1000 0"
+        <a-sphere radius="1000" src="flat_earth03.jpg" position="0 1000 0"
             animation="property: rotation; to: -60 300 0; dur: 25000">
         </a-sphere>
         <a-ring color="#111" radius-inner="0" radius-outer="990" position="0 1000 0" rotation="-90 0 0">
@@ -53,7 +53,7 @@
         <a-entity id="rig">
             <a-camera id="cam" position="0 1000 4500"
                 animation="property: position; to: 0 1010 300; dur: 25000">
-                <a-entity collider-check raycaster="objects: .collidable; showLine:true"></a-entity>
+                <a-entity collider-check raycaster="objects: .collidable; showLine: true"></a-entity>
                 <a-sphere static-body colliding></a-sphere>
             </a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
