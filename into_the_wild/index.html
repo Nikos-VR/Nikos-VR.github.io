@@ -44,6 +44,10 @@
             sound="src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2"
             animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" sounding
             animation-mixer></a-entity>
+        <a-entity id="rig">
+            <a-camera position="0 5 0"></a-camera>
+            <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
+        </a-entity>
     </a-scene>
     <template id="avatarTemplate">
         <a-entity gltf-model="#emoji" scale="0.5 0.5 0.5"></a-entity>
