@@ -9,7 +9,8 @@
             init: function () {
                 var el = this.el;
                 el.addEventListener('collide', function (e) {
-                    console.log(e.detail.body.id);
+                    var cam = document.getElementById('cam');
+                    cam.setAttribute('animation', 'property: position; to: 0 1000 4900; dur: 25000');
                 });
             }
         });
@@ -40,7 +41,7 @@
             <a-plane static-body color="#222" height="600" width="600"></a-plane>
         </a-ring>
         <a-entity id="rig">
-            <a-camera position="0 1000 4900"
+            <a-camera id="cam" position="0 1000 4900"
                 animation="property: position; to: 0 1010 300; dur: 25000" collider-check>
                 <a-cursor fuse="true" visible="false"></a-cursor>
                 <a-sphere static-body colliding></a-sphere>
