@@ -8,9 +8,11 @@
         
         AFRAME.registerComponent('messaging', {
             tick: function () {
+                var countdown = Math.round(time / 100);
                 if (time < 0) message = "Game over..."
+                time--;
                 if (message != "") this.el.setAttribute('value', message);
-                else this.el.setAttribute('value', '' + time--);
+                else this.el.setAttribute('value', '' + countdown);
                 if (unlocked) this.el.setAttribute('color', 'slategrey');
             }
         });
