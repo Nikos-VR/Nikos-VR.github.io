@@ -5,6 +5,8 @@
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
+        var ghosts = 100;
+        
         AFRAME.registerComponent('colliding', {
             init: function () {
                 var el = this.el;
@@ -13,12 +15,23 @@
                 });
             }
         });
+        AFRAME.registerComponent('flying', {
+            tick: function () {
+                if (Math.random() < 0.5) return;
+                var el = this.el;
+                var x = Math.random() * 500 - 250;
+                var y = Math.random() * 1010 + 1;
+                var z = Math.random() * 500 - 250;
+                el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z);
+            }
+        });
     </script>
 </head>
 
 <body>
     <a-scene id="s1" physics>
         <a-assets>
+            <a-asset-item id="ghost" src="ghost.gltf"></a-asset-item>
             <a-asset-item id="b9" src="b9.gltf"></a-asset-item>
         </a-assets>
         <a-sky radius="5000" src="eso0932a.jpg"></a-sky>
@@ -49,6 +62,18 @@
                 b.setAttribute('position', i + ' 1015 ' + j);
                 scene1.appendChild(b);
             }
+        }
+        for (var i = 0; i < 100; i++) {
+            var ghost = document.createElement('a-entity');
+            var x = Math.random() * 500 - 250;
+            var y = Math.random() * 1010 + 1;
+            var z = Math.random() * 500 - 250;
+            var r = Math.random() * 180 - 90;
+            ghost.setAttribute('gltf-model', '#ghost');
+            ghost.setAttribute('position', x + ' ' + y + ' ' + z);
+            ghost.setAttribute('rotation', '0 ' + r + ' 0');
+            ghost.setAttribute('flying', '');
+            scene1.appendChild(ghost);
         }
     </script>
 </body>
