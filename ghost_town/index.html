@@ -54,6 +54,7 @@
             <a-camera id="cam" position="0 1000 4500"
                 animation="property: position; to: 0 1010 300; dur: 25000">
                 <a-sphere static-body colliding collider-check raycaster="objects: .collidable; showLine:true"></a-sphere>
+                <a-cursor fuse="true" fuse-timeout="500" visible="false"></a-cursor>
             </a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
