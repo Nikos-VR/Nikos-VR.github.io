@@ -3,6 +3,8 @@
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js">
     </script>
+    <script src="https://unpkg.com/@croquet/croquet"></script>
+    <script src="https://unpkg.com/aframe-croquet-component/public/lib/aframe-croquet-component.js"></script>
     <script>
         AFRAME.registerComponent('flying', {
             tick: function () {
@@ -24,7 +26,10 @@
     </script>
 </head>
 <body>
-    <a-scene id="s1" background="color: cadetblue">
+    <template id="avatarTemplate">
+        <a-entity gltf-model="#emoji" scale="0.5 0.5 0.5"></a-entity>
+    </template>
+    <a-scene id="s1" background="color: cadetblue" croquet>
         <a-assets>
             <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
             <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
