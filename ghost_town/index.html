@@ -55,13 +55,23 @@
 </head>
 <body>
     <a-scene id="s1">
-        <a-assets>
+        <a-assets timeout="10000">
             <a-asset-item id="ghost" src="ghost.gltf"></a-asset-item>
+            <img id="stars" src="eso0932a.jpg">
+            <img id="earth" src="flat_earth03.jpg">
+            <img id="b1" src="b1.png">
+            <img id="b2" src="b2.png">
+            <img id="b3" src="b3.png">
+            <img id="b4" src="b4.png">
+            <img id="b5" src="b5.png">
+            <img id="b6" src="b6.png">
+            <audio id="gun" src="mixkit-short-laser-gun-shot-1670.wav"></audio>
+            <audio id="explode" src="mixkit-explosion-in-battle-2809.wav"></audio>
         </a-assets>
-        <a-sky radius="5000" src="eso0932a.jpg"
+        <a-sky radius="5000" src="#stars"
             animation="property: rotation; to: 0 90 -30; dur: 20000">
         </a-sky>
-        <a-sphere radius="1000" src="flat_earth03.jpg"
+        <a-sphere radius="1000" src="#earth"
             animation="property: rotation; to: -30 360 0; dur: 30000">
         </a-sphere>
         <a-ring color="#666" radius-inner="0" radius-outer="990" rotation="-90 0 0">
@@ -73,8 +83,8 @@
                 <a-cursor animation="property: visible; to: true; dur: 25000"></a-cursor>
                 <a-entity id="laser"></a-entity>
                 <a-sphere static-body colliding></a-sphere>
-                <a-sound id="shot" src="mixkit-short-laser-gun-shot-1670.wav"></a-sound>
-                <a-sound id="crash" src="mixkit-explosion-in-battle-2809.wav"></a-sound>
+                <a-sound id="shot" src="#gun"></a-sound>
+                <a-sound id="crash" src="#explode"></a-sound>
             </a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
@@ -86,7 +96,7 @@
         for (var i = -350; i < 350; i += 70) {
             for (var j = -350; j < 350; j += 70) {
                 var box = document.createElement('a-box');
-                var tex = 'b' + Math.ceil(Math.random() * 6) + '.png';
+                var tex = '#b' + Math.ceil(Math.random() * 6);
                 var h = Math.ceil(Math.random() * 5) * 50;
                 box.setAttribute('src', tex);
                 box.setAttribute('repeat', '1 ' + (h / 50));
