@@ -27,19 +27,21 @@
 </head>
 <body>
     <a-scene id="s1" background="color: cadetblue" croquet>
-        <a-assets>
+        <a-assets timeout="5000">
             <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
             <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
             <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
             <a-asset-item id="emoji" src="emoji.gltf"></a-asset-item>
+            <audio id="hawk" src="Hawk Call 2x-SoundBible.com-1697796838.mp3"></audio>
+            <audio id="bzzz" src="Bee-SoundBible.com-914644763.mp3"></audio>
         </a-assets>
         <a-plane color="forestgreen" height="1000" width="1000" rotation="-90 0 0"></a-plane>
         <a-entity gltf-model="#bird" scale="5 5 5"
-            sound="src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2"
+            sound="src:#hawk; poolSize: 2"
             animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true"
             animation-mixer></a-entity>
         <a-entity gltf-model="#bird" scale="5 5 5" rotation="0 180 0"
-            sound="src: url(Hawk Call 2x-SoundBible.com-1697796838.mp3); poolSize: 2"
+            sound="src:#hawk; poolSize: 2"
             animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" sounding
             animation-mixer></a-entity>
         <a-entity id="rig">
@@ -73,7 +75,7 @@
             bee.setAttribute('gltf-model', '#bee');
             bee.setAttribute('position', x + ' ' + y + ' ' + z);
             bee.setAttribute('rotation', '0 ' + r + ' 0');
-            bee.setAttribute('sound', 'src: url(Bee-SoundBible.com-914644763.mp3); volume: 0.1; poolSize: 10');
+            bee.setAttribute('sound', 'src:#bzzz; volume: 0.1; poolSize: 10');
             bee.setAttribute('flying', '');
             bee.setAttribute('sounding', '');
             scene1.appendChild(bee);
