@@ -20,7 +20,7 @@
                 });
             }
         });
-        AFRAME.registerComponent('flying', {
+        AFRAME.registerComponent('ghosting', {
             init: function () {
                 var el = this.el;
                 var laser = document.getElementById('laser');
@@ -106,7 +106,7 @@
             ghost.setAttribute('scale', '500 500 500');
             ghost.setAttribute('position', x + ' ' + y + ' ' + z);
             ghost.setAttribute('rotation', '0 ' + r + ' 0');
-            ghost.setAttribute('flying', '');
+            ghost.setAttribute('ghosting', '');
             scene1.appendChild(ghost);
         }
     </script>
