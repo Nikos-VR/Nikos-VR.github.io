@@ -4,11 +4,11 @@
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
-        var unlocked = false, message = "", time = 6000;
+        var unlocked = false, message = "", time = 2500;
         
         AFRAME.registerComponent('messaging', {
             tick: function () {
-                var countdown = Math.round(time / 200);
+                var countdown = Math.round(time / 100);
                 if (message != "") this.el.setAttribute('value', message);
                 else {
                     this.el.setAttribute('value', '' + countdown);
