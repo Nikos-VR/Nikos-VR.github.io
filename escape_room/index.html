@@ -21,7 +21,7 @@
             init: function () {
                 var el = this.el;
                 el.addEventListener('mouseenter', function () {
-                    if (unlocked) {
+                    if (unlocked && time >= 0) {
                         el.setAttribute('color', 'slategrey');
                         message = "You are free!";
                     }
