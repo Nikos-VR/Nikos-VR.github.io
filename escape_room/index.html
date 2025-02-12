@@ -8,7 +8,7 @@
         
         AFRAME.registerComponent('messaging', {
             tick: function () {
-                var countdown = Math.round(time / 100);
+                var countdown = Math.round(time / 200);
                 if (message != "") this.el.setAttribute('value', message);
                 else {
                     this.el.setAttribute('value', '' + countdown);
