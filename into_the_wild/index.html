@@ -1,6 +1,8 @@
 <html>
 <head>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js">
+    </script>
 </head>
 <body>
     <a-scene id="s1" background="color: cadetblue">
@@ -13,8 +15,12 @@
             <audio id="bzzz" src="Bee-SoundBible.com-914644763.mp3"></audio>
         </a-assets>
         <a-plane color="forestgreen" height="1000" width="1000" rotation="-90 0 0"></a-plane>
-        <a-entity gltf-model="#bird" scale="5 5 5" position="-50 50 -100"></a-entity>
-        <a-entity gltf-model="#bird" scale="5 5 5" position="50 50 -100" rotation="0 180 0"></a-entity>
+        <a-entity gltf-model="#bird" scale="5 5 5"
+            animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true"
+            animation-mixer></a-entity>
+        <a-entity gltf-model="#bird" scale="5 5 5" rotation="0 180 0"
+            animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true"
+            animation-mixer></a-entity>
         <a-camera position="0 5 0"></a-camera>
     </a-scene>
     <script>
