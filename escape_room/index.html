@@ -18,7 +18,7 @@
         AFRAME.registerComponent('opening', {
             init: function () {
                 var el = this.el;
-                el.addEventListener('click', function () {
+                el.addEventListener('mouseenter', function () {
                     if (unlocked) {
                         el.setAttribute('color', 'slategrey');
                         message = "You are free!";
