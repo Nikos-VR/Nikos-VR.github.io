@@ -24,6 +24,7 @@
     </script>
     <script src="https://unpkg.com/@croquet/croquet"></script>
     <script src="https://unpkg.com/aframe-croquet-component/public/lib/aframe-croquet-component.js"></script>
+    <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
 </head>
 <body>
     <template id="avatarTemplate">
@@ -47,7 +48,10 @@
             sound="src:#hawk; poolSize: 2" sounding
             animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true"
             animation-mixer></a-entity>
-        <a-camera position="0 5 0"></a-camera>
+        <a-entity id="rig">
+            <a-camera position="0 5 0"></a-camera>
+            <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
+        </a-entity>
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
