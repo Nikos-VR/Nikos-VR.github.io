@@ -4,16 +4,12 @@
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js">
     </script>
     <script>
-        AFRAME.registerComponent('collider-check', {
-            init: function () {
-                this.el.addEventListener('raycaster-intersected', function () {
-                    this.el.setAttribute('color', 'red');
-                });
-            }
-        });
         AFRAME.registerComponent('removing', {
             init: function () {
                 var el = this.el;
+                el.addEventListener('raycaster-intersected', function () {
+                    el.setAttribute('color', 'red');
+                });
                 el.addEventListener('mouseenter', function () {
                     el.setAttribute('color', 'red');
                 });
