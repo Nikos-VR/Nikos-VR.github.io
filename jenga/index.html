@@ -6,8 +6,8 @@
     <script>
         AFRAME.registerComponent('collider-check', {
             init: function () {
-                this.el.addEventListener('raycaster-intersection', function () {
-                    console.log('Player hit something!');
+                this.el.addEventListener('raycaster-intersected', function () {
+                    this.el.setAttribute('color', 'red');
                 });
             }
         });
@@ -40,7 +40,7 @@
                 var box = document.createElement('a-box');
                 box.setAttribute('dynamic-body', '');
                 box.setAttribute('removing', '');
-                box.setAttribute('class', 'collidable');
+                box.setAttribute('collider-check', '');
                 box.setAttribute('position', e * (j - 2) + ' ' + (i + 0.5) + ' ' + (-12 - (j - 2) * o));
                 box.setAttribute('color', 'firebrick');
                 box.setAttribute('scale', (4 * o + 1) + ' 1 ' + (4 * e + 1));
