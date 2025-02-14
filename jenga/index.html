@@ -7,9 +7,6 @@
         AFRAME.registerComponent('removing', {
             init: function () {
                 var el = this.el;
-                el.addEventListener('raycaster-intersected', function () {
-                    el.setAttribute('color', 'red');
-                });
                 el.addEventListener('mouseenter', function () {
                     el.setAttribute('color', 'red');
                 });
