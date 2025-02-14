@@ -23,7 +23,7 @@
 <body>
     <a-scene id="s1" background="color: cadetblue">
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
-        <a-entity raycaster="objects: .collidable; showLine:true;" cursor="fuse: true" oculus-touch-controls="hand: right"></a-entity>
+        <a-entity raycaster="showLine:true;" cursor="fuse: true" oculus-touch-controls="hand: right"></a-entity>
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
@@ -33,7 +33,6 @@
                 var box = document.createElement('a-box');
                 box.setAttribute('dynamic-body', '');
                 box.setAttribute('removing', '');
-                box.setAttribute('class', 'collidable');
                 box.setAttribute('position', e * (j - 2) + ' ' + (i + 0.5) + ' ' + (-12 - (j - 2) * o));
                 box.setAttribute('color', 'firebrick');
                 box.setAttribute('scale', (4 * o + 1) + ' 1 ' + (4 * e + 1));
