@@ -20,7 +20,7 @@
     <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse">
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-entity id="rig">
-            <!--<a-camera><a-cursor fuse="true" fuse-timeout="5000"></a-cursor></a-camera>-->
+            <a-camera><!--<a-cursor fuse="true" fuse-timeout="5000"></a-cursor>--></a-camera>
             <a-entity cursor raycaster="objects: .bricks; showLine: true; lineColor: goldenrod" oculus-touch-controls="hand: right"></a-entity>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
