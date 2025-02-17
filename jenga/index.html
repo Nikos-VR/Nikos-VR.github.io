@@ -1,7 +1,9 @@
 <html>
+
 <head>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
         var pp, c;
@@ -41,29 +43,31 @@
         });
     </script>
 </head>
+
 <body>
-        <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse">
-            <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
-            <a-entity id="rig">
-                <a-camera wasd-controls="fly: true"></a-camera>
-                <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
-                <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
-            </a-entity>
-        </a-scene>
+    <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse">
+        <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
+        <a-entity id="rig">
+            <a-camera wasd-controls="fly: true"></a-camera>
+            <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
+            <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
+        </a-entity>
+    </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
-            for (var i = 0; i < 9; i++) {
-                var e = i % 2, o = !e;
-                for (var j = 0; j < 5; j++) {
-                    var box = document.createElement('a-box');
-                    box.setAttribute('dynamic-body', '');
-                    box.setAttribute('moving', '');
-                    box.setAttribute('position', e * (j - 2) + ' ' + (i + 0.5) + ' ' + (-12 - (j - 2) * o));
-                    box.setAttribute('color', 'firebrick');
-                    box.setAttribute('scale', (4 * o + 1) + ' 1 ' + (4 * e + 1));
-                    scene1.appendChild(box);
-                }
+        for (var i = 0; i < 9; i++) {
+            var e = i % 2, o = !e;
+            for (var j = 0; j < 5; j++) {
+                var box = document.createElement('a-box');
+                box.setAttribute('dynamic-body', '');
+                box.setAttribute('moving', '');
+                box.setAttribute('position', e * (j - 2) + ' ' + (i + 0.5) + ' ' + (-12 - (j - 2) * o));
+                box.setAttribute('color', 'firebrick');
+                box.setAttribute('scale', (4 * o + 1) + ' 1 ' + (4 * e + 1));
+                scene1.appendChild(box);
             }
+        }
     </script>
 </body>
+
 </html>
