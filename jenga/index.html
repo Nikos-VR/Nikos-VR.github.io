@@ -33,11 +33,11 @@
         });
     </script>
     <style>
-        a-scene { width: 99%; height: 50%; }
-        div { text-align: center; float: left; width: 50%; }
+        a-scene { width: 100%; height: 50%; }
+        div { text-align: center; display: inline-block; width: 30%; margin: 3%; }
     </style>
 </head>
-<body>
+<body style="text-align: center;">
     <script>
         function tower(s) {
             for (var i = 0; i < 9; i++) {
@@ -54,10 +54,10 @@
             }
         }
     </script>
-    <h1 style="text-align: center;">JENGA</h1><hr />
-    <div onclick="this.requestFullscreen();">
+    <h1>JENGA</h1><hr />
+    <div>
         <h3>Desktop version</h3>
-        <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse" embedded>
+        <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse" xr-mode-ui="enabled: false" embedded onclick="this.requestFullscreen();">
             <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
             <a-camera wasd-controls="fly: true"></a-camera>
         </a-scene>
