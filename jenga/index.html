@@ -12,8 +12,8 @@
                 var el = this.el;
                 el.addEventListener('mouseenter', function () { el.setAttribute('color', 'red'); });
                 el.addEventListener('mouseleave', function () { el.setAttribute('color', 'firebrick'); });
-                el.addEventListener('mousedown', function () { el.setAttribute('grabbed', ''); });
-                el.addEventListener('mouseup', function () { el.removeAttribute('grabbed'); pp = null; });
+                el.addEventListener('mousedown', function () { el.setAttribute('color', 'green'); el.setAttribute('grabbed', ''); });
+                el.addEventListener('mouseup', function () { el.setAttribute('color', 'blue'); el.removeAttribute('grabbed'); pp = null; });
             },
             tick: function () {
                 var el = this.el;
