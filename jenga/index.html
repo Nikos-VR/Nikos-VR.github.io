@@ -4,6 +4,7 @@
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js">
     </script>
+    <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
         var pp;
         AFRAME.registerComponent('moving', {
@@ -11,8 +12,10 @@
                 var el = this.el;
                 el.addEventListener('mouseenter', function () { el.setAttribute('color', 'red'); });
                 el.addEventListener('mouseleave', function () { el.setAttribute('color', 'firebrick'); });
-                el.addEventListener('mousedown', function () { el.setAttribute('color', 'green'); el.setAttribute('grabbed', ''); });
-                el.addEventListener('mouseup', function () { el.setAttribute('color', 'blue'); el.removeAttribute('grabbed'); pp = null; });
+                el.addEventListener('mousedown', function () { el.setAttribute('grabbed', ''); });
+                el.addEventListener('mouseup', function () { el.removeAttribute('grabbed'); pp = null; });
+                el.addEventListener('triggerdown', function () { el.setAttribute('grabbed', ''); });
+                el.addEventListener('triggerup', function () { el.removeAttribute('grabbed'); pp = null; });
             },
             tick: function () {
                 var el = this.el;
@@ -36,9 +39,13 @@
 </head>
 
 <body>
-    <a-scene id="s1" background="color: cadetblue">
+    <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse">
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
-        <a-camera><a-cursor fuse="true" fuse-timeout="3000"></a-cursor></a-camera>
+        <a-entity id="rig">
+            <a-camera wasd-controls="fly: true"></a-camera>
+            <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
+            <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
+        </a-entity>
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
