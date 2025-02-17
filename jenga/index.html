@@ -34,10 +34,17 @@
             }
         });
     </script>
+    <style>
+        a-scene { width: 40%; margin: 5% }
+    </style>
 </head>
 
 <body>
-    <a-scene id="s1" background="color: cadetblue">
+    <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse" embedded>
+        <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
+        <a-camera wasd-controls="fly: true"></a-camera>
+    </a-scene>
+    <a-scene id="s2" background="color: cadetblue" embedded>
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-entity id="rig">
             <a-camera wasd-controls="fly: true"></a-camera>
@@ -47,6 +54,7 @@
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
+        var scene2 = document.getElementById('s2');
         for (var i = 0; i < 9; i++) {
             var e = i % 2, o = !e;
             for (var j = 0; j < 5; j++) {
@@ -57,6 +65,7 @@
                 box.setAttribute('color', 'firebrick');
                 box.setAttribute('scale', (4 * o + 1) + ' 1 ' + (4 * e + 1));
                 scene1.appendChild(box);
+                scene2.appendChild(box);
             }
         }
     </script>
