@@ -4,7 +4,6 @@
     <script
         src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js">
     </script>
-    <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
         var pp;
         AFRAME.registerComponent('moving', {
@@ -38,10 +37,6 @@
 <body>
     <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse">
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
-        <a-entity id="rig">
-            <a-camera wasd-controls="fly: true"></a-camera>
-            <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
-        </a-entity>
          <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
     </a-scene>
     <script>
