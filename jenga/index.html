@@ -6,12 +6,31 @@
     </script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
-        AFRAME.registerComponent('removing', {
+        var pp;
+        AFRAME.registerComponent('moving', {
             init: function () {
                 var el = this.el;
                 el.addEventListener('mouseenter', function () { el.setAttribute('color', 'red'); });
                 el.addEventListener('mouseleave', function () { el.setAttribute('color', 'firebrick'); });
-                el.addEventListener('click', function () { el.remove(); });
+                el.addEventListener('mousedown', function () { el.setAttribute('grabbed', ''); });
+                el.addEventListener('mouseup', function () { el.removeAttribute('grabbed'); pp = null; });
+            },
+            tick: function () {
+                var el = this.el;
+                if (el.getAttribute('grabbed') != null) {
+                    try {
+                        var pos = el.getAttribute('position');
+                        var p = document.querySelector('[cursor]').components.raycaster.getIntersection(el).point;
+                        if (pp) {
+                            pos.x += p.x - pp.x, pos.y += p.y - pp.y, pos.z += p.z - pp.z;
+                            el.removeAttribute('dynamic-body');
+                            el.setAttribute('position', pos);
+                            el.setAttribute('dynamic-body', '');
+                        }
+                        pp = p;
+                    }
+                    catch { el.removeAttribute('grabbed'); pp = null; }
+                }
             }
         });
     </script>
@@ -20,8 +39,8 @@
     <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse">
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-entity id="rig">
-            <a-camera><!--<a-cursor fuse="true" fuse-timeout="5000"></a-cursor>--></a-camera>
-            <a-entity cursor raycaster="objects: .bricks; showLine: true; lineColor: goldenrod" oculus-touch-controls="hand: right"></a-entity>
+            <a-camera fly="true"><!--<a-cursor fuse="true" fuse-timeout="5000"></a-cursor>--></a-camera>
+            <a-cursor raycaster="objects: .bricks; showLine: true; lineColor: goldenrod" oculus-touch-controls="hand: right"></a-cursor>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
     </a-scene>
@@ -32,7 +51,7 @@
             for (var j = 0; j < 5; j++) {
                 var box = document.createElement('a-box');
                 box.setAttribute('dynamic-body', '');
-                box.setAttribute('removing', '');
+                box.setAttribute('moving', '');
                 box.setAttribute('class', 'bricks');
                 box.setAttribute('position', e * (j - 2) + ' ' + (i + 0.5) + ' ' + (-12 - (j - 2) * o));
                 box.setAttribute('color', 'firebrick');
