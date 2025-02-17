@@ -40,7 +40,7 @@
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-entity id="rig">
             <a-camera fly="true"><!--<a-cursor fuse="true" fuse-timeout="5000"></a-cursor>--></a-camera>
-            <a-cursor raycaster="objects: .bricks; showLine: true; lineColor: goldenrod" oculus-touch-controls="hand: right"></a-cursor>
+            <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
     </a-scene>
@@ -52,7 +52,6 @@
                 var box = document.createElement('a-box');
                 box.setAttribute('dynamic-body', '');
                 box.setAttribute('moving', '');
-                box.setAttribute('class', 'bricks');
                 box.setAttribute('position', e * (j - 2) + ' ' + (i + 0.5) + ' ' + (-12 - (j - 2) * o));
                 box.setAttribute('color', 'firebrick');
                 box.setAttribute('scale', (4 * o + 1) + ' 1 ' + (4 * e + 1));
