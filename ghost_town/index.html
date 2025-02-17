@@ -54,7 +54,7 @@
     </script>
 </head>
 <body>
-    <a-scene id="s1" fog="type: exponential; color: #AAA">
+    <a-scene id="s1">
         <a-assets timeout="10000">
             <a-asset-item id="ghost" src="ghost.gltf"></a-asset-item>
             <img id="stars" src="eso0932a.jpg">
@@ -101,6 +101,7 @@
                 box.setAttribute('src', tex);
                 box.setAttribute('repeat', '1 ' + (h / 50));
                 box.setAttribute('dynamic-body', '');
+                box.setAttribute('opacity', '0.9');
                 box.setAttribute('scale', '50 ' + h + ' 50');
                 box.setAttribute('position', i + ' ' + (h / 2) + ' ' + j);
                 scene1.appendChild(box);
