@@ -12,9 +12,9 @@
                 el.addEventListener('mouseleave', function () { el.setAttribute('color', 'firebrick'); });
                 el.addEventListener('mousedown', function () {
                     el.setAttribute('grabbed', '');
-                    var xr = document.querySelector('a-scene').getAttribute('xr-mode-ui');
-                    console.log(xr);
-                    c = document.querySelector('a-cursor') || document.querySelector('[cursor]');
+                    var xr = document.querySelector('a-scene').is('vr-mode');
+                    if (xr) c = document.querySelector('a-cursor');
+                    else c = document.querySelector('[cursor]');
                 });
                 el.addEventListener('mouseup', function () {
                     el.removeAttribute('grabbed');
