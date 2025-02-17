@@ -1,9 +1,7 @@
 <html>
-
 <head>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
         var pp;
@@ -35,40 +33,49 @@
         });
     </script>
     <style>
-        a-scene { width: 40%; margin: 5% }
+        a-scene { width: 99%; height: 50%; }
+        div { text-align: center; width: 50%; }
     </style>
 </head>
-
 <body>
-    <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse" embedded>
-        <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
-        <a-camera wasd-controls="fly: true"></a-camera>
-    </a-scene>
-    <a-scene id="s2" background="color: cadetblue" embedded>
-        <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
-        <a-entity id="rig">
-            <a-camera wasd-controls="fly: true"></a-camera>
-            <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
-            <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
-        </a-entity>
-    </a-scene>
     <script>
-        var scene1 = document.getElementById('s1');
-        var scene2 = document.getElementById('s2');
-        for (var i = 0; i < 9; i++) {
-            var e = i % 2, o = !e;
-            for (var j = 0; j < 5; j++) {
-                var box = document.createElement('a-box');
-                box.setAttribute('dynamic-body', '');
-                box.setAttribute('moving', '');
-                box.setAttribute('position', e * (j - 2) + ' ' + (i + 0.5) + ' ' + (-12 - (j - 2) * o));
-                box.setAttribute('color', 'firebrick');
-                box.setAttribute('scale', (4 * o + 1) + ' 1 ' + (4 * e + 1));
-                scene1.appendChild(box);
-                scene2.appendChild(box);
+        function tower(s) {
+            for (var i = 0; i < 9; i++) {
+                var e = i % 2, o = !e;
+                for (var j = 0; j < 5; j++) {
+                    var box = document.createElement('a-box');
+                    box.setAttribute('dynamic-body', '');
+                    box.setAttribute('moving', '');
+                    box.setAttribute('position', e * (j - 2) + ' ' + (i + 0.5) + ' ' + (-12 - (j - 2) * o));
+                    box.setAttribute('color', 'firebrick');
+                    box.setAttribute('scale', (4 * o + 1) + ' 1 ' + (4 * e + 1));
+                    s.appendChild(box);
+                }
             }
         }
     </script>
+    <h1 style="text-align: center;">JENGA</h1><hr />
+    <div>
+        <h3>Desktop version</h3>
+        <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse" embedded>
+            <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
+            <a-camera wasd-controls="fly: true"></a-camera>
+        </a-scene>
+        <p>Use the mouse and the keyboard.</p>
+        <script>tower(document.getElementById('s1'));</script>
+    </div>
+    <div>
+        <h3>Meta Quest 2 version</h3>
+        <a-scene id="s2" background="color: cadetblue" embedded>
+            <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
+            <a-entity id="rig">
+                <a-camera wasd-controls="fly: true"></a-camera>
+                <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
+                <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
+            </a-entity>
+        </a-scene>
+        <p>Use the right hand controller.</p>
+        <script>tower(document.getElementById('s2'));</script>
+    </div>
 </body>
-
 </html>
