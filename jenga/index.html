@@ -11,8 +11,8 @@
                 var el = this.el;
                 el.addEventListener('mouseenter', function () { el.setAttribute('color', 'red'); });
                 el.addEventListener('mouseleave', function () { el.setAttribute('color', 'firebrick'); });
-                el.addEventListener('mousedown', function () { el.setAttribute('grabbed', ''); });
-                el.addEventListener('mouseup', function () { el.removeAttribute('grabbed'); pp = null; });
+                el.addEventListener('mousedown', function () { el.setAttribute('color', 'green'); el.setAttribute('grabbed', ''); });
+                el.addEventListener('mouseup', function () { el.setAttribute('color', 'blue'); el.removeAttribute('grabbed'); pp = null; });
             },
             tick: function () {
                 var el = this.el;
@@ -38,8 +38,7 @@
 <body>
     <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse">
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
-            <a-camera>
-            <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor></a-camera>
+        <a-camera><a-cursor fuse="true" fuse-timeout="3000"></a-cursor></a-camera>
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
