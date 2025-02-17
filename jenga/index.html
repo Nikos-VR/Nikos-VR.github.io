@@ -4,21 +4,27 @@
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
-        var pp;
+        var pp, c;
         AFRAME.registerComponent('moving', {
             init: function () {
                 var el = this.el;
                 el.addEventListener('mouseenter', function () { el.setAttribute('color', 'red'); });
                 el.addEventListener('mouseleave', function () { el.setAttribute('color', 'firebrick'); });
-                el.addEventListener('mousedown', function () { el.setAttribute('grabbed', ''); });
-                el.addEventListener('mouseup', function () { el.removeAttribute('grabbed'); pp = null; });
+                el.addEventListener('mousedown', function () {
+                    el.setAttribute('grabbed', '');
+                    c = document.querySelector('a-cursor') || document.querySelector('[cursor]');
+                });
+                el.addEventListener('mouseup', function () {
+                    el.removeAttribute('grabbed');
+                    pp = null;
+                });
             },
             tick: function () {
                 var el = this.el;
                 if (el.getAttribute('grabbed') != null) {
                     try {
                         var pos = el.getAttribute('position');
-                        var p = document.querySelector('[cursor]').components.raycaster.getIntersection(el).point;
+                        var p = c.components.raycaster.getIntersection(el).point;
                         if (pp) {
                             pos.x += p.x - pp.x, pos.y += p.y - pp.y, pos.z += p.z - pp.z;
                             el.removeAttribute('dynamic-body');
@@ -32,14 +38,18 @@
             }
         });
     </script>
-    <style>
-        a-scene { width: 100%; height: 50%; }
-        div { text-align: center; display: inline-block; width: 30%; margin: 3%; }
-    </style>
 </head>
-<body style="text-align: center;">
+<body>
+        <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse">
+            <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
+            <a-entity id="rig">
+                <a-camera wasd-controls="fly: true"></a-camera>
+                <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
+                <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
+            </a-entity>
+        </a-scene>
     <script>
-        function tower(s) {
+        var scene1 = document.getElementById('s1');
             for (var i = 0; i < 9; i++) {
                 var e = i % 2, o = !e;
                 for (var j = 0; j < 5; j++) {
@@ -49,33 +59,9 @@
                     box.setAttribute('position', e * (j - 2) + ' ' + (i + 0.5) + ' ' + (-12 - (j - 2) * o));
                     box.setAttribute('color', 'firebrick');
                     box.setAttribute('scale', (4 * o + 1) + ' 1 ' + (4 * e + 1));
-                    s.appendChild(box);
+                    scene1.appendChild(box);
                 }
             }
-        }
     </script>
-    <h1>JENGA</h1><hr />
-    <div>
-        <h3>Desktop version</h3>
-        <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse" xr-mode-ui="enabled: false" embedded onclick="this.requestFullscreen();">
-            <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
-            <a-camera wasd-controls="fly: true"></a-camera>
-        </a-scene>
-        <p>Use the mouse and the keyboard.</p>
-        <script>tower(document.getElementById('s1'));</script>
-    </div>
-    <div>
-        <h3>Meta Quest version</h3>
-        <a-scene id="s2" background="color: cadetblue" embedded>
-            <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
-            <a-entity id="rig">
-                <a-camera wasd-controls="fly: true"></a-camera>
-                <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
-                <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
-            </a-entity>
-        </a-scene>
-        <p>Use the right hand controller.</p>
-        <script>tower(document.getElementById('s2'));</script>
-    </div>
 </body>
 </html>
