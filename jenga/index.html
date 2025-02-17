@@ -20,7 +20,7 @@
                 if (el.getAttribute('grabbed') != null) {
                     try {
                         var pos = el.getAttribute('position');
-                        var p = document.getElementById('ray').components.raycaster.getIntersection(el).point;
+                        var p = document.querySelector('a-cursor').components.raycaster.getIntersection(el).point;
                         if (pp) {
                             pos.x += p.x - pp.x, pos.y += p.y - pp.y, pos.z += p.z - pp.z;
                             el.removeAttribute('dynamic-body');
@@ -41,7 +41,7 @@
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-entity id="rig">
             <a-camera wasd-controls="fly: true"></a-camera>
-            <a-cursor id="ray" raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
+            <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
     </a-scene>
