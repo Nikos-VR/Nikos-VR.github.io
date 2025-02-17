@@ -20,7 +20,7 @@
                 if (el.getAttribute('grabbed') != null) {
                     try {
                         var pos = el.getAttribute('position');
-                        var p = document.querySelector('a-cursor').components.raycaster.getIntersection(el).point;
+                        var p = document.querySelector('[cursor]').components.raycaster.getIntersection(el).point;
                         if (pp) {
                             pos.x += p.x - pp.x, pos.y += p.y - pp.y, pos.z += p.z - pp.z;
                             el.removeAttribute('dynamic-body');
