@@ -46,7 +46,7 @@
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-entity id="rig">
             <a-camera position="0 10 5"></a-camera>
-            <a-cursor raycaster="objects: .bricks; showLine: true; useWorldCoordinates: true" oculus-touch-controls="hand: right"></a-cursor>
+            <a-cursor raycaster oculus-touch-controls="hand: right"></a-cursor>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
     </a-scene>
@@ -56,7 +56,6 @@
             var e = i % 2, o = !e;
             for (var j = 0; j < 5; j++) {
                 var box = document.createElement('a-box');
-                box.setAttribute('class', 'bricks');
                 box.setAttribute('dynamic-body', '');
                 box.setAttribute('moving', '');
                 box.setAttribute('position', e * (j - 2) + ' ' + (i + 0.5) + ' ' + (-12 - (j - 2) * o));
