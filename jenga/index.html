@@ -17,7 +17,10 @@
                         c = document.querySelector('a-cursor');
                         c.setAttribute('raycaster', {showLine: true, direction: 0 -1 -1});
                     }
-                    else c = document.querySelector('[cursor]');
+                    else {
+                        c = document.querySelector('[cursor]');
+                        c.removeAttribute('raycaster');
+                    }
                 });
                 el.addEventListener('mouseup', function () {
                     el.removeAttribute('grabbed');
@@ -49,7 +52,7 @@
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-entity id="rig">
             <a-camera wasd-controls="fly: true"></a-camera>
-            <a-cursor raycaster oculus-touch-controls="hand: right"></a-cursor>
+            <a-cursor oculus-touch-controls="hand: right"></a-cursor>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
     </a-scene>
