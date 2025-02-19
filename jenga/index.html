@@ -60,6 +60,7 @@
                 box.setAttribute('moving', '');
                 box.setAttribute('position', e * (j - 2) / 5 + ' ' + (i + 1) / 5 + ' ' + (-12 - (j - 2) * o) / 5);
                 box.setAttribute('color', 'firebrick');
+                box.setAttribute('metalness', '' + Math.random());
                 box.setAttribute('scale', (4 * o + 1) / 5 + ' 0.2 ' + (4 * e + 1) / 5);
                 scene1.appendChild(box);
             }
