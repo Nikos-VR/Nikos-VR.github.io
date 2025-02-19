@@ -42,11 +42,11 @@
     </script>
 </head>
 <body>
-    <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse" physics="frictionEquationStiffness: 1e100; restitution: 0.001">
+    <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse" physics="gravity: -5; iterations: 100; maxInterval: 0.01">
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-entity id="rig">
-            <a-camera position="0 5 5"></a-camera>
-            <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
+            <a-camera></a-camera>
+            <a-cursor raycaster="showLine: true; direction: 0 0 -1" oculus-touch-controls="hand: right"></a-cursor>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
     </a-scene>
@@ -58,9 +58,9 @@
                 var box = document.createElement('a-box');
                 box.setAttribute('dynamic-body', '');
                 box.setAttribute('moving', '');
-                box.setAttribute('position', e * (j - 2) / 2 + ' ' + (i + 0.5) / 2 + ' ' + (-12 - (j - 2) * o) / 2);
+                box.setAttribute('position', e * (j - 2) / 5 + ' ' + (i + 1) / 5 + ' ' + (-12 - (j - 2) * o) / 5);
                 box.setAttribute('color', 'firebrick');
-                box.setAttribute('scale', (4 * o + 1) / 2 + ' 0.5 ' + (4 * e + 1) / 2);
+                box.setAttribute('scale', (4 * o + 1) / 5 + ' 0.2 ' + (4 * e + 1) / 5);
                 scene1.appendChild(box);
             }
         }
