@@ -13,7 +13,10 @@
                 el.addEventListener('mousedown', function () {
                     el.setAttribute('grabbed', '');
                     var xr = document.querySelector('a-scene').is('vr-mode');
-                    if (xr) c = document.querySelector('a-cursor');
+                    if (xr) {
+                        c = document.querySelector('a-cursor');
+                        c.setAttribute('raycaster', {showLine: true, direction: 0 -1 -1});
+                    }
                     else c = document.querySelector('[cursor]');
                 });
                 el.addEventListener('mouseup', function () {
@@ -46,7 +49,7 @@
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-entity id="rig">
             <a-camera wasd-controls="fly: true"></a-camera>
-            <a-cursor raycaster="showLine: true; direction: 0 -1 -1" oculus-touch-controls="hand: right"></a-cursor>
+            <a-cursor raycaster oculus-touch-controls="hand: right"></a-cursor>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
     </a-scene>
