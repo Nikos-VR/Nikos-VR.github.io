@@ -19,7 +19,7 @@
                     }
                     else {
                         c = document.querySelector('[cursor]');
-                        c.removeAttribute('raycaster');
+                        c.setAttribute('raycaster', '');
                     }
                 });
                 el.addEventListener('mouseup', function () {
@@ -52,7 +52,7 @@
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-entity id="rig">
             <a-camera wasd-controls="fly: true"></a-camera>
-            <a-cursor oculus-touch-controls="hand: right"></a-cursor>
+            <a-cursor raycaster oculus-touch-controls="hand: right"></a-cursor>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
     </a-scene>
