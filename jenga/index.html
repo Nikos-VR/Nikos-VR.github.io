@@ -13,10 +13,7 @@
                 el.addEventListener('mousedown', function () {
                     el.setAttribute('grabbed', '');
                     var xr = document.querySelector('a-scene').is('vr-mode');
-                    if (xr) {
-                        c = document.querySelector('a-cursor');
-                        c.setAttribute('raycaster', 'direction: 0 -1 -1');
-                    }
+                    if (xr) c = document.querySelector('a-cursor');
                     else c = document.querySelector('[cursor]');
                 });
                 el.addEventListener('mouseup', function () {
