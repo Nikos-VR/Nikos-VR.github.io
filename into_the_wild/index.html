@@ -47,8 +47,10 @@
         <a-entity light="type: directional;
                    castShadow: true;
                    intensity: 0.4;
-                   shadowCameraVisible: true;"
-            position="-5 3 1.5"></a-entity>
+                   shadowCameraTop:    10;
+                   shadowCameraRight:  10;
+                   shadowCameraLeft:  -10" 
+        position="-5 3 1.5"></a-entity>
         <a-entity gltf-model="#bird" scale="5 5 5"
             sound="src:#hawk; poolSize: 2" sounding
             animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true"
