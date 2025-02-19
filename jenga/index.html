@@ -15,7 +15,7 @@
                     var xr = document.querySelector('a-scene').is('vr-mode');
                     if (xr) {
                         c = document.querySelector('a-cursor');
-                        c.setAttribute('raycaster.direction', '0 -1 -1');
+                        c.setAttribute('raycaster', 'direction: 0 -1 -1');
                     }
                     else c = document.querySelector('[cursor]');
                 });
