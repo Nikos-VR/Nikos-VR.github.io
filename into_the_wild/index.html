@@ -28,7 +28,7 @@
 </head>
 <body>
     <template id="avatarTemplate">
-        <a-entity gltf-model="#bee" scale="0.01 0.01 0.01"></a-entity>
+        <a-entity gltf-model="#bee" scale="0.1 0.1 0.1"></a-entity>
     </template>
     <a-scene id="s1" background="color: darkslategray" fog="near: 0; far: 300" croquet>
         <a-entity id="rig">
@@ -45,11 +45,11 @@
         <a-plane color="#1a0d00" height="1000" width="1000" rotation="-90 0 0"></a-plane>
         <a-entity gltf-model="#bird" scale="5 5 5"
             sound="src:#hawk; poolSize: 2" sounding
-            animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true"
+            animation="property: position; from: -50 75 -500; to: -50 75 500; dur: 25000; loop: true"
             animation-mixer></a-entity>
         <a-entity gltf-model="#bird" scale="5 5 5" rotation="0 180 0"
             sound="src:#hawk; poolSize: 2" sounding
-            animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true"
+            animation="property: position; from: 50 75 500; to: 50 75 -500; dur: 33000; loop: true"
             animation-mixer></a-entity>
         <a-light type="ambient" intensity="0.25"></a-light>
     </a-scene>
