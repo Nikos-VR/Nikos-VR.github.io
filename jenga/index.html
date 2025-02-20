@@ -44,7 +44,7 @@
         <a-plane static-body height="100" width="100" rotation="-90 0 0" color="tan"></a-plane>
         <a-entity id="rig">
             <a-camera wasd-controls="fly: true"></a-camera>
-            <a-cursor raycaster="objects: .bricks; showLine: true" oculus-touch-controls="hand: right"></a-cursor>
+            <a-cursor raycaster="showLine: true" oculus-touch-controls="hand: right"></a-cursor>
             <a-entity oculus-touch-controls="hand: left" oculus-thumbstick-controls></a-entity>
         </a-entity>
     </a-scene>
@@ -60,7 +60,6 @@
                 box.setAttribute('color', 'hsl(0, ' + (50 + Math.random() * 50) + '%, ' + (5 + Math.random() * 25) + '%)');
                 box.setAttribute('scale', (4 * o + 1) / 5 + ' 0.2 ' + (4 * e + 1) / 5);
                 scene1.appendChild(box);
-                box.classList.add("bricks");
             }
         }
     </script>
