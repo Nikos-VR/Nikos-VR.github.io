@@ -8,7 +8,7 @@
         AFRAME.registerComponent('moving', {
             init: function () {
                 var el = this.el;
-                el.addEventListener('mouseenter', function () { el.setAttribute('opacity', '0.5'); });
+                el.addEventListener('mouseenter', function () { el.setAttribute('opacity', '0.75'); });
                 el.addEventListener('mouseleave', function () { el.setAttribute('opacity', '1'); });
                 el.addEventListener('mousedown', function () {
                     el.setAttribute('grabbed', '');
