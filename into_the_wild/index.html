@@ -32,7 +32,6 @@
         <a-entity gltf-model="#emoji" scale="0.5 0.5 0.5"></a-entity>
     </template>
     <a-scene id="s1" croquet>
-        <a-entity environment="skyColor: darkslategray; shadow: true; fog: 0.25; stageSize: 1000"></a-entity>
         <a-entity id="rig">
             <a-camera position="0 5 0"></a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
@@ -45,7 +44,8 @@
             <audio id="hawk" src="Hawk Call 2x-SoundBible.com-1697796838.mp3"></audio>
             <audio id="bzzz" src="Bee-SoundBible.com-914644763.mp3"></audio>
         </a-assets>
-        <a-plane color="forestgreen" height="1000" width="1000" rotation="-90 0 0"></a-plane>
+        <a-entity environment="skyColor: darkslategray; shadow: true; fog: 0.25; stageSize: 1000">
+        <a-plane color="forestgreen" height="1000" width="1000" rotation="-90 0 0"></a-plane></a-entity>
         <a-entity gltf-model="#bird" scale="5 5 5"
             sound="src:#hawk; poolSize: 2" sounding
             animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true"
