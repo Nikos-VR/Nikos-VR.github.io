@@ -45,13 +45,13 @@
         <a-plane color="#1a0d00" height="1000" width="1000" rotation="-90 0 0"></a-plane>
         <a-entity gltf-model="#bird" scale="5 5 5"
             sound="src:#hawk; poolSize: 2" sounding
-            animation="property: position; from: -50 75 -500; to: -50 75 500; dur: 25000; loop: true"
+            animation="property: position; from: -50 100 -500; to: -50 100 500; dur: 25000; loop: true"
             animation-mixer></a-entity>
         <a-entity gltf-model="#bird" scale="5 5 5" rotation="0 180 0"
             sound="src:#hawk; poolSize: 2" sounding
-            animation="property: position; from: 50 75 500; to: 50 75 -500; dur: 33000; loop: true"
+            animation="property: position; from: 50 100 500; to: 50 100 -500; dur: 33000; loop: true"
             animation-mixer></a-entity>
-        <a-light type="ambient" intensity="0.5"></a-light>
+        <a-light type="ambient" intensity="0.3"></a-light>
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
