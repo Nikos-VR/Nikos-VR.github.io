@@ -57,7 +57,7 @@
                 box.setAttribute('dynamic-body', '');
                 box.setAttribute('moving', '');
                 box.setAttribute('position', e * (j - 2) / 5 + ' ' + (i + 1) / 5 + ' ' + (-12 - (j - 2) * o) / 5);
-                box.setAttribute('color', 'hsl(0, ' + (50 + Math.random() * 50) + '%, 25%)');
+                box.setAttribute('color', 'hsl(0, ' + (50 + Math.random() * 50) + '%, ' + (10 + Math.random() * 30) + '%)');
                 box.setAttribute('scale', (4 * o + 1) / 5 + ' 0.2 ' + (4 * e + 1) / 5);
                 scene1.appendChild(box);
                 box.classList.add("bricks");
