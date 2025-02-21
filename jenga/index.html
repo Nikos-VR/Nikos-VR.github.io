@@ -45,7 +45,7 @@
     <a-scene id="s1" background="color: cadetblue" cursor="rayOrigin: mouse" physics="gravity: -5; iterations: 100; maxInterval: 0.01">
         <a-plane static-body height="100" width="100" rotation="-90 0 0"></a-plane>
         <a-entity id="rig">
-            <a-camera wasd-controls="fly: true"></a-camera>
+            <a-camera position="0 1 2" wasd-controls="fly: true"></a-camera>
             <a-cursor raycaster="objects: .bricks; showLine: true; far: 5" oculus-touch-controls="hand: right"></a-cursor>
             <a-entity oculus-touch-controls="hand: left" oculus-thumbstick-controls></a-entity>
         </a-entity>
