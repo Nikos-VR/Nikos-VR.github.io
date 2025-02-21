@@ -21,12 +21,6 @@
                 if (sound) sound.playSound();
             }
         });
-        AFRAME.registerComponent('watching', {
-            init: function () {
-                var el = this.el;
-                el.addEventListener('mouseenter', function () { console.log(this.el); });
-            }
-        });
     </script>
     <script src="https://unpkg.com/@croquet/croquet"></script>
     <script src="https://unpkg.com/aframe-croquet-component/public/lib/aframe-croquet-component.js"></script>
@@ -34,11 +28,11 @@
 </head>
 <body>
     <template id="avatarTemplate">
-        <a-entity id="test" gltf-model="#robot" scale="0.01 0.01 0.01" rotation="0 180 0" watching></a-entity>
+        <a-entity gltf-model="#robot" scale="0.01 0.01 0.01" rotation="0 180 0"></a-entity>
     </template>
     <a-scene id="s1" background="color: darkslategray" fog="near: 0; far: 300" croquet>
         <a-entity id="rig">
-            <a-camera position="0 2 0"><a-cursor></a-cursor></a-camera>
+            <a-camera position="0 2 0"></a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
         <a-assets>
