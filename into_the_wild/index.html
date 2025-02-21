@@ -33,8 +33,8 @@
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
 </head>
 <body>
-    <template id="avatarTemplate" watching>
-        <a-entity gltf-model="#robot" scale="0.01 0.01 0.01" rotation="0 180 0"></a-entity>
+    <template id="avatarTemplate">
+        <a-entity id="test" gltf-model="#robot" scale="0.01 0.01 0.01" rotation="0 180 0" watching></a-entity>
     </template>
     <a-scene id="s1" background="color: darkslategray" fog="near: 0; far: 300" croquet>
         <a-entity id="rig">
