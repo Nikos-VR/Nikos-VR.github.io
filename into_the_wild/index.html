@@ -21,6 +21,12 @@
                 if (sound) sound.playSound();
             }
         });
+        AFRAME.registerComponent('watching', {
+            init: function () {
+                var el = this.el;
+                el.addEventListener('mouseenter', function () { console.log(this.el.id); });
+            }
+        });
     </script>
     <script src="https://unpkg.com/@croquet/croquet"></script>
     <script src="https://unpkg.com/aframe-croquet-component/public/lib/aframe-croquet-component.js"></script>
