@@ -58,7 +58,7 @@
                 var box = document.createElement('a-box');
                 box.setAttribute('dynamic-body', '');
                 box.setAttribute('moving', '');
-                box.setAttribute('position', e * (j - 2) / 10 + ' ' + (i + 1) / 10 + ' ' + (-12 - (j - 2) * o) / 10);
+                box.setAttribute('position', e * (j - 2) / 10 + ' ' + (i + 0.05) / 10 + ' ' + (-12 - (j - 2) * o) / 10);
                 box.setAttribute('color', 'hsl(0, ' + (50 + Math.random() * 50) + '%, ' + (20 + Math.random() * 10) + '%)');
                 box.setAttribute('scale', (4 * o + 1) / 10 + ' 0.1 ' + (4 * e + 1) / 10);
                 scene1.appendChild(box);
