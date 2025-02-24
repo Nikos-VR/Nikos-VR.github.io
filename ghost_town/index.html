@@ -10,13 +10,14 @@
                 var el = this.el;
                 var crash = document.getElementById('crash');
                 el.addEventListener('collide', function (e) {
-                    var cam = document.getElementById('cam');
+                    var cam = document.getElementById('rig');
                     var txt = document.createElement('a-text');
                     crash.components.sound.playSound();
                     txt.setAttribute('value', 'GAME OVER...');
                     txt.setAttribute('position', '-0.7 0 -0.5');
                     cam.appendChild(txt);
-                    cam.setAttribute('animation', 'property: position; to: 0 800 0; dur: 5000');
+                    cam.setAttribute('animation', 'property: position; to: 0 2500 0; dur: 5000');
+                    //cam.setAttribute('animation__2', 'property: rotation; to: -90 0 0; dur: 5000');
                 });
             }
         });
@@ -25,7 +26,7 @@
                 var el = this.el;
                 var laser = document.getElementById('laser');
                 var shot = document.getElementById('shot');
-                var cam = document.getElementById('cam');
+                var cam = document.getElementById('rig');
                 el.addEventListener('mouseenter', function () {
                     shot.components.sound.playSound();
                     laser.setAttribute('line', 'start: 0 -0.01 0; end: 0 0 -1; color: lime');
@@ -38,24 +39,25 @@
                         txt.setAttribute('value', 'YOU WON!');
                         txt.setAttribute('position', '-0.5 0 -0.5');
                         cam.appendChild(txt);
-                        cam.setAttribute('animation', 'property: position; to: 0 800 0; dur: 5000');
+                        cam.setAttribute('animation', 'property: position; to: 0 2500 0; dur: 5000');
+                        //cam.setAttribute('animation__2', 'property: rotation; to: -90 0 0; dur: 5000');
                     }
                 });
             },
             tick: function () {
-                if (Math.random() < 0.99) return;
-                var x = Math.random() * 700 - 350;
+                if (Math.random() < 0.9) return;
+                var x = Math.random() * 600 - 300;
                 var y = Math.random() * 200 + 10;
-                var z = Math.random() * 700 - 350;
-                var d = Math.random() * 20 + 1000;
-                this.el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z + '; dur: ' + d);
+                var z = Math.random() * 600 - 300;
+                this.el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z);
             }
         });
     </script>
 </head>
 <body>
     <a-scene id="s1">
-        <a-assets timeout="10000">
+        <a-assets>
+            <a-asset-item id="tree" src="tree.glb"></a-asset-item>
             <a-asset-item id="ghost" src="ghost.gltf"></a-asset-item>
             <img id="stars" src="eso0932a.jpg">
             <img id="earth" src="flat_earth03.jpg">
@@ -68,19 +70,16 @@
             <audio id="gun" src="mixkit-short-laser-gun-shot-1670.wav"></audio>
             <audio id="explode" src="mixkit-explosion-in-battle-2809.wav"></audio>
         </a-assets>
-        <a-sky radius="5000" src="#stars"
-            animation="property: rotation; to: 0 90 -30; dur: 20000">
+        <a-sky radius="5000" src="#stars" animation="property: rotation; to: 0 90 -30; dur: 20000">
         </a-sky>
-        <a-sphere radius="1000" src="#earth"
-            animation="property: rotation; to: -30 360 0; dur: 30000">
+        <a-sphere radius="1000" src="#earth" animation="property: rotation; to: -30 360 0; dur: 30000">
         </a-sphere>
         <a-ring color="#666" radius-inner="0" radius-outer="990" rotation="-90 0 0">
             <a-plane static-body color="#666" height="705" width="705"></a-plane>
         </a-ring>
-        <a-entity id="rig">
-            <a-camera id="cam" position="0 0 4900" wasd-controls="acceleration: 500"
-                animation="property: position; to: 0 50 600; dur: 25000">
-                <a-cursor animation="property: visible; to: true; dur: 25000"></a-cursor>
+        <a-entity id="rig" position="0 0 4900" animation="property: position; to: 0 50 600; dur: 25000">
+            <a-camera id="cam" wasd-controls="acceleration: 500">
+                <a-cursor color="lime" animation="property: visible; to: true; dur: 25000"></a-cursor>
                 <a-entity id="laser"></a-entity>
                 <a-sphere static-body colliding></a-sphere>
                 <a-sound id="shot" src="#gun"></a-sound>
@@ -88,30 +87,42 @@
             </a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
-        <a-light color="#BBB" intensity="0.01" type="ambient"></a-light>
-        <a-light intensity="0.025" castShadow="true" position="0 1 1"></a-light>
+        <a-light color="#BBB" intensity="0.025" type="ambient"></a-light>
+        <a-light intensity="0.05" position="0 1 1"></a-light>
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
-        for (var i = -350; i < 350; i += 70) {
-            for (var j = -350; j < 350; j += 70) {
+        for (var i = -320; i < 400; i += 80) {
+            for (var j = -320; j < 400; j += 80) {
+                var pave = document.createElement('a-box');
+                pave.setAttribute('static-body', '');
+                pave.setAttribute('color', 'silver');
+                pave.setAttribute('scale', '60 0.5 60');
+                pave.setAttribute('position', i + ' 0.25 ' + j);
+                scene1.appendChild(pave);
+
+                var floor = document.createElement('a-box');
+                floor.setAttribute('static-body', '');
+                floor.setAttribute('scale', '30 10 30');
+                floor.setAttribute('position', i + ' 5.5 ' + j);
+                scene1.appendChild(floor);
+
                 var box = document.createElement('a-box');
-                var tex = '#b' + Math.ceil(Math.random() * 6);
-                var h = Math.ceil(Math.random() * 5) * 50;
+                var tex = '#b' + Math.ceil(Math.random() * 3);
+                var h = Math.ceil(Math.random() * 5 + 1) * 50;
                 box.setAttribute('src', tex);
                 box.setAttribute('repeat', '1 ' + (h / 50));
                 box.setAttribute('dynamic-body', '');
-                box.setAttribute('opacity', '0.9');
                 box.setAttribute('scale', '50 ' + h + ' 50');
-                box.setAttribute('position', i + ' ' + (h / 2) + ' ' + j);
+                box.setAttribute('position', i + ' ' + (h / 2 + 10.5) + ' ' + j);
                 scene1.appendChild(box);
             }
         }
         for (var i = 0; i < 10; i++) {
             var ghost = document.createElement('a-entity');
-            var x = Math.random() * 700 - 350;
+            var x = Math.random() * 600 - 300;
             var y = Math.random() * 200 + 10;
-            var z = Math.random() * 700 - 350;
+            var z = Math.random() * 600 - 300;
             var r = Math.random() * 180 - 90;
             ghost.setAttribute('gltf-model', '#ghost');
             ghost.setAttribute('scale', '500 500 500');
