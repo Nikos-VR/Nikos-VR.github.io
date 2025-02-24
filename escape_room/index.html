@@ -40,7 +40,7 @@
                     }
                     var pos = document.getElementById('cam').getAttribute('position');
                     el.removeAttribute('dynamic-body');
-                    el.setAttribute('animation', 'property: position; to: ' + pos);
+                    el.setAttribute('animation', 'property: position; to: ' + pos + '; dur: 5000');
 
                     if (el.id == "torch") document.getElementById('light').setAttribute('animation', 'property: visible; to: true');
                     else if (el.id == "key") locked = false;
