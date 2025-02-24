@@ -32,8 +32,8 @@
                         if (!locked && time >= 0) message = "Well done!";
                         return;
                     }
-                    document.querySelector('a-camera').removeAttribute('animation');
-                    document.querySelector('a-camera').setAttribute('animation', 'property: zoom; from: 1; to: 100; dir: alternate; loop: 2');
+                    document.getElementById('cam').removeAttribute('animation');
+                    document.getElementById('cam').setAttribute('animation', 'property: zoom; from: 1; to: 100; dir: alternate; loop: 2');
 
                     if (el.id == "window") {
                         if (tool) {
@@ -104,8 +104,8 @@
             <a-cylinder height="19" radius="0.05" position="0.4 2 0.4"></a-cylinder>
             <a-box color="silver" scale="0.05 5 1" position="0.4 8 0"></a-box>
         </a-box>
-        <a-entity id="rig">
-            <a-camera colliding>
+        <a-entity id="rig" position="0 2 0" colliding>
+            <a-camera id="cam">
                 <a-text value="" align="center" geometry="primitive: plane; width: 0; height: 1" position="0 0.7 -1" material="opacity: 0" messaging></a-text>
                 <a-cone static-body height="2" position="0 -1 0"></a-cone>
                 <a-cursor color="yellow" fuse="true" far="10"></a-cursor>
