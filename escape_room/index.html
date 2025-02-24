@@ -21,7 +21,7 @@
                 if (pos.x > 19) pos.x = 19;
                 if (pos.z < -19) pos.z = -19;
                 if (pos.z > 19) pos.z = 19;
-                this.el.setAttribute('position', pos);
+                document.getElementById('cam').setAttribute('position', pos);
             }
         });
         AFRAME.registerComponent('focusing', {
