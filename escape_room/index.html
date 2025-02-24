@@ -16,7 +16,7 @@
         });
         AFRAME.registerComponent('colliding', {
             tick: function () {
-                var pos = this.el.getAttribute('position');
+                var pos = document.getElementById('cam').getAttribute('position');
                 if (pos.x < -19) pos.x = -19;
                 if (pos.x > 19) pos.x = 19;
                 if (pos.z < -19) pos.z = -19;
