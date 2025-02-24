@@ -74,8 +74,8 @@
         </a-sky>
         <a-sphere radius="1000" src="#earth" animation="property: rotation; to: -30 360 0; dur: 30000">
         </a-sphere>
-        <a-ring color="#666" radius-inner="0" radius-outer="990" rotation="-90 0 0">
-            <a-plane static-body color="#666" height="705" width="705"></a-plane>
+        <a-ring color="#333" radius-inner="0" radius-outer="990" rotation="-90 0 0">
+            <a-plane static-body color="#333" height="705" width="705"></a-plane>
         </a-ring>
         <a-entity id="rig" position="0 0 4900" animation="property: position; to: 0 50 600; dur: 25000">
             <a-camera id="cam" wasd-controls="acceleration: 500">
@@ -103,6 +103,7 @@
 
                 var floor = document.createElement('a-box');
                 floor.setAttribute('static-body', '');
+                floor.setAttribute('color', '#666');
                 floor.setAttribute('scale', '30 10 30');
                 floor.setAttribute('position', i + ' 5.5 ' + j);
                 scene1.appendChild(floor);
