@@ -32,7 +32,7 @@
                     else if (el.id == "window") {
                         if (tool) {
                             document.querySelector('a-scene').removeAttribute('animation');
-                            document.querySelector('a-scene').setAttribute('animation', 'property: fog.far; to: 1000; dur: 50000');
+                            document.querySelector('a-scene').setAttribute('animation', 'property: fog.far; to: 1000; dur: 5000');
                             gas = false;
                             el.components.sound.playSound();
                         }
@@ -45,7 +45,7 @@
                     if (el.id == "torch") document.getElementById('light').setAttribute('animation', 'property: visible; to: true');
                     else if (el.id == "key") locked = false;
                     else if (el.id == "hammer") tool = true;
-                    setTimeout(function () { el.remove(); }, 1000);
+                    setTimeout(function () { el.remove(); }, 5000);
                 });
             }
         });
