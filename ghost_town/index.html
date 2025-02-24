@@ -10,14 +10,15 @@
                 var el = this.el;
                 var crash = document.getElementById('crash');
                 el.addEventListener('collide', function (e) {
-                    var cam = document.getElementById('rig');
+                    var rig = document.getElementById('rig');
+                    var cam = document.getElementById('cam');
                     var txt = document.createElement('a-text');
                     crash.components.sound.playSound();
                     txt.setAttribute('value', 'GAME OVER...');
                     txt.setAttribute('position', '-0.7 0 -0.5');
                     cam.appendChild(txt);
-                    cam.setAttribute('animation', 'property: position; to: 0 2500 0; dur: 5000');
-                    //cam.setAttribute('animation__2', 'property: rotation; to: -90 0 0; dur: 5000');
+                    rig.setAttribute('animation', 'property: position; to: 0 2500 0; dur: 5000');
+                    rig.setAttribute('animation__2', 'property: rotation; to: -90 0 0; dur: 5000');
                 });
             }
         });
@@ -26,7 +27,8 @@
                 var el = this.el;
                 var laser = document.getElementById('laser');
                 var shot = document.getElementById('shot');
-                var cam = document.getElementById('rig');
+                var cam = document.getElementById('cam');
+                var rig = document.getElementById('rig');
                 el.addEventListener('mouseenter', function () {
                     shot.components.sound.playSound();
                     laser.setAttribute('line', 'start: 0 -0.01 0; end: 0 0 -1; color: lime');
@@ -39,8 +41,8 @@
                         txt.setAttribute('value', 'YOU WON!');
                         txt.setAttribute('position', '-0.5 0 -0.5');
                         cam.appendChild(txt);
-                        cam.setAttribute('animation', 'property: position; to: 0 2500 0; dur: 5000');
-                        //cam.setAttribute('animation__2', 'property: rotation; to: -90 0 0; dur: 5000');
+                        rig.setAttribute('animation', 'property: position; to: 0 2500 0; dur: 5000');
+                        rig.setAttribute('animation__2', 'property: rotation; to: -90 0 0; dur: 5000');
                     }
                 });
             },
