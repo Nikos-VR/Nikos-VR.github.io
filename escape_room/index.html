@@ -32,8 +32,8 @@
                         if (!locked && time >= 0) message = "Well done!";
                         return;
                     }
-                    document.querySelector('a-camera').removeAttribute('animation');
-                    document.querySelector('a-camera').setAttribute('animation', 'property: zoom; from: 1; to: 100; dir: alternate; loop: 2');
+                    var pos = document.getElementById('rig').getAttribute('position');
+                    el.setAttribute('animation', 'property: position; to: ' + pos);
 
                     if (el.id == "window") {
                         if (tool) {
