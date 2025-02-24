@@ -15,7 +15,7 @@
                     var txt = document.createElement('a-text');
                     crash.components.sound.playSound();
                     txt.setAttribute('value', 'GAME OVER...');
-                    txt.setAttribute('position', '-0.7 0 -0.5');
+                    txt.setAttribute('position', '-0.7 0 -1');
                     cam.appendChild(txt);
                     rig.setAttribute('animation', 'property: position; to: 0 2500 0; dur: 5000');
                     rig.setAttribute('animation__2', 'property: rotation; to: -90 0 0; dur: 5000');
@@ -39,7 +39,7 @@
                     if (--ghosts <= 0) {
                         var txt = document.createElement('a-text');
                         txt.setAttribute('value', 'YOU WON!');
-                        txt.setAttribute('position', '-0.5 0 -0.5');
+                        txt.setAttribute('position', '-0.5 0 -1');
                         cam.appendChild(txt);
                         rig.setAttribute('animation', 'property: position; to: 0 2500 0; dur: 5000');
                         rig.setAttribute('animation__2', 'property: rotation; to: -90 0 0; dur: 5000');
