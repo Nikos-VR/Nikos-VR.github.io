@@ -10,6 +10,7 @@
                 var el = this.el;
                 var crash = document.getElementById('crash');
                 el.addEventListener('collide', function (e) {
+                    var cur = document.querySelector('a-cursor');
                     var rig = document.getElementById('rig');
                     var cam = document.getElementById('cam');
                     var txt = document.createElement('a-text');
@@ -17,6 +18,7 @@
                     txt.setAttribute('value', 'GAME OVER...');
                     txt.setAttribute('position', '-0.7 0 -1');
                     cam.appendChild(txt);
+                    cur.setAttribute('visible', 'false');
                     rig.setAttribute('animation', 'property: position; to: 0 2500 0; dur: 5000');
                     rig.setAttribute('animation__2', 'property: rotation; to: -90 0 0; dur: 5000');
                 });
@@ -29,6 +31,7 @@
                 var shot = document.getElementById('shot');
                 var cam = document.getElementById('cam');
                 var rig = document.getElementById('rig');
+                var cur = document.querySelector('a-cursor');
                 el.addEventListener('mouseenter', function () {
                     shot.components.sound.playSound();
                     laser.setAttribute('line', 'start: 0 -0.01 0; end: 0 0 -1; color: lime');
@@ -41,6 +44,7 @@
                         txt.setAttribute('value', 'YOU WON!');
                         txt.setAttribute('position', '-0.5 0 -1');
                         cam.appendChild(txt);
+                        cur.setAttribute('visible', 'false');
                         rig.setAttribute('animation', 'property: position; to: 0 2500 0; dur: 5000');
                         rig.setAttribute('animation__2', 'property: rotation; to: -90 0 0; dur: 5000');
                     }
