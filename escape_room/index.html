@@ -32,24 +32,23 @@
                         if (!locked && time >= 0) message = "Well done!";
                         return;
                     }
-                    var pos = document.getElementById('rig').getAttribute('position');
-                    el.removeAttribute('dynamic-body');
-                    el.setAttribute('animation', 'property: position; to: ' + pos);
-
-                    if (el.id == "window") {
+                    else if (el.id == "window") {
                         if (tool) {
                             document.querySelector('a-scene').removeAttribute('animation');
                             document.querySelector('a-scene').setAttribute('animation', 'property: fog.far; to: 1000; dur: 50000');
                             gas = false;
                             el.components.sound.playSound();
                         }
+                        return;
                     }
-                    else {
-                        if (el.id == "torch") document.getElementById('light').setAttribute('animation', 'property: visible; to: true');
-                        else if (el.id == "key") locked = false;
-                        else if (el.id == "hammer") tool = true;
-                        setTimeout(function () { el.remove(); }, 1000);
-                    }
+                    var pos = document.getElementById('rig').getAttribute('position');
+                    el.removeAttribute('dynamic-body');
+                    el.setAttribute('animation', 'property: position; to: ' + pos);
+
+                    if (el.id == "torch") document.getElementById('light').setAttribute('animation', 'property: visible; to: true');
+                    else if (el.id == "key") locked = false;
+                    else if (el.id == "hammer") tool = true;
+                    setTimeout(function () { el.remove(); }, 1000);
                 });
             }
         });
