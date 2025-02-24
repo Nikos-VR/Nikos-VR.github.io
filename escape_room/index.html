@@ -32,7 +32,7 @@
                     else if (el.id == "window") {
                         if (tool) {
                             document.querySelector('a-scene').removeAttribute('animation');
-                            document.querySelector('a-scene').setAttribute('animation', 'property: fog.far; to: 1000; dur: 5000');
+                            document.querySelector('a-scene').setAttribute('animation', 'property: fog.far; to: 1000; dur: 50000');
                             gas = false;
                             el.components.sound.playSound();
                         }
