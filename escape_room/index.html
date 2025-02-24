@@ -32,7 +32,7 @@
                         if (!locked && time >= 0) message = "Well done!";
                         return;
                     }
-                    //document.getElementById('cam').removeAttribute('animation');
+                    document.getElementById('cam').removeAttribute('animation');
                     document.getElementById('cam').setAttribute('animation', 'property: zoom; from: 1; to: 100; dir: alternate; loop: 2');
 
                     if (el.id == "window") {
