@@ -33,6 +33,7 @@
                         return;
                     }
                     var pos = document.getElementById('rig').getAttribute('position');
+                    el.removeAttribute('dynamic-body');
                     el.setAttribute('animation', 'property: position; to: ' + pos);
 
                     if (el.id == "window") {
