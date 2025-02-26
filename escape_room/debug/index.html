@@ -46,16 +46,16 @@
                         return;
                     }
                     el.removeAttribute('dynamic-body');
-                    el.setAttribute('animation', 'property: position; to: ' + pos.x + ' ' + pos.y + ' ' + pos.z);
+                    el.setAttribute('animation', 'property: position; to: ' + pos.x + ' ' + pos.y + ' ' + pos.z + '; dur: 3000');
                     document.querySelector('a-cursor').setAttribute('fuse', 'false');
 
-                    if (el.id == "torch") document.getElementById('light').setAttribute('animation', 'property: visible; to: true');
+                    if (el.id == "torch") document.getElementById('light').setAttribute('animation', 'property: visible; to: true; dur: 3000');
                     else if (el.id == "key") locked = false;
                     else if (el.id == "hammer") tool = true;
                     setTimeout(function () {
                         el.remove();
                         document.querySelector('a-cursor').setAttribute('fuse', 'true');
-                    }, 1000);
+                    }, 3000);
                 });
             }
         });
