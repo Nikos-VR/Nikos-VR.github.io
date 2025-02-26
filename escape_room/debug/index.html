@@ -39,7 +39,7 @@
                         }
                         return;
                     }
-                    var pos = document.getElementById('cam').getAttribute('position');
+                    var pos = document.getElementById('cam').object3D.position;
                     el.removeAttribute('dynamic-body');
                     el.setAttribute('animation', 'property: position; to: ' + pos.x + ' ' + pos.y + ' ' + pos.z);
 
