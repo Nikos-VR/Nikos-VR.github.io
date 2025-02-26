@@ -23,7 +23,7 @@
                 if (pos.x > 19) pos.x = 19;
                 if (pos.z < -19) pos.z = -19;
                 if (pos.z > 19) pos.z = 19;
-                coords.setAttribute('position', pos.x + ' ' + pos.y + ' ' + pos.z);
+                coords.setAttribute('position', pos);
             }
         });
         AFRAME.registerComponent('focusing', {
