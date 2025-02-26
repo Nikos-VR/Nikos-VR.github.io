@@ -4,21 +4,26 @@
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
-        var locked = true, tool = false, gas = true, message = "", time = 5000;
+        var locked = true, tool = false, gas = true, message = "", time = 5000, coords;
 
         AFRAME.registerComponent('updating', {
+            init: function () {
+                var xr = document.querySelector('a-scene').is('vr-mode');
+                if (xr) coords = document.getElementById('rig');
+                else coords = document.getElementById('cam');
+            },
             tick: function () {
                 if (gas) time--;
                 if (time < 0) message = "Game over...";
                 if (message != "") this.el.setAttribute('value', message);
                 else this.el.setAttribute('value', '' + Math.round(time / 100));
 
-                var pos = document.getElementById('rig').getAttribute('position');
+                var pos = coords.getAttribute('position');
                 if (pos.x < -19) pos.x = -19;
                 if (pos.x > 19) pos.x = 19;
                 if (pos.z < -19) pos.z = -19;
                 if (pos.z > 19) pos.z = 19;
-                document.getElementById('rig').setAttribute('position', pos);
+                coords.setAttribute('position', pos);
             }
         });
         AFRAME.registerComponent('focusing', {
@@ -39,7 +44,7 @@
                         }
                         return;
                     }
-                    var pos = document.getElementById('rig').getAttribute('position');
+                    var pos = coords.getAttribute('position');
                     el.removeAttribute('dynamic-body');
                     el.setAttribute('animation', 'property: position; to: ' + pos.x + ' ' + pos.y + ' ' + pos.z);
 
