@@ -7,15 +7,16 @@
         var locked = true, tool = false, gas = true, message = "", time = 5000, coords;
 
         AFRAME.registerComponent('updating', {
+            init: function () {
+                coords = document.getElementById('cam');
+                document.querySelector('a-scene').addEventListener('enter-vr', coords = document.getElementById('rig'));
+                document.querySelector('a-scene').addEventListener('exit-vr', coords = document.getElementById('cam'));
+            },
             tick: function () {
                 if (gas) time--;
                 if (time < 0) message = "Game over...";
                 if (message != "") this.el.setAttribute('value', message);
                 else this.el.setAttribute('value', '' + Math.round(time / 100));
-
-                var xr = document.querySelector('a-scene').is('vr-mode');
-                if (xr) coords = document.getElementById('rig');
-                else coords = document.getElementById('cam');
 
                 var pos = coords.getAttribute('position');
                 if (pos.x < -19) pos.x = -19;
