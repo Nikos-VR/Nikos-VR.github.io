@@ -1,24 +1,22 @@
 <html>
 <head>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script>
-        AFRAME.registerComponent('flying', {
-            tick: function () {
-                if (Math.random() < 0.5) return;
-                var el = this.el;
-                var x = Math.random() * 100 - 50;
-                var y = Math.random() * 5 + 5;
-                var z = Math.random() * 100 - 50;
-                el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z);
-            }
-        });
         AFRAME.registerComponent('sounding', {
             tick: function () {
                 if (Math.random() < 0.99) return;
                 var sound = this.el.components.sound;
                 if (sound) sound.playSound();
+            }
+        });
+        AFRAME.registerComponent('flying', {
+            tick: function () {
+                if (Math.random() < 0.5) return;
+                var x = Math.random() * 100 - 50;
+                var y = Math.random() * 5 + 5;
+                var z = Math.random() * 100 - 50;
+                this.el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z);
             }
         });
     </script>
@@ -27,32 +25,26 @@
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
 </head>
 <body>
-    <template id="avatarTemplate">
-        <a-entity gltf-model="#robot" scale="0.02 0.02 0.02" rotation="0 180 0"></a-entity>
-    </template>
-    <a-scene id="s1" background="color: darkslategray" fog="near: 0; far: 300" croquet>
+    <template id="avatarTemplate"><a-entity gltf-model="#witch" scale="5 5 5" rotation="0 180 0" shadow="receive: false"></a-entity></template>
+    <a-scene id="s1" background="color:#0d0928" fog="far:300" shadow="type: pcfsoft" croquet>
         <a-entity id="rig">
-            <a-camera></a-camera>
+            <a-camera position="0 3 0"></a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
         </a-entity>
+        <a-sphere radius="500" position="0 5000 0" material="fog: false"></a-sphere>
+        <a-entity light="type: directional; intensity: 0.25; castShadow: true; shadowCameraBottom: -500; shadowCameraTop: 500; shadowCameraLeft: -500; shadowCameraRight: 500" position="0 250 0"></a-entity>
+        <a-light type="ambient" intensity="0.05"></a-light>
         <a-assets>
             <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
             <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
             <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
-            <a-asset-item id="robot" src="robot.glb"></a-asset-item>
+            <a-asset-item id="witch" src="witch.glb"></a-asset-item>
             <audio id="hawk" src="Hawk Call 2x-SoundBible.com-1697796838.mp3"></audio>
             <audio id="bzzz" src="Bee-SoundBible.com-914644763.mp3"></audio>
         </a-assets>
-        <a-plane color="#2a1c0e" height="1000" width="1000" rotation="-90 0 0"></a-plane>
-        <a-entity gltf-model="#bird" scale="5 5 5"
-            sound="src:#hawk; poolSize: 2" sounding
-            animation="property: position; from: -50 100 -500; to: -50 100 500; dur: 25000; loop: true"
-            animation-mixer></a-entity>
-        <a-entity gltf-model="#bird" scale="5 5 5" rotation="0 180 0"
-            sound="src:#hawk; poolSize: 2" sounding
-            animation="property: position; from: 50 100 500; to: 50 100 -500; dur: 33000; loop: true"
-            animation-mixer></a-entity>
-        <a-light type="ambient" intensity="0.3"></a-light>
+        <a-plane color="#2a1c0e" height="1000" width="1000" rotation="-90 0 0" metalness="0" shadow></a-plane>
+        <a-entity gltf-model="#bird" scale="5 5 5" shadow="receive: false" sound="src:#hawk; poolSize: 2" sounding animation="property: position; from: -50 50 -500; to: -50 50 500; dur: 25000; loop: true" animation-mixer></a-entity>
+        <a-entity gltf-model="#bird" scale="5 5 5" rotation="0 180 0" shadow="receive: false" sound="src:#hawk; poolSize: 2" sounding animation="property: position; from: 50 50 500; to: 50 50 -500; dur: 33000; loop: true" animation-mixer></a-entity>
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
@@ -66,6 +58,7 @@
             tree.setAttribute('position', x + ' 0 ' + z);
             tree.setAttribute('scale', s + ' ' + s + ' ' + s);
             tree.setAttribute('rotation', '0 ' + r + ' 0');
+            tree.setAttribute('shadow', 'receive: false');
             scene1.appendChild(tree);
         }
         for (var i = 0; i < 10; i++) {
@@ -78,9 +71,9 @@
             bee.setAttribute('position', x + ' ' + y + ' ' + z);
             bee.setAttribute('scale', '0.01 0.01 0.01');
             bee.setAttribute('rotation', '0 ' + r + ' 0');
-            bee.setAttribute('flying', '');
             bee.setAttribute('sound', 'src:#bzzz; volume: 0.1; poolSize: 10');
             bee.setAttribute('sounding', '');
+            bee.setAttribute('flying', '');
             scene1.appendChild(bee);
         }
     </script>
