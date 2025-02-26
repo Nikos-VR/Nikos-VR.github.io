@@ -38,7 +38,6 @@
                         return;
                     }
                     else if (el.id == "window") {
-                        coords.setAttribute('animation', 'property: position; from: ' + pos.x + ' ' + pos.y + ' ' + pos.z + '; to: -20 6 15; dir: alternate; loop: 2');
                         if (tool) {
                             document.querySelector('a-scene').removeAttribute('animation');
                             document.querySelector('a-scene').setAttribute('animation', 'property: fog.far; to: 1000; dur: 50000');
