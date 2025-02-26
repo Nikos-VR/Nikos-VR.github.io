@@ -35,17 +35,18 @@
                             document.querySelector('a-scene').setAttribute('animation', 'property: fog.far; to: 1000; dur: 50000');
                             gas = false;
                             el.components.sound.playSound();
+                            el.setAttribute('blending', 'subtractive');
                         }
                         return;
                     }
                     var pos = document.getElementById('cam').getAttribute('position');
                     el.removeAttribute('dynamic-body');
-                    el.setAttribute('animation', 'property: position; to: ' + pos + '; dur: 5000');
+                    el.setAttribute('animation', 'property: position; to: ' + pos.x + ' ' + pos.y + ' ' + pos.z);
 
                     if (el.id == "torch") document.getElementById('light').setAttribute('animation', 'property: visible; to: true');
                     else if (el.id == "key") locked = false;
                     else if (el.id == "hammer") tool = true;
-                    setTimeout(function () { el.remove(); }, 5000);
+                    setTimeout(function () { el.remove(); }, 1000);
                 });
             }
         });
@@ -54,7 +55,10 @@
 <body>
     <a-scene id="s1" fog="color: silver; near: 0" animation="property: fog.far; to: 5; dur: 50000; easing: easeOutQuad">
         <a-plane static-body width="40" height="8" position="-20 4 0" rotation="0 90 0">
-            <a-box id="window" color="darkblue" scale="1.5 1.5 0.5" position="-15 2 -0.2" sound="src: url(mixkit-glass-break-with-hammer-thud-759.wav)" focusing></a-box>
+            <a-box id="window" color="darkblue" opacity="0.5" scale="1.5 1.5 0.5" position="-15 2 -0.2" sound="src: url(../mixkit-glass-break-with-hammer-thud-759.wav)" focusing>
+                <a-light distance="1" type="spot" position="0 0 1"></a-light>
+                <a-light angle="90" intensity="0.01" type="spot" position="0 0 -1" rotation="180 0 0"></a-light>
+            </a-box>
         </a-plane>
         <a-plane static-body width="40" height="8" position="20 4 0" rotation="0 -90 0"></a-plane>
         <a-plane static-body width="40" height="8" position="0 4 20" material="side:back"></a-plane>
@@ -68,10 +72,10 @@
             <a-box color="silver" scale="0.04 0.03 0.02" position="0.02 0.04 0"></a-box>
             <a-torus color="silver" radius="0.03" radius-tubular="0.003" position="0 -0.1 0"></a-torus>
         </a-cylinder>
-        <a-cylinder dynamic-body id="torch" color="black" height="0.5" radius="0.1" rotation="90 0 0" focusing>
-            <a-cone color="black" height="0.2" radius-top="0.1" radius-bottom="0.2" position="0 0.2 0" rotation="180 0 0"></a-cone>
-            <a-ring radius-inner="0" radius-outer="0.2" position="0 0.31 0" rotation="-90 0 0" blending="multiply"></a-ring>
+        <a-cylinder dynamic-body id="torch" height="0.5" radius="0.1" rotation="90 0 0" focusing>
+            <a-cone height="0.2" radius-top="0.1" radius-bottom="0.2" position="0 0.2 0" rotation="180 0 0"></a-cone>
             <a-light distance="20" intensity="0.25" type="spot" penumbra="0.5" position="0 0.2 0" rotation="90 0 0"></a-light>
+            <a-light distance="0.3" type="spot" position="0 0.4 0" rotation="-90 0 0"></a-light>
         </a-cylinder>
         <a-cylinder dynamic-body id="hammer" color="tan" height="0.5" radius="0.05" focusing>
             <a-box color="black" width="0.5" height="0.1" depth="0.1" position="0 0.25 0"></a-box>
