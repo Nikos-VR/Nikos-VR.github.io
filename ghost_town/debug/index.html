@@ -4,12 +4,12 @@
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
-        var ghosts = 10;
+        var ghosts = 25;
+        
         AFRAME.registerComponent('colliding', {
             init: function () {
-                var el = this.el;
                 var crash = document.getElementById('crash');
-                el.addEventListener('collide', function (e) {
+                this.el.addEventListener('collide', function (e) {
                     var cur = document.querySelector('a-cursor');
                     var rig = document.getElementById('rig');
                     var cam = document.getElementById('cam');
@@ -26,19 +26,18 @@
         });
         AFRAME.registerComponent('ghosting', {
             init: function () {
-                var el = this.el;
                 var laser = document.getElementById('laser');
                 var shot = document.getElementById('shot');
                 var cam = document.getElementById('cam');
                 var rig = document.getElementById('rig');
                 var cur = document.querySelector('a-cursor');
-                el.addEventListener('mouseenter', function () {
+                this.el.addEventListener('mouseenter', function () {
                     shot.components.sound.playSound();
-                    laser.setAttribute('line', 'start: 0 -0.01 0; end: 0 0 -1; color: lime');
+                    laser.setAttribute('line', 'start: 0 -0.01 0; end: 0 0 -1; color: pink');
                 });
-                el.addEventListener('mouseleave', function () {
+                this.el.addEventListener('mouseleave', function () {
                     laser.removeAttribute('line');
-                    el.remove();
+                    this.remove();
                     if (--ghosts <= 0) {
                         var txt = document.createElement('a-text');
                         txt.setAttribute('value', 'YOU WON!');
@@ -63,29 +62,27 @@
 <body>
     <a-scene id="s1" timeout="10000">
         <a-assets>
-            <a-asset-item id="tree" src="tree.glb"></a-asset-item>
-            <a-asset-item id="ghost" src="ghost.gltf"></a-asset-item>
-            <img id="stars" src="eso0932a.jpg">
-            <img id="earth" src="flat_earth03.jpg">
-            <img id="b1" src="b1.png">
-            <img id="b2" src="b2.png">
-            <img id="b3" src="b3.png">
-            <img id="b4" src="b4.png">
-            <img id="b5" src="b5.png">
-            <img id="b6" src="b6.png">
-            <audio id="gun" src="mixkit-short-laser-gun-shot-1670.wav"></audio>
-            <audio id="explode" src="mixkit-explosion-in-battle-2809.wav"></audio>
+            <a-asset-item id="tree" src="../tree.glb"></a-asset-item>
+            <a-asset-item id="ghost" src="../ghost.gltf"></a-asset-item>
+            <img id="stars" src="../eso0932a.jpg">
+            <img id="earth" src="../flat_earth03.jpg">
+            <img id="b1" src="../b1.png">
+            <img id="b2" src="../b2.png">
+            <img id="b3" src="../b3.png">
+            <img id="b4" src="../b4.png">
+            <img id="b5" src="../b5.png">
+            <img id="b6" src="../b6.png">
+            <audio id="gun" src="../mixkit-short-laser-gun-shot-1670.wav"></audio>
+            <audio id="explode" src="../mixkit-explosion-in-battle-2809.wav"></audio>
         </a-assets>
-        <a-sky radius="5000" src="#stars" animation="property: rotation; to: 0 90 -30; dur: 20000">
-        </a-sky>
-        <a-sphere radius="1000" src="#earth" animation="property: rotation; to: -30 360 0; dur: 30000">
-        </a-sphere>
+        <a-sky radius="5000" src="#stars" animation="property: rotation; to: 0 90 -30; dur: 20000"></a-sky>
+        <a-sphere radius="1000" src="#earth" animation="property: rotation; to: -30 360 0; dur: 30000"></a-sphere>
         <a-ring color="#333" radius-inner="0" radius-outer="990" rotation="-90 0 0">
             <a-plane static-body color="#333" height="705" width="705"></a-plane>
         </a-ring>
         <a-entity id="rig" position="0 0 4900" animation="property: position; to: 0 50 600; dur: 25000">
             <a-camera id="cam" wasd-controls="acceleration: 500">
-                <a-cursor color="lime" animation="property: visible; to: true; dur: 25000"></a-cursor>
+                <a-cursor color="pink" animation="property: visible; to: true; dur: 25000"></a-cursor>
                 <a-entity id="laser"></a-entity>
                 <a-sphere static-body colliding></a-sphere>
                 <a-sound id="shot" src="#gun"></a-sound>
@@ -93,39 +90,41 @@
             </a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls="acceleration: 500"></a-entity>
         </a-entity>
-        <a-light color="#BBB" intensity="0.025" type="ambient"></a-light>
-        <a-light intensity="0.05" position="0 1 1"></a-light>
+        <a-light intensity="0.025" type="ambient"></a-light>
+        <a-entity light="type: point; castShadow: true; color: cyan" position="0 1 0"></a-entity>
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
-        for (var i = -320; i < 400; i += 80) {
-            for (var j = -320; j < 400; j += 80) {
+        for (var i = -320; i < 400; i += 40) {
+            for (var j = -320; j < 400; j += 40) {
+                if (i == 0 && j == 0 || Math.random() > 0.5) continue;
                 var pave = document.createElement('a-box');
                 pave.setAttribute('static-body', '');
                 pave.setAttribute('color', 'silver');
-                pave.setAttribute('scale', '60 0.5 60');
+                pave.setAttribute('scale', '40 0.5 40');
                 pave.setAttribute('position', i + ' 0.25 ' + j);
                 scene1.appendChild(pave);
 
                 var floor = document.createElement('a-box');
                 floor.setAttribute('static-body', '');
                 floor.setAttribute('color', '#666');
-                floor.setAttribute('scale', '30 10 30');
+                floor.setAttribute('scale', '25 10 25');
                 floor.setAttribute('position', i + ' 5.5 ' + j);
                 scene1.appendChild(floor);
 
                 var box = document.createElement('a-box');
-                var tex = '#b' + Math.ceil(Math.random() * 3);
-                var h = Math.ceil(Math.random() * 5 + 1) * 50;
+                var tex = '#b' + Math.ceil(Math.random() * 6);
+                var h = Math.ceil(Math.random() * 4 + 2) * 30;
                 box.setAttribute('src', tex);
-                box.setAttribute('repeat', '1 ' + (h / 50));
+                box.setAttribute('repeat', '1 ' + (h / 30));
                 box.setAttribute('dynamic-body', '');
-                box.setAttribute('scale', '50 ' + h + ' 50');
+                box.setAttribute('scale', '30 ' + h + ' 30');
                 box.setAttribute('position', i + ' ' + (h / 2 + 10.5) + ' ' + j);
+                box.setAttribute('shadow', '');
                 scene1.appendChild(box);
             }
         }
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < ghosts; i++) {
             var ghost = document.createElement('a-entity');
             var x = Math.random() * 600 - 300;
             var y = Math.random() * 200 + 10;
