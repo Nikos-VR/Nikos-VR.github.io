@@ -24,6 +24,8 @@
                 if (pos.z < -19) pos.z = -19;
                 if (pos.z > 19) pos.z = 19;
                 coords.setAttribute('position', pos.x + ' ' + pos.y + ' ' + pos.z);
+
+                this.el.setAttribute('value', Math.round(pos.x));
             }
         });
         AFRAME.registerComponent('focusing', {
