@@ -23,19 +23,21 @@
                 if (pos.x > 19) pos.x = 19;
                 if (pos.z < -19) pos.z = -19;
                 if (pos.z > 19) pos.z = 19;
-                coords.setAttribute('position', pos);
+                coords.setAttribute('position', pos.x + ' ' + pos.y + ' ' + pos.z);
             }
         });
         AFRAME.registerComponent('focusing', {
             init: function () {
                 var el = this.el;
                 el.addEventListener('mouseenter', function () {
+                    var pos = coords.getAttribute('position');
                     if (el.id == "door") {
                         if (!locked && time >= 0) message = "Well done!";
                         return;
                     }
                     else if (el.id == "window") {
-                        coords.setAttribute('animation', 'property: scale; from: 1 1 1; to: 10 10 10; dir: alternate; loop: 2');
+                        var tar = el.getAttribute('position');
+                        coords.setAttribute('animation', 'property: position; from: ' + pos.x + ' ' + pos.y + ' ' + pos.z + '; to: ' + tar.x + ' ' + tar.y + ' ' + tar.z + '; dir: alternate; loop: 2');
                         if (tool) {
                             document.querySelector('a-scene').removeAttribute('animation');
                             document.querySelector('a-scene').setAttribute('animation', 'property: fog.far; to: 1000; dur: 50000');
@@ -45,7 +47,6 @@
                         }
                         return;
                     }
-                    var pos = coords.getAttribute('position');
                     el.removeAttribute('dynamic-body');
                     el.setAttribute('animation', 'property: position; to: ' + pos.x + ' ' + pos.y + ' ' + pos.z);
 
