@@ -29,7 +29,7 @@
         AFRAME.registerComponent('focusing', {
             init: function () {
                 var el = this.el;
-                el.addEventListener('click', function () {
+                el.addEventListener('mouseenter', function () {
                     var pos = coords.getAttribute('position');
                     if (el.id == "door") {
                         if (!locked && time >= 0) message = "Well done!";
