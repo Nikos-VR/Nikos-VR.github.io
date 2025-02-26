@@ -19,7 +19,6 @@
                 else this.el.setAttribute('value', '' + Math.round(time / 100));
 
                 var pos = coord.getAttribute('position');
-                document.getElementById('cam').object3D.getWorldPosition(pos);
                 if (pos.x < -19) pos.x = -19;
                 if (pos.x > 19) pos.x = 19;
                 if (pos.z < -19) pos.z = -19;
