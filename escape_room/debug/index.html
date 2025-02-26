@@ -24,14 +24,12 @@
                 if (pos.z < -19) pos.z = -19;
                 if (pos.z > 19) pos.z = 19;
                 coords.setAttribute('position', pos.x + ' ' + pos.y + ' ' + pos.z);
-
-                this.el.setAttribute('value', Math.round(pos.x));
             }
         });
         AFRAME.registerComponent('focusing', {
             init: function () {
                 var el = this.el;
-                el.addEventListener('mouseenter', function () {
+                el.addEventListener('click', function () {
                     var pos = coords.getAttribute('position');
                     if (el.id == "door") {
                         if (!locked && time >= 0) message = "Well done!";
@@ -116,7 +114,7 @@
             <a-camera id="cam">
                 <a-text value="" align="center" geometry="primitive: plane; width: 0; height: 1" position="0 0.5 -1" material="opacity: 0" updating></a-text>
                 <a-cone static-body height="2" position="0 -1 0"></a-cone>
-                <a-cursor color="yellow" fuse="true" far="10"></a-cursor>
+                <a-cursor color="yellow" fuse="true" far="5"></a-cursor>
                 <a-light id="light" distance="20" intensity="0.25" type="spot" penumbra="0.5" visible="false"></a-light>
             </a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
