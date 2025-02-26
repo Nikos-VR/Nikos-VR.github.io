@@ -9,8 +9,8 @@
         AFRAME.registerComponent('updating', {
             init: function () {
                 coords = document.getElementById('cam');
-                document.querySelector('a-scene').addEventListener('enter-vr', coords = document.getElementById('rig'));
-                document.querySelector('a-scene').addEventListener('exit-vr', coords = document.getElementById('cam'));
+                document.querySelector('a-scene').addEventListener('enter-vr', function () { coords = document.getElementById('rig'); });
+                document.querySelector('a-scene').addEventListener('exit-vr', function () { coords = document.getElementById('cam'); });
             },
             tick: function () {
                 if (gas) time--;
