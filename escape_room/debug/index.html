@@ -19,8 +19,6 @@
                 if (pos.z < -19) pos.z = -19;
                 if (pos.z > 19) pos.z = 19;
                 document.getElementById('rig').setAttribute('position', pos);
-
-                this.el.setAttribute('value', Math.round(pos.x));
             }
         });
         AFRAME.registerComponent('focusing', {
