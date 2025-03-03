@@ -71,5 +71,36 @@
             <a-box color="silver" scale="0.05 5 1" position="0.4 8 0"></a-box>
         </a-box>
     </a-scene>
+    <script>
+        var scene1 = document.getElementById('s1');
+        for (var i = 0; i < 200; i++) {
+            var box = document.createElement('a-box');
+            var x = Math.random() * 40 - 20;
+            var z = Math.random() * 40 - 20;
+            box.setAttribute('dynamic-body', '');
+            box.setAttribute('color', 'tan');
+            box.setAttribute('scale', (Math.random() + 0.25) + ' ' + (Math.random() + 0.25) + ' ' + (Math.random() + 0.25));
+            box.setAttribute('position', x + ' 7 ' + z);
+            scene1.appendChild(box);
+        }
+        for (var i = 0; i < 10; i++) {
+            var t = document.getElementById('table').cloneNode(true);
+            var x = Math.random() * 40 - 20;
+            var z = Math.random() * 40 - 20;
+            t.setAttribute('position', x + ' 2 ' + z);
+            t.setAttribute('rotation', '0 ' + Math.random() * 90 + ' 0');
+            scene1.appendChild(t);
+        }
+        for (var i = 0; i < 20; i++) {
+            var c = document.getElementById('chair').cloneNode(true);
+            var x = Math.random() * 40 - 20;
+            var z = Math.random() * 40 - 20;
+            c.setAttribute('position', x + ' 6 ' + z);
+            scene1.appendChild(c);
+        }
+        document.getElementById('hammer').setAttribute('position', (Math.random() * 30 - 15) + ' 5 ' + (Math.random() * 30 - 15));
+        document.getElementById('torch').setAttribute('position', (Math.random() * 30 - 15) + ' 3 ' + (Math.random() * 30 - 15));
+        document.getElementById('key').setAttribute('position', (Math.random() * 30 - 15) + ' 1 ' + (Math.random() * 30 - 15));
+    </script>
 </body>
 </html>
