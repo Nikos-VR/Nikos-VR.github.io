@@ -25,11 +25,9 @@
                 var el = this.el;
                 el.addEventListener('mouseenter', function () {
                     var pos = document.getElementById('cam').getAttribute('position');
+                    
                     if (el.id == "door") {
-                        if (!locked && time >= 0) {
-                            el.components.sound.playSound();
-                            message = "Well done!";
-                        }
+                        if (!locked && time >= 0) { el.components.sound.playSound(); message = "Well done!"; }
                         return;
                     }
                     else if (el.id == "window") {
@@ -37,8 +35,7 @@
                             document.querySelector('a-scene').removeAttribute('animation');
                             document.querySelector('a-scene').setAttribute('animation', 'property: fog.far; to: 1000; dur: 50000');
                             gas = false;
-                            el.components.sound.playSound();
-                            el.setAttribute('blending', 'subtractive');
+                            el.components.sound.playSound(); el.setAttribute('blending', 'subtractive');
                         }
                         return;
                     }
