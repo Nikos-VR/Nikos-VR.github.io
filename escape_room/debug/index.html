@@ -73,16 +73,6 @@
     </a-scene>
     <script>
         var scene1 = document.getElementById('s1');
-        for (var i = 0; i < 200; i++) {
-            var box = document.createElement('a-box');
-            var x = Math.random() * 40 - 20;
-            var z = Math.random() * 40 - 20;
-            box.setAttribute('dynamic-body', '');
-            box.setAttribute('color', 'tan');
-            box.setAttribute('scale', (Math.random() + 0.25) + ' ' + (Math.random() + 0.25) + ' ' + (Math.random() + 0.25));
-            box.setAttribute('position', x + ' 7 ' + z);
-            scene1.appendChild(box);
-        }
         for (var i = 0; i < 10; i++) {
             var t = document.getElementById('table').cloneNode(true);
             var x = Math.random() * 40 - 20;
