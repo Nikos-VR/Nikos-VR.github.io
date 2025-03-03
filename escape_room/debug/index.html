@@ -40,12 +40,12 @@
                         return;
                     }
                     el.removeAttribute('dynamic-body');
-                    el.setAttribute('animation', 'property: position; to: ' + pos.x + ' -0.25 ' + pos.z);
+                    el.setAttribute('animation', 'property: position; to: ' + pos.x + ' 0 ' + pos.z);
 
                     if (el.id == "torch") document.getElementById('light').setAttribute('animation', 'property: visible; to: true');
                     else if (el.id == "key") locked = false;
                     else if (el.id == "hammer") tool = true;
-                    setTimeout(function () { el.remove(); }, 5000);
+                    setTimeout(function () { el.remove(); }, 3000);
                 });
             }
         });
