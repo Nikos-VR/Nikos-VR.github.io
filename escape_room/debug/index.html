@@ -20,6 +20,38 @@
                 document.getElementById('cam').setAttribute('position', pos);
             }
         });
+        AFRAME.registerComponent('focusing', {
+            init: function () {
+                var el = this.el;
+                el.addEventListener('mouseenter', function () {
+                    var pos = coords.getAttribute('position');
+                    if (el.id == "door") {
+                        if (!locked && time >= 0) {
+                            el.components.sound.playSound();
+                            message = "Well done!";
+                        }
+                        return;
+                    }
+                    else if (el.id == "window") {
+                        if (tool) {
+                            document.querySelector('a-scene').removeAttribute('animation');
+                            document.querySelector('a-scene').setAttribute('animation', 'property: fog.far; to: 1000; dur: 50000');
+                            gas = false;
+                            el.components.sound.playSound();
+                            el.setAttribute('blending', 'subtractive');
+                        }
+                        return;
+                    }
+                    el.removeAttribute('dynamic-body');
+                    el.setAttribute('animation', 'property: position; to: ' + pos.x + ' 0 ' + pos.z);
+
+                    if (el.id == "torch") document.getElementById('light').setAttribute('animation', 'property: visible; to: true');
+                    else if (el.id == "key") locked = false;
+                    else if (el.id == "hammer") tool = true;
+                    setTimeout(function () { el.remove(); }, 5000);
+                });
+            }
+        });
     </script>
 </head>
 <body>
@@ -45,14 +77,14 @@
             <a-cursor color="yellow" fuse="true" far="10"></a-cursor>
             <a-light id="light" distance="20" intensity="0.25" type="spot" penumbra="0.5" visible="false"></a-light>
         </a-camera>
-        <a-cylinder dynamic-body id="hammer" color="tan" height="0.5" radius="0.05">
+        <a-cylinder dynamic-body id="hammer" color="tan" height="0.5" radius="0.05" focusing>
             <a-box color="black" width="0.5" height="0.1" depth="0.1" position="0 0.25 0"></a-box>
         </a-cylinder>
-        <a-cylinder dynamic-body id="key" color="silver" height="0.15" radius="0.01">
+        <a-cylinder dynamic-body id="key" color="silver" height="0.15" radius="0.01" focusing>
             <a-box color="silver" scale="0.04 0.03 0.02" position="0.02 0.04 0"></a-box>
             <a-torus color="silver" radius="0.03" radius-tubular="0.003" position="0 -0.1 0"></a-torus>
         </a-cylinder>
-        <a-cylinder dynamic-body id="torch" height="0.5" radius="0.1" rotation="90 0 0">
+        <a-cylinder dynamic-body id="torch" height="0.5" radius="0.1" rotation="90 0 0" focusing>
             <a-cone height="0.2" radius-top="0.1" radius-bottom="0.2" position="0 0.2 0" rotation="180 0 0"></a-cone>
             <a-light distance="20" intensity="0.25" type="spot" penumbra="0.5" position="0 0.2 0" rotation="90 0 0"></a-light>
             <a-light distance="0.3" type="spot" position="0 0.4 0" rotation="-90 0 0"></a-light>
