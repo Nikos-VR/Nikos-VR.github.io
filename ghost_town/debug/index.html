@@ -20,7 +20,7 @@
         }
         AFRAME.registerComponent('colliding', {
             tick: function () {
-                var pos1 = document.getElementById('cam1').getAttribute('position');
+                var pos1 = document.getElementById('rig').getAttribute('position');
                 var pos2 = this.el.getAttribute('position');
                 if (Math.abs(pos1.x - pos2.x) < 44 && Math.abs(pos1.z - pos2.z) < 44) toggle('GAME OVER', '#explode');
 
@@ -84,9 +84,9 @@
                 </a-camera>
             </a-entity>
         </a-entity>
-        <a-entity id="rig">
-            <a-camera id="cam1" wasd-controls="acceleration: 500" position="0 -100 4900"
+        <a-entity id="rig" position="0 -100 4900"
                 animation="property: position; to: 0 50 750; dur: 25000">
+            <a-camera id="cam1" wasd-controls="acceleration: 500">
                 <a-cursor color="pink" animation="property: visible; to: true; dur: 25000"></a-cursor>
                 <a-entity id="laser"></a-entity>
                 <a-sound id="shot" src="#gun"></a-sound>
