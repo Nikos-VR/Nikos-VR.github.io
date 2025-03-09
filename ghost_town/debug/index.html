@@ -3,7 +3,7 @@
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
-        var ghosts = 25;
+        var ghosts = 25, coords;
         function toggle(t, s) {
             document.querySelector('a-scene').setAttribute('fog', 'far: 1');
             document.getElementById('txt').setAttribute('text', 'value:' + t);
@@ -19,10 +19,15 @@
             document.getElementById('player').components.sound.playSound();
         }
         AFRAME.registerComponent('colliding', {
+            init: function () {
+                coords = document.getElementById('cam1');
+                document.querySelector('a-scene').addEventListener('enter-vr', function () { coords = document.getElementById('rig'); });
+                document.querySelector('a-scene').addEventListener('exit-vr', function () { coords = document.getElementById('cam1'); });
+            },
             tick: function () {
-                var pos1 = document.getElementById('cam1').getAttribute('position');
+                var pos1 = coords.getAttribute('position');
                 var pos2 = this.el.getAttribute('position');
-                if (Math.abs(pos1.x - pos2.x) < 44 && Math.abs(pos1.z - pos2.z) < 44) toggle('GAME OVER', '#explode');
+                if (Math.abs(pos1.x - pos2.x) < 40 && Math.abs(pos1.z - pos2.z) < 40) toggle('GAME OVER', '#explode');
 
                 var rot = document.getElementById('spacecraft').getAttribute('rotation');
                 var distance = Math.sqrt(pos1.x * pos1.x + pos1.z * pos1.z);
@@ -35,7 +40,7 @@
             init: function () {
                 this.el.addEventListener('mouseenter', function () {
                     document.getElementById('shot').components.sound.playSound();
-                    document.getElementById('laser').setAttribute('line', 'start: 0 -0.01 0; end: 0 0 -1; color: pink');
+                    document.getElementById('laser').setAttribute('line', 'start: 0 -0.01 0; end: 0 0 -1; color: lime');
                 });
                 this.el.addEventListener('mouseleave', function () {
                     document.getElementById('laser').removeAttribute('line');
@@ -45,9 +50,9 @@
             },
             tick: function () {
                 if (Math.random() < 0.99) return;
-                var x = Math.random() * 600 - 300;
-                var y = Math.random() * 150 + 10;
-                var z = Math.random() * 600 - 300;
+                var x = Math.random() * 700 - 350;
+                var y = Math.random() * 50 + 10;
+                var z = Math.random() * 700 - 350;
                 this.el.setAttribute('animation', 'property: position; to: ' + x + ' ' + y + ' ' + z);
             }
         });
@@ -74,29 +79,28 @@
         </a-assets>
         <a-sky radius="5000" src="#stars" animation="property: rotation; to: 0 90 -30; dur: 20000"></a-sky>
         <a-sphere radius="1000" src="#earth" animation="property: rotation; to: -30 360 0; dur: 30000"></a-sphere>
-        <a-ring color="#222" radius-inner="0" radius-outer="990" rotation="-90 0 0"></a-ring>
+        <a-ring color="black" radius-inner="0" radius-outer="990" rotation="-90 0 0"></a-ring>
         <a-entity id="spacecraft" gltf-model="#craft" scale="10 10 10"
-            animation="property: position; from: 0 100 0; to: 0 200 0; dur: 39000; dir: alternate; loop: true"
-            animation__2="property: rotation; from: 0 0 0; to: 0 360 0; dur: 21000; dir: alternate; loop: true">
-            <a-entity light="type: spot; penumbra: 0.5; castShadow: true" position="0 -1 5" rotation="0 -180 0">
+            animation="property: position; from: 0 66 0; to: 0 77 0; dur: 21000; dir: alternate; loop: true"
+            animation__2="property: rotation; from: 0 0 0; to: 0 360 0; dur: 39000; dir: alternate; loop: true">
+            <a-entity light="type: spot; penumbra: 0.5; distance: 200; castShadow: true" position="0 -1 5" rotation="0 -180 0">
                 <a-camera id="cam2" position="0 3 6" wasd-controls="enabled: false" look-controls="enabled: false">
                     <a-entity text="font: https://cdn.aframe.io/fonts/mozillavr.fnt" id="txt" position="0.4 0 -0.2"></a-entity>
                 </a-camera>
             </a-entity>
         </a-entity>
-        <a-entity id="rig">
-            <a-camera id="cam1" wasd-controls="acceleration: 500" position="0 -100 4900"
-                animation="property: position; to: 0 50 750; dur: 25000">
-                <a-cursor color="pink" animation="property: visible; to: true; dur: 25000"></a-cursor>
+        <a-entity id="rig" position="0 -20 4900" animation="property: position; to: 0 10 0; dur: 30000; easing: easeInOutQuad">
+            <a-camera id="cam1" wasd-controls="acceleration: 500">
+                <a-cursor color="lime" animation="property: visible; to: true; dur: 30000"></a-cursor>
                 <a-entity id="laser"></a-entity>
                 <a-sound id="shot" src="#gun"></a-sound>
                 <a-sound id="player"></a-sound>
             </a-camera>
             <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls="acceleration: 500"></a-entity>
         </a-entity>
-        <a-light intensity="0.05" type="ambient"></a-light>
-        <a-light intensity="0.1" position="0 1 1"></a-light>
-        <a-box id="pavement" color="#444" width="80" height="0.5" depth="80" visible="false">
+        <a-light intensity="0.025" type="ambient"></a-light>
+        <a-light intensity="0.05" position="0 1 1"></a-light>
+        <a-box id="pavement" color="#333" width="80" height="0.5" depth="80" visible="false">
             <a-entity gltf-model="#tree" position="-35 0 25"></a-entity><a-entity gltf-model="#tree" position="-35 0 15"></a-entity>
             <a-entity gltf-model="#tree" position="-35 0 5"></a-entity><a-entity gltf-model="#tree" position="-35 0 -5"></a-entity>
             <a-entity gltf-model="#tree" position="-35 0 -15"></a-entity><a-entity gltf-model="#tree" position="-35 0 -25"></a-entity>
@@ -125,12 +129,11 @@
                 scene1.appendChild(p);
 
                 var box = document.createElement('a-box');
-                var tex = '#b' + Math.ceil(Math.random() * 6);
-                var h = Math.ceil(Math.random() * 4 + 2) * 60;
-                box.setAttribute('src', tex);
-                box.setAttribute('repeat', '1 ' + (h / 60));
-                box.setAttribute('scale', '60 ' + h + ' 60');
-                box.setAttribute('position', i + ' ' + (h / 2 + 10.5) + ' ' + j);
+                var h = Math.ceil(Math.random() * 6);
+                box.setAttribute('src', "#b" + h);
+                box.setAttribute('repeat', '1 ' + Math.ceil(h / 2));
+                box.setAttribute('scale', '60 ' + (30 * (h + 1)) + ' 60');
+                box.setAttribute('position', i + ' ' + ((h + 1) * 15 + 10.5) + ' ' + j);
                 box.setAttribute('shadow', '');
                 box.setAttribute('colliding', '');
                 scene1.appendChild(box);
@@ -138,15 +141,14 @@
         }
         for (var i = 0; i < ghosts; i++) {
             var ghost = document.createElement('a-entity');
-            var x = Math.random() * 600 - 300;
-            var y = Math.random() * 150 + 10;
-            var z = Math.random() * 600 - 300;
+            var x = Math.random() * 700 - 350;
+            var y = Math.random() * 50 + 10;
+            var z = Math.random() * 700 - 350;
             var r = Math.random() * 360;
-            var s = Math.random() * 200 + 50;
             ghost.setAttribute('gltf-model', '#ghost');
             ghost.setAttribute('position', x + ' ' + y + ' ' + z);
             ghost.setAttribute('rotation', '0 ' + r + ' 0');
-            ghost.setAttribute('scale', s + ' ' + s + ' ' + s);
+            ghost.setAttribute('scale', '100 100 100');
             ghost.setAttribute('ghosting', '');
             scene1.appendChild(ghost);
         }
