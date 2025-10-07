@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Js Online SEq</title>
+    <style>
+        ::-webkit-scrollbar {
+            width: 9px;
+            height: 9px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d4d4d4;
+            border-radius: 10px;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .controls-panel {
+            font-size: x-large;
+        }
+
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: transparent;
+            color: white;
+            border: none;
+            font-size: xx-large;
+        }
+
+        button:disabled {
+            color: silver;
+            cursor: not-allowed;
+        }
+
+        input[type="range"] {
+            cursor: pointer;
+            height: 1px;
+            vertical-align: middle;
+            width: 75px;
+            margin-right: 25px;
+        }
+
+        #sequencer-container {
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+        }
+
+        .track {
+            display: flex;
+            align-items: center;
+        }
+
+        .track-ui-container {
+            display: flex;
+            flex-direction: column;
+            background-color: #2a2a2a;
+            padding: 10px;
+        }
+
+        .track-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .track-controls button {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .record-btn {
+            border: solid firebrick 1px;
+            border-radius: 15px;
+        }
+
+        .record-btn.recording {
+            color: firebrick;
+        }
+
+        .track-label {
+            font-size: x-small;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 90px;
+            padding-left: 3px;
+        }
+
+        .trim-controls {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            margin-top: 5px;
+        }
+
+        .trim-controls label {
+            font-size: 10px;
+        }
+
+        .trim-controls input[type="range"] {
+            margin-right: 0;
+        }
+
+        .grid-row {
+            display: flex;
+        }
+
+        .cell {
+            width: 50px;
+            height: 61px;
+            background-color: #444;
+            border: 1px solid #555;
+            cursor: pointer;
+        }
+
+        .cell.active {
+            background-color: cadetblue;
+        }
+
+        .cell.measure-divider {
+            border-right: 3px solid goldenrod;
+        }
+
+        .cell.playback-head {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="controls-panel" style="float:right">
+        <label for="tempo-slider">&#9833;</label>
+        <input type="range" id="tempo-slider" min="30" max="180" value="120" title="120 BPM">
+        <label for="time-signature-slider">&#119066;</label>
+        <input type="range" id="time-signature-slider" min="2" max="7" value="4" title="4/4">
+        <label for="rows-slider">&#127929;</label>
+        <input type="range" id="rows-slider" min="2" max="15" value="8" title="8 tracks">
+        <label for="cols-slider">&#9202;</label>
+        <input type="range" id="cols-slider" min="4" max="128" value="64" title="32 secs">
+    </div>
+    <div class="controls-panel">
+        <button id="play-btn" style="color:darkolivegreen" title="Play">&#9654;</button>
+        <button id="pause-btn" style="color:goldenrod" title="Pause" disabled>&#9208;</button>
+        <button id="stop-btn" style="color:cadetblue" title="Stop">&#9724;</button>
+        <button id="download-btn" style="color:firebrick" title="Download">&#8681;</button>
+    </div>
+    <br>
+    <div id="sequencer-container"></div>
+
+    <script>
+        window.addEventListener('load', () => {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const dom = {
+                playBtn: document.getElementById('play-btn'),
+                pauseBtn: document.getElementById('pause-btn'),
+                stopBtn: document.getElementById('stop-btn'),
+                downloadBtn: document.getElementById('download-btn'),
+                tempoSlider: document.getElementById('tempo-slider'),
+                timeSignatureSlider: document.getElementById('time-signature-slider'),
+                rowsSlider: document.getElementById('rows-slider'),
+                colsSlider: document.getElementById('cols-slider'),
+                sequencerContainer: document.getElementById('sequencer-container'),
+            };
+
+            let state = {
+                tempo: 120, timeSignature: 4, numRows: 8, numCols: 64,
+                isPlaying: false, currentStep: 0, scheduler: null,
+                grid: [], tracks: [], cells: [],
+                mediaRecorder: null, recordingTrackIndex: null,
+            };
+
+            function playSound(track) {
+                if (!track || !track.buffer || audioContext.state === 'suspended') return;
+                const source = audioContext.createBufferSource();
+                source.buffer = track.buffer;
+                source.connect(audioContext.destination);
+
+                const offset = track.trimStart;
+                const duration = track.trimEnd - track.trimStart;
+
+                if (duration > 0) {
+                    source.start(0, offset, duration);
+                }
+            }
+
+            async function processAudioBuffer(arrayBuffer, rowIndex, fileName = 'Recorded Sample') {
+                try {
+                    const buffer = await audioContext.decodeAudioData(arrayBuffer);
+                    state.tracks[rowIndex] = {
+                        buffer: buffer,
+                        name: fileName,
+                        trimStart: 0,
+                        trimEnd: buffer.duration,
+                    };
+                    updateTrackUI(rowIndex);
+                } catch (error) { console.error('Error decoding audio data', error); }
+            }
+
+            function createGrid() {
+                dom.sequencerContainer.innerHTML = '';
+                state.grid = [];
+                state.cells = [];
+                state.tracks.length = state.numRows;
+
+                for (let row = 0; row < state.numRows; row++) {
+                    state.grid[row] = Array(state.numCols).fill(false);
+                    state.cells[row] = [];
+                    const trackDiv = document.createElement('div');
+                    trackDiv.className = 'track';
+
+                    const uiContainer = document.createElement('div');
+                    uiContainer.className = 'track-ui-container';
+
+                    const controlsDiv = document.createElement('div');
+                    controlsDiv.className = 'track-controls';
+                    const label = document.createElement('span');
+                    label.id = `track-label-${row}`;
+                    label.className = 'track-label';
+                    label.textContent = `Track ${row + 1}`;
+
+                    const previewBtn = document.createElement('button');
+                    previewBtn.id = `preview-btn-${row}`;
+                    previewBtn.innerHTML = '&#9654;';
+                    previewBtn.disabled = true;
+                    previewBtn.onclick = () => playSound(state.tracks[row]);
+                    previewBtn.title = "Preview";
+
+                    const uploadInput = document.createElement('input');
+                    uploadInput.type = 'file';
+                    uploadInput.accept = 'audio/*';
+                    uploadInput.style.display = 'none';
+                    uploadInput.onchange = (e) => loadSample(e.target.files[0], row);
+
+                    const uploadBtn = document.createElement('button');
+                    uploadBtn.innerHTML = '&#x1F4C2;';
+                    uploadBtn.onclick = () => uploadInput.click();
+                    uploadBtn.title = "Upload";
+
+                    const recordBtn = document.createElement('button');
+                    recordBtn.id = `record-btn-${row}`;
+                    recordBtn.className = 'record-btn';
+                    recordBtn.innerHTML = '&#9210;';
+                    recordBtn.onclick = () => handleRecordClick(row);
+                    controlsDiv.append(previewBtn, label, uploadBtn, recordBtn, uploadInput);
+                    recordBtn.title = "Record";
+
+                    const trimDiv = document.createElement('div');
+                    trimDiv.className = 'trim-controls';
+
+                    const startLabel = document.createElement('label'); startLabel.textContent = 'S';
+                    const startSlider = document.createElement('input');
+                    startSlider.type = 'range'; startSlider.id = `start-slider-${row}`; startSlider.disabled = true;
+                    startSlider.min = 0; startSlider.max = 1; startSlider.step = 0.01;
+                    startSlider.oninput = (e) => handleTrimChange(row, 'start', parseFloat(e.target.value));
+                    startSlider.title = "Start";
+
+                    const endLabel = document.createElement('label'); endLabel.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;E';
+                    const endSlider = document.createElement('input');
+                    endSlider.type = 'range'; endSlider.id = `end-slider-${row}`; endSlider.disabled = true;
+                    endSlider.min = 0; endSlider.max = 1; endSlider.step = 0.01;
+                    endSlider.oninput = (e) => handleTrimChange(row, 'end', parseFloat(e.target.value));
+                    endSlider.title = "End";
+
+                    trimDiv.append(startLabel, startSlider, endLabel, endSlider);
+                    uiContainer.append(controlsDiv, trimDiv);
+
+                    const gridRowDiv = document.createElement('div');
+                    gridRowDiv.className = 'grid-row';
+                    for (let col = 0; col < state.numCols; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        if ((col + 1) % state.timeSignature === 0) cell.classList.add('measure-divider');
+                        cell.onclick = () => {
+                            state.grid[row][col] = !state.grid[row][col];
+                            cell.classList.toggle('active', state.grid[row][col]);
+                        };
+                        state.cells[row][col] = cell;
+                        gridRowDiv.appendChild(cell);
+                    }
+
+                    trackDiv.append(uiContainer, gridRowDiv);
+                    dom.sequencerContainer.appendChild(trackDiv);
+                }
+            }
+
+            function updateTrackUI(rowIndex) {
+                const track = state.tracks[rowIndex];
+                document.getElementById(`track-label-${rowIndex}`).textContent = track.name;
+
+                const previewBtn = document.getElementById(`preview-btn-${rowIndex}`);
+                const startSlider = document.getElementById(`start-slider-${rowIndex}`);
+                const endSlider = document.getElementById(`end-slider-${rowIndex}`);
+
+                previewBtn.disabled = false;
+                startSlider.disabled = false;
+                endSlider.disabled = false;
+
+                startSlider.max = track.buffer.duration;
+                startSlider.value = track.trimStart;
+                endSlider.max = track.buffer.duration;
+                endSlider.value = track.trimEnd;
+            }
+
+            function handleTrimChange(rowIndex, type, value) {
+                const track = state.tracks[rowIndex];
+                const startSlider = document.getElementById(`start-slider-${rowIndex}`);
+                const endSlider = document.getElementById(`end-slider-${rowIndex}`);
+
+                if (type === 'start') {
+                    if (value >= track.trimEnd) {
+                        value = track.trimEnd - 0.01;
+                        startSlider.value = value;
+                    }
+                    track.trimStart = value;
+                } else {
+                    if (value <= track.trimStart) {
+                        value = track.trimStart + 0.01;
+                        endSlider.value = value;
+                    }
+                    track.trimEnd = value;
+                }
+            }
+
+            function setupEventListeners() {
+                dom.playBtn.addEventListener('click', startSequencer);
+                dom.pauseBtn.addEventListener('click', pauseSequencer);
+                dom.stopBtn.addEventListener('click', stopSequencer);
+                dom.downloadBtn.addEventListener('click', exportToWav);
+
+                dom.tempoSlider.addEventListener('input', (e) => {
+                    state.tempo = parseInt(e.target.value, 10);
+                    e.target.title = state.tempo + " BPM";
+                    dom.colsSlider.title = Math.round(state.numCols / state.tempo * 6000) / 100 + " secs";
+                });
+                dom.timeSignatureSlider.addEventListener('input', (e) => {
+                    state.timeSignature = parseInt(e.target.value, 10);
+                    e.target.title = state.timeSignature + "/4";
+                    createGrid();
+                });
+                dom.rowsSlider.addEventListener('input', (e) => {
+                    state.numRows = parseInt(e.target.value, 10);
+                    e.target.title = state.numRows + " tracks";
+                    createGrid();
+                });
+                dom.colsSlider.addEventListener('input', (e) => {
+                    state.numCols = parseInt(e.target.value, 10);
+                    e.target.title = Math.round(state.numCols / state.tempo * 6000) / 100 + " secs";
+                    createGrid();
+                });
+            }
+
+            createGrid();
+            setupEventListeners();
+
+            function loadSample(file, rowIndex) {
+                const reader = new FileReader();
+                reader.onload = (e) => processAudioBuffer(e.target.result, rowIndex, file.name);
+                reader.readAsArrayBuffer(file);
+            }
+
+            async function handleRecordClick(rowIndex) {
+                if (audioContext.state === 'suspended') await audioContext.resume();
+                if (state.mediaRecorder && state.mediaRecorder.state === 'recording') {
+                    if (state.recordingTrackIndex === rowIndex) state.mediaRecorder.stop();
+                } else {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        startRecording(stream, rowIndex);
+                    } catch (err) { alert("Η πρόσβαση στο μικρόφωνο είναι απαραίτητη."); }
+                }
+            }
+
+            function startRecording(stream, rowIndex) {
+                state.mediaRecorder = new MediaRecorder(stream);
+                const audioChunks = [];
+                state.mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                state.mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    audioBlob.arrayBuffer().then(arrayBuffer => processAudioBuffer(arrayBuffer, state.recordingTrackIndex));
+                    stream.getTracks().forEach(track => track.stop());
+                    state.mediaRecorder = null;
+                    updateRecordButtons(null);
+                };
+                state.mediaRecorder.start();
+                state.recordingTrackIndex = rowIndex;
+                updateRecordButtons(rowIndex);
+            }
+
+            function nextStep() {
+                const quarterNoteTime = 60000 / state.tempo;
+                state.grid.forEach((row, rowIndex) => {
+                    if (row[state.currentStep] && state.tracks[rowIndex]) {
+                        playSound(state.tracks[rowIndex]);
+                    }
+                });
+                updatePlaybackHead(state.currentStep, (state.currentStep + 1) % state.numCols);
+                state.currentStep = (state.currentStep + 1) % state.numCols;
+                state.scheduler = setTimeout(nextStep, quarterNoteTime);
+            }
+
+            async function exportToWav() {
+                dom.downloadBtn.disabled = true;
+                dom.downloadBtn.textContent = 'Rendering...';
+                const quarterNoteDuration = 60 / state.tempo;
+                const loopDuration = state.numCols * quarterNoteDuration;
+                const offlineCtx = new OfflineAudioContext({
+                    numberOfChannels: 2, length: audioContext.sampleRate * loopDuration, sampleRate: audioContext.sampleRate,
+                });
+                state.grid.forEach((row, rowIndex) => {
+                    const track = state.tracks[rowIndex];
+                    if (!track) return;
+                    for (let col = 0; col < state.numCols; col++) {
+                        if (row[col]) {
+                            const source = offlineCtx.createBufferSource();
+                            source.buffer = track.buffer;
+                            source.connect(offlineCtx.destination);
+                            const offset = track.trimStart;
+                            const duration = track.trimEnd - track.trimStart;
+                            if (duration > 0) {
+                                source.start(col * quarterNoteDuration, offset, duration);
+                            }
+                        }
+                    }
+                });
+                const renderedBuffer = await offlineCtx.startRendering();
+                const wavBlob = bufferToWav(renderedBuffer);
+                const url = URL.createObjectURL(wavBlob);
+                const a = document.createElement('a');
+                a.style.display = 'none'; a.href = url; a.download = 'sequencer-loop.wav';
+                document.body.appendChild(a); a.click();
+                URL.revokeObjectURL(url); document.body.removeChild(a);
+                dom.downloadBtn.disabled = false; dom.downloadBtn.textContent = 'Download WAV';
+            }
+
+            function startSequencer() { if (audioContext.state === 'suspended') { audioContext.resume(); } if (state.isPlaying) return; state.isPlaying = true; dom.playBtn.disabled = true; dom.pauseBtn.disabled = false; state.currentStep = state.currentStep > 0 ? state.currentStep : (state.numCols - 1); nextStep(); }
+            function pauseSequencer() { if (!state.isPlaying) return; state.isPlaying = false; dom.playBtn.disabled = false; dom.pauseBtn.disabled = true; clearTimeout(state.scheduler); }
+            function stopSequencer() { state.isPlaying = false; dom.playBtn.disabled = false; dom.pauseBtn.disabled = true; clearTimeout(state.scheduler); updatePlaybackHead(state.currentStep, -1); state.currentStep = 0; }
+            function updatePlaybackHead(oldStep, newStep) { for (let row = 0; row < state.numRows; row++) { if (state.cells[row] && state.cells[row][oldStep]) { state.cells[row][oldStep].classList.remove('playback-head'); } if (newStep !== -1 && state.cells[row] && state.cells[row][newStep]) { state.cells[row][newStep].classList.add('playback-head'); } } }
+            function updateRecordButtons(recordingIndex) { for (let i = 0; i < state.numRows; i++) { const btn = document.getElementById(`record-btn-${i}`); if (btn) { if (recordingIndex === null) { btn.disabled = false; btn.style.color = 'white'; btn.classList.remove('recording'); } else if (i === recordingIndex) { btn.disabled = false; btn.style.color = 'firebrick'; btn.classList.add('recording'); } else { btn.disabled = true; } } } }
+            function bufferToWav(buffer) { const numOfChan = buffer.numberOfChannels, length = buffer.length * numOfChan * 2 + 44, bufferWav = new ArrayBuffer(length), view = new DataView(bufferWav), channels = []; let i, sample, pos = 0; function writeString(view, offset, string) { for (let i = 0; i < string.length; i++) { view.setUint8(offset + i, string.charCodeAt(i)); } } writeString(view, pos, 'RIFF'); pos += 4; view.setUint32(pos, length - 8, true); pos += 4; writeString(view, pos, 'WAVE'); pos += 4; writeString(view, pos, 'fmt '); pos += 4; view.setUint32(pos, 16, true); pos += 4; view.setUint16(pos, 1, true); pos += 2; view.setUint16(pos, numOfChan, true); pos += 2; view.setUint32(pos, buffer.sampleRate, true); pos += 4; view.setUint32(pos, buffer.sampleRate * 2 * numOfChan, true); pos += 4; view.setUint16(pos, numOfChan * 2, true); pos += 2; view.setUint16(pos, 16, true); pos += 2; writeString(view, pos, 'data'); pos += 4; view.setUint32(pos, length - pos - 4, true); pos += 4; for (i = 0; i < buffer.numberOfChannels; i++) { channels.push(buffer.getChannelData(i)); } let offset = 0; while (pos < length) { for (i = 0; i < numOfChan; i++) { sample = Math.max(-1, Math.min(1, channels[i][offset])); sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0; view.setInt16(pos, sample, true); pos += 2; } offset++; } return new Blob([view], { type: 'audio/wav' }); }
+
+        });
+    </script>
+</body>
+
+</html>
