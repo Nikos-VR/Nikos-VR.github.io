@@ -1,5 +1,6 @@
 The repository includes works created for the teaching needs of the courses "Digital Image Processing", "Digital Audio Processing" and "Virtual Reality" at the Department of Performing and Digital Arts of the University of Peloponnese.
 
+...
 
 Olive: web-based node editor for real-time image and video processing (https://nikos-vr.github.io/olive)
 
