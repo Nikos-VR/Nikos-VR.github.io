@@ -1,4 +1,6 @@
-This repository contains works made as part of the course "Virtual Reality II" at the Department of Performing and Digital Arts of the University of the Peloponnese and demonstrate A-Frame and the aframe-physics-system component.
+The repository includes works created for the teaching needs of the courses "Digital Image Processing", "Digital Audio Processing" and "Virtual Reality" at the Department of Performing and Digital Arts of the University of Peloponnese:
 
-1) https://nikos-vr.github.io/jenga,
-2) https://nikos-vr.github.io/escape
+1) Olive: web-based node editor for real-time image and video processing (https://nikos-vr.github.io/olive)
+2) Jose: simple yet fully functional javascript online audio sequencer (https://nikos-vr.github.io/jose)
+3) Jenga: virtual reality simulation of the popular puzzle game (https://nikos-vr.github.io/jenga),
+4) Escape: simulation in a virtual reality environment of an escape room (https://nikos-vr.github.io/escape)
