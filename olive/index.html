@@ -25,11 +25,12 @@
             width: 200px;
             background-color: #282828;
             box-sizing: border-box;
-            z-index: 990;
+            z-index: 800;
             height: 100%;
             text-align: center;
             font-size: small;
             overflow-x: hidden;
+            padding-top: 75px;
         }
 
         .palette-title {
@@ -103,7 +104,7 @@
             padding: 5px;
             position: absolute;
             top: 0;
-            z-index: 900;
+            z-index: 700;
         }
 
         .node-input-field {
@@ -145,7 +146,7 @@
             font-weight: bold;
             position: absolute;
             top: 0;
-            z-index: 900;
+            z-index: 700;
             background-color: #000;
             border: 0;
             cursor: pointer;
@@ -218,7 +219,15 @@
             color: white;
             padding: 5px 10px;
             border-radius: 5px;
-            z-index: 100;
+            z-index: 600;
+        }
+
+        #logo {
+            position: absolute;
+            top: 10px;
+            left: 55px;
+            z-index: 900;
+            color: white;
         }
     </style>
 
@@ -236,18 +245,24 @@
 </head>
 
 <body>
+    <a href="docs/manual.pdf" target="_blank" class="load-save-button" style="right:0;text-decoration:none;padding:2px">&#10067;</a>
     <button onclick="document.getElementById('projectPath').click();" title="Open" class="load-save-button"
-        style="right:0">&#x1F4C2;</button>
-    <button onclick="saveProject();" title="Save" class="load-save-button" style="right:25px">&#128190;</button>
+        style="right:20px">&#x1F4C2;</button>
+    <button onclick="saveProject();" title="Save" class="load-save-button" style="right:48px">&#128190;</button>
     <input tabIndex="-1" type="file" id="projectPath" accept=".olive" onchange="loadProjectFromJSON(event);"
         style="display:none">
-    <input type="text" id="projectName" class="name-input-field" value="Untitled project" style="right:63px">
+    <input type="text" id="projectName" class="name-input-field" value="Untitled project" style="right:84px">
     <div id="main-container">
         <div id="node-palette" style="display: none;"> </div>
         <div id="graph-container">
             <svg id="wire-svg"></svg>
         </div>
         <div id="opencv-status">Loading OpenCV...</div>
+    </div>
+    <div id="logo">
+        <strong style="font-size: 50px;">O</strong>
+        <div style="font-size: 17px; margin-top: -30px;margin-left: 40px;">LIVE</div>
+        <div style="font-size: 12px; color: #666; margin-top: -35px;margin-left: 40px;">penCV</div>
     </div>
 
     <script>
