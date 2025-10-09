@@ -994,7 +994,7 @@
                                 cv.merge(final, dst);
                                 final.delete();
                             }
-                            else if (title === 'Distance') {
+                            else if (title === 'Skeleton') {
                                 let channels = new cv.MatVector();
                                 cv.split(src, channels);
                                 let R = channels.get(0);
@@ -1875,7 +1875,7 @@
                 "Distort": [{ title: "Polar Transformation", type: "Throughput" }, { title: "Glitch Effects", type: "Throughput" }, { title: "Thresholding", type: "Throughput" }],
                 "Mix / Merge": [{ title: "Matrix Operations", type: "Mixer" }, { title: "Channel Mixer", type: "Throughput" }, { title: "Color Blending", type: "Mixer" }, { title: "Concatenation", type: "Mixer" }],
                 "Detect": [{ title: "Connected Components", type: "Throughput" }, { title: "Human Pose", type: "MediaPipe" }, { title: "Background Subtraction", type: "Throughput" }],
-                "Visualize": [{ title: "Canvas Viewer", type: "Viewer" }, { title: "Optical Flow", type: "Throughput" }, { title: "Distance", type: "Throughput" }]
+                "Visualize": [{ title: "Canvas Viewer", type: "Viewer" }, { title: "Optical Flow", type: "Throughput" }, { title: "Skeleton", type: "Throughput" }]
             };
             for (const category in paletteNodes) {
                 const categoryBlock = document.createElement("div");
