@@ -513,7 +513,6 @@
 
             async function exportToWav() {
                 dom.downloadBtn.disabled = true;
-                dom.downloadBtn.textContent = 'Rendering...';
                 const quarterNoteDuration = 60 / state.tempo;
                 const loopDuration = state.numCols * quarterNoteDuration;
                 const offlineCtx = new OfflineAudioContext({
@@ -539,10 +538,10 @@
                 const wavBlob = bufferToWav(renderedBuffer);
                 const url = URL.createObjectURL(wavBlob);
                 const a = document.createElement('a');
-                a.style.display = 'none'; a.href = url; a.download = 'sequencer-loop.wav';
+                a.style.display = 'none'; a.href = url; a.download = 'sequence.wav';
                 document.body.appendChild(a); a.click();
                 URL.revokeObjectURL(url); document.body.removeChild(a);
-                dom.downloadBtn.disabled = false; dom.downloadBtn.textContent = 'Download WAV';
+                dom.downloadBtn.disabled = false;
             }
 
             function startSequencer() { if (audioContext.state === 'suspended') { audioContext.resume(); } if (state.isPlaying) return; state.isPlaying = true; dom.playBtn.disabled = true; dom.pauseBtn.disabled = false; state.currentStep = state.currentStep > 0 ? state.currentStep : (state.numCols - 1); nextStep(); }
