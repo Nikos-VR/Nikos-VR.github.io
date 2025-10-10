@@ -1536,13 +1536,13 @@
                     if (sourceIsValid) {
                         try {
                             if (node.checkFirstFrame) {
+                                statusEl.style.display = "block";
                                 async function mediaP() {
                                     await node.holistic.send({ image: sourceElement });
                                     setTimeout(mediaP, 100);
                                 }
                                 mediaP();
                                 node.checkFirstFrame = false;
-                                statusEl.style.display = "block";
                             }
                             node.currentVrm.update(clock.getDelta());
                         }
