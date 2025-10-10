@@ -142,11 +142,11 @@
 <body>
     <div class="controls-panel" style="float:right">
         <label for="tempo-slider">&#9833;</label>
-        <input type="range" id="tempo-slider" min="30" max="180" value="120" title="120 BPM">
+        <input type="range" id="tempo-slider" min="30" max="240" value="120" title="120 BPM">
         <label for="time-signature-slider">&#119066;</label>
         <input type="range" id="time-signature-slider" min="2" max="7" value="4" title="4/4">
         <label for="rows-slider">&#127929;</label>
-        <input type="range" id="rows-slider" min="2" max="15" value="8" title="8 tracks">
+        <input type="range" id="rows-slider" min="1" max="25" value="8" title="8 tracks">
         <label for="cols-slider">&#9202;</label>
         <input type="range" id="cols-slider" min="4" max="128" value="64" title="32 secs">
     </div>
@@ -295,6 +295,107 @@
                 }
             }
 
+            function updateGrid() {
+                const oldGrid = [...state.grid];
+                const oldTracks = [...state.tracks];
+
+                dom.sequencerContainer.innerHTML = '';
+                state.grid = [];
+                state.cells = [];
+                state.tracks = [];
+
+                for (let row = 0; row < state.numRows; row++) {
+                    state.grid[row] = [];
+                    state.cells[row] = [];
+                    state.tracks[row] = oldTracks[row] || null;
+
+                    const trackDiv = document.createElement('div');
+                    trackDiv.className = 'track';
+                    const uiContainer = document.createElement('div');
+                    uiContainer.className = 'track-ui-container';
+                    const controlsDiv = document.createElement('div');
+                    controlsDiv.className = 'track-controls';
+
+                    const label = document.createElement('span');
+                    label.id = `track-label-${row}`;
+                    label.className = 'track-label';
+                    label.textContent = `Track ${row + 1}`;
+
+                    const previewBtn = document.createElement('button');
+                    previewBtn.id = `preview-btn-${row}`;
+                    previewBtn.innerHTML = '&#9654;';
+                    previewBtn.disabled = true;
+                    previewBtn.onclick = () => playSound(state.tracks[row]);
+                    previewBtn.title = "Preview";
+
+                    const uploadInput = document.createElement('input');
+                    uploadInput.type = 'file';
+                    uploadInput.accept = 'audio/*';
+                    uploadInput.style.display = 'none';
+                    uploadInput.onchange = (e) => loadSample(e.target.files[0], row);
+
+                    const uploadBtn = document.createElement('button');
+                    uploadBtn.innerHTML = '&#x1F4C2;';
+                    uploadBtn.onclick = () => uploadInput.click();
+                    uploadBtn.title = "Upload";
+
+                    const recordBtn = document.createElement('button');
+                    recordBtn.id = `record-btn-${row}`;
+                    recordBtn.className = 'record-btn';
+                    recordBtn.innerHTML = '&#9210;';
+                    recordBtn.onclick = () => handleRecordClick(row);
+                    recordBtn.title = "Record";
+
+                    controlsDiv.append(previewBtn, label, uploadBtn, recordBtn, uploadInput);
+
+                    const trimDiv = document.createElement('div');
+                    trimDiv.className = 'trim-controls';
+
+                    const startLabel = document.createElement('label'); startLabel.textContent = 'S';
+                    const startSlider = document.createElement('input');
+                    startSlider.type = 'range'; startSlider.id = `start-slider-${row}`; startSlider.disabled = true;
+                    startSlider.min = 0; startSlider.max = 1; startSlider.step = 0.01;
+                    startSlider.oninput = (e) => handleTrimChange(row, 'start', parseFloat(e.target.value));
+                    startSlider.title = "Start";
+
+                    const endLabel = document.createElement('label'); endLabel.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;E';
+                    const endSlider = document.createElement('input');
+                    endSlider.type = 'range'; endSlider.id = `end-slider-${row}`; endSlider.disabled = true;
+                    endSlider.min = 0; endSlider.max = 1; endSlider.step = 0.01;
+                    endSlider.oninput = (e) => handleTrimChange(row, 'end', parseFloat(e.target.value));
+                    endSlider.title = "End";
+
+                    trimDiv.append(startLabel, startSlider, endLabel, endSlider);
+                    uiContainer.append(controlsDiv, trimDiv);
+
+                    const gridRowDiv = document.createElement('div');
+                    gridRowDiv.className = 'grid-row';
+                    for (let col = 0; col < state.numCols; col++) {
+                        const wasActive = oldGrid[row] ? oldGrid[row][col] : false;
+                        state.grid[row][col] = wasActive;
+                        
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        if (wasActive) cell.classList.add('active');
+                        if ((col + 1) % state.timeSignature === 0) cell.classList.add('measure-divider');
+                        
+                        cell.onclick = () => {
+                            state.grid[row][col] = !state.grid[row][col];
+                            cell.classList.toggle('active', state.grid[row][col]);
+                        };
+                        state.cells[row][col] = cell;
+                        gridRowDiv.appendChild(cell);
+                    }
+                    
+                    trackDiv.append(uiContainer, gridRowDiv);
+                    dom.sequencerContainer.appendChild(trackDiv);
+
+                    if (state.tracks[row]) {
+                        updateTrackUI(row);
+                    }
+                }
+            }
+
             function updateTrackUI(rowIndex) {
                 const track = state.tracks[rowIndex];
                 document.getElementById(`track-label-${rowIndex}`).textContent = track.name;
@@ -347,21 +448,21 @@
                 dom.timeSignatureSlider.addEventListener('input', (e) => {
                     state.timeSignature = parseInt(e.target.value, 10);
                     e.target.title = state.timeSignature + "/4";
-                    createGrid();
+                    updateGrid();
                 });
                 dom.rowsSlider.addEventListener('input', (e) => {
                     state.numRows = parseInt(e.target.value, 10);
                     e.target.title = state.numRows + " tracks";
-                    createGrid();
+                    updateGrid();
                 });
                 dom.colsSlider.addEventListener('input', (e) => {
                     state.numCols = parseInt(e.target.value, 10);
                     e.target.title = Math.round(state.numCols / state.tempo * 6000) / 100 + " secs";
-                    createGrid();
+                    updateGrid();
                 });
             }
 
-            createGrid();
+            updateGrid();
             setupEventListeners();
 
             function loadSample(file, rowIndex) {
