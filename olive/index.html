@@ -240,6 +240,8 @@
     <script src="js/OrbitControls.js"></script>
     <script src="js/DragControls.js"></script>
     <script src="js/GLTFLoader.js"></script>
+    <script src="js/FontLoader.js"></script>
+    <script src="js/TextGeometry.js"></script>
     <script src="js/three-vrm.js"></script>
     <script async defer src="js/opencv.js"></script>
     <script src="js/camera_utils.js" crossorigin="anonymous"></script>
@@ -278,6 +280,9 @@
         let pendingWire = null;
         let activeNode = null;
         let openCvReady = false;
+
+        const fontCache = {};
+        const fontLoader = new THREE.FontLoader();
 
         function cartesian2polar(x, y) {
             let R = Math.sqrt(x * x + y * y)
@@ -330,15 +335,164 @@
                     if (!document.fullscreenElement) node.mediaElement.style.zoom = 190 / node.mediaElement.naturalWidth;
                 };
             }
+            else if (type === 'Text') {
+                node.outputs.push({ name: 'output' });
+
+                node.text = 'OLIVE';
+                node.textColor = '#ffffff';
+                node.textSize = 30;
+                node.textHeight = 10;
+                node.fontName = 'helvetiker_regular';
+                node.font = null;
+                node.needsUpdate = true;
+
+                const scene = new THREE.Scene();
+                node.camera = new THREE.OrthographicCamera(screen.width / -2, screen.width / 2, screen.height / 2, screen.height / -2, 1, 1000);
+                node.camera.position.z = 100;
+
+                const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true });
+                renderer.setSize(screen.width, screen.height);
+                renderer.setClearColor(0x000000, 0);
+
+                const controls = new THREE.OrbitControls(node.camera, renderer.domElement);
+                controls.enableZoom = true;
+
+                function loadFont(fontName) {
+                    if (fontCache[fontName]) {
+                        node.font = fontCache[fontName];
+                        node.needsUpdate = true;
+                        return;
+                    }
+                    const fontUrls = {
+                        'helvetiker_regular': 'fonts/helvetiker_regular.typeface.json',
+                        'gentilis_regular': 'fonts/gentilis_regular.typeface.json',
+                        'droid_sans_regular': 'fonts//droid_sans_regular.typeface.json',
+                        'optimer_regular': 'fonts/optimer_regular.typeface.json'
+                    };
+                    fontLoader.load(fontUrls[fontName], (loadedFont) => {
+                        fontCache[fontName] = loadedFont;
+                        node.font = loadedFont;
+                        node.needsUpdate = true;
+                    });
+                }
+                loadFont(node.fontName);
+
+                node.changeFont = (newFontName) => {
+                    node.fontName = newFontName;
+                    loadFont(newFontName);
+                };
+
+                let textMesh = null;
+                function updateText() {
+                    if (textMesh) {
+                        scene.remove(textMesh);
+                        textMesh.geometry.dispose();
+                        textMesh.material.dispose();
+                    }
+                    if (!node.font || !node.text) return;
+
+                    const geometry = new THREE.TextGeometry(node.text, {
+                        font: node.font,
+                        size: node.textSize,
+                        height: node.textHeight
+                    });
+                    geometry.computeBoundingBox();
+                    geometry.center();
+
+                    const material = new THREE.MeshBasicMaterial({ color: new THREE.Color(node.textColor) });
+                    textMesh = new THREE.Mesh(geometry, material);
+                    scene.add(textMesh);
+                }
+                node.three = { scene, renderer, controls, updateText };
+
+                node.onExecute = () => {
+                    if (node.needsUpdate) {
+                        updateText();
+                        node.needsUpdate = false;
+                    }
+                    controls.update();
+                    renderer.render(scene, node.camera);
+                    node.outputValues.output = renderer.domElement;
+
+                    renderer.domElement.style.display = "none";
+                    if (document.fullscreenElement === renderer.domElement) renderer.domElement.style.display = "block";
+                };
+            }
+            else if (type === 'Parametric') {
+                node.outputs.push({ name: 'output' });
+                node.canvas = document.createElement('canvas');
+                node.canvas.className = 'inner-canvas';
+                node.canvas.width = 600;
+                node.canvas.height = 600;
+                node.ctx = node.canvas.getContext('2d', { willReadFrequently: true });
+
+                node.curveColor = '#cccccc';
+                node.paramA = Math.ceil(Math.random() * 600) + 10;
+                node.paramB = Math.ceil(Math.random() * 600) + 25;
+                node.curveName = 'rhodonea';
+                node.curveType = ["", "", "checked"];
+                node.timeIndex = 0;
+
+                function curve(t) {
+                    let x, y;
+                    if (node.curveName === "rhodonea") {
+                        x = Math.sin(t) * Math.sin(Math.sqrt(node.paramA) * t);
+                        y = Math.cos(t) * Math.sin(Math.sqrt(node.paramA) * t);
+                    }
+                    else if (node.curveName === "astroid") {
+                        x = Math.pow(Math.cos(node.paramA * t), node.paramA % 3 * 2 + 3);
+                        y = Math.pow(Math.sin(node.paramA * t), node.paramA % 3 * 2 + 3);
+                    }
+                    else if (node.curveName === "combined") {
+                        x = Math.cos(node.paramA * t) - Math.pow(Math.cos(node.paramA * t), node.paramA % 10 * 2 + 3);
+                        y = Math.sin(node.paramA * t) - Math.pow(Math.sin(node.paramA * t), node.paramA % 10 * 2 + 3);
+                    }
+                    return [x, y];
+                }
+                node.onExecute = () => {
+                    let scale = 2 * 10000;
+                    let step = scale * Math.sqrt(node.paramB);
+                    let start = node.timeIndex++ / step;
+
+                    if (node.curveName === "rhodonea") start *= 100;
+                    let end = start + 1000 * scale * 2 * Math.PI;
+
+                    let i = curve(start);
+                    let x, y, z;
+
+                    node.ctx.clearRect(0, 0, node.canvas.width, node.canvas.width);
+                    node.ctx.beginPath();
+                    node.ctx.moveTo(node.canvas.width / 2 * (1 + i[0]), node.canvas.width / 2 * (1 + i[1]));
+
+                    node.ctx.strokeStyle = node.curveColor;
+                    node.ctx.fillStyle = 'white';
+
+                    for (var t = start; t < end; t += step) {
+                        z = curve(t);
+                        x = node.canvas.width / 2 * (1 + z[0]);
+                        y = node.canvas.width / 2 * (1 + z[1]);
+
+                        if (node.curveType[0] === "checked") node.ctx.fillRect(x - 1, y - 1, 3, 3);
+                        else {
+                            if (node.curveType[1] === "checked") node.ctx.lineTo(x, y);
+                            else node.ctx.quadraticCurveTo(node.canvas.width / 2, node.canvas.width / 2, x, y);
+                        }
+                    }
+                    if (node.curveType[0] !== "checked") node.ctx.stroke();
+
+                    node.outputValues.output = node.canvas;
+                };
+            }
             else if (type === '3DScene') {
                 node.inputs.push({ name: 'input' });
                 node.outputs.push({ name: 'output' });
 
                 const scene = new THREE.Scene();
                 node.camera = new THREE.PerspectiveCamera(45, screen.width / screen.height, 1, 1000);
-                const renderer = new THREE.WebGLRenderer({ antialias: true });
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
                 renderer.setSize(screen.width, screen.height);
+                renderer.setClearColor(0x000000, 0);
 
                 const controls = new THREE.OrbitControls(node.camera, renderer.domElement);
                 controls.enableZoom = true;
@@ -1437,13 +1591,13 @@
                 node.buttonDisabled = "";
 
                 const scene = new THREE.Scene();
-                const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+                const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true });
                 node.camera = new THREE.PerspectiveCamera(45, screen.width / screen.height, 1, 100);
                 node.camera.position.set(0, 1.5, 2);
 
                 renderer.domElement.style.display = "none";
                 renderer.setSize(screen.width, screen.height);
-                scene.background = new THREE.Color(0x000000);
+                renderer.setClearColor(0x000000, 0);
 
                 const light = new THREE.DirectionalLight(0xffffff);
                 light.position.set(1, 1, 1).normalize();
@@ -1730,6 +1884,47 @@
                                 <input type="text" class="node-input-field" data-property="videoUrl" placeholder="Video URL..." value="${nodeData.videoUrl}">
                             </div>`;
                         break;
+                    case 'Text':
+                        const fontOptions = [
+                            { value: 'helvetiker_regular', name: 'Helvetiker' },
+                            { value: 'gentilis_regular', name: 'Gentilis' },
+                            { value: 'droid_sans_regular', name: 'Droid Sans' },
+                            { value: 'optimer_regular', name: 'Optimer' }
+                        ];
+                        let optionsHTML = fontOptions.map(font =>
+                            `<option value="${font.value}" ${nodeData.fontName === font.value ? 'selected' : ''}>${font.name}</option>`
+                        ).join('');
+                        specificContentHTML = `
+                            <div class="node-content">
+                                <select class="node-select-field text-font-selector" data-node-id="${nodeData.id}">${optionsHTML}</select>
+                                <input type="text" class="node-input-field text-input" data-node-id="${nodeData.id}" value="${nodeData.text}">
+                                <input type="color" class="node-input-color text-color-input" data-node-id="${nodeData.id}" value="${nodeData.textColor}">
+                                <input type="range" class="node-input-range text-size-input" data-node-id="${nodeData.id}" min="10" max="100" value="${nodeData.textSize}" title="Font-size: ${nodeData.textSize}" style="width:144px">
+                                <input type="range" class="node-input-range text-size-height" data-node-id="${nodeData.id}" min="1" max="50" value="${nodeData.textHeight}" title="Thickness: ${nodeData.textHeight}" style="width:144px">
+                                <br><br>
+                                <button class="node-fullscreen-button" onclick="this.nextElementSibling.requestFullscreen();">Render 3D Scene</button>
+                            </div>`;
+                        break;
+                    case 'Curves':
+                        const curveOptions = [
+                            { value: 'rhodonea', name: 'Rhodonea' },
+                            { value: 'astroid', name: 'Astroid' },
+                            { value: 'combined', name: 'Combined' }
+                        ];
+                        let curvesHTML = curveOptions.map(curve =>
+                            `<option value="${curve.value}" ${nodeData.curveName === curve.value ? 'selected' : ''}>${curve.name}</option>`
+                        ).join('');
+                        specificContentHTML = `
+                            <div class="node-content">
+                                <select class="node-select-field curve-type-selector" data-node-id="${nodeData.id}">${curvesHTML}</select>
+                                <input type="color" class="node-input-color curve-color-input" data-node-id="${nodeData.id}" value="${nodeData.curveColor}">
+                                <input type="range" class="node-input-range curve-A-input" data-node-id="${nodeData.id}" min="10" max="610" value="${nodeData.paramA}" title="A: ${nodeData.paramA}" style="width:144px">
+                                <input type="range" class="node-input-range curve-B-input" data-node-id="${nodeData.id}" min="25" max="625" value="${nodeData.paramB}" title="B: ${nodeData.paramB}" style="width:144px">
+                                <p><input type="radio" id="curvePoints" data-node-id="${nodeData.id}" class="node-input-check curve-style" name="curveStyle" ${nodeData.curveType[0]}><small>Points</small>
+                                <input type="radio" id="curveLines" data-node-id="${nodeData.id}" class="node-input-check curve-style" name="curveStyle" ${nodeData.curveType[1]}><small>Lines</small>
+                                <input type="radio" data-node-id="${nodeData.id}" class="node-input-check curve-style" name="curveStyle" ${nodeData.curveType[2]}><small>Curves</small></p>
+                            </div>`;
+                        break;
                     case 'Histogram Equalization':
                         specificContentHTML = `
                             <div class="node-content node-viewer-content-container">
@@ -1901,10 +2096,10 @@
                         populateCameraSelector(contentDiv, nodeData);
                     }
                 }
-                else if ((nodeData.type === '3DScene' || nodeData.type === 'Character') && nodeData.three) {
+                else if ((nodeData.type === '3DScene' || nodeData.type === 'Character' || nodeData.type === 'Text') && nodeData.three) {
                     nodeEl.querySelector('.node-content').appendChild(nodeData.three.renderer.domElement);
                 }
-                else if ((nodeData.type === 'Viewer' || nodeData.type === 'Throughput' || nodeData.type === 'Mixer') && nodeData.canvas) {
+                else if ((nodeData.type === 'Viewer' || nodeData.type === 'Throughput' || nodeData.type === 'Mixer' || nodeData.type === 'Parametric') && nodeData.canvas) {
                     nodeEl.querySelector('.node-content').appendChild(nodeData.canvas);
                 }
             });
@@ -2036,6 +2231,7 @@
             paletteContainer.style.display = 'block';
             const paletteNodes = {
                 "Capture": [{ title: "Image", type: "Input" }, { title: "Video", type: "Input" }, { title: "Camera", type: "Input" }],
+                "Generate": [{ title: "Text", type: "Text" }, { title: "Curves", type: "Parametric" }],
                 "Enhance": [{ title: "Gamma Correction", type: "Throughput" }, { title: "Histogram Equalization", type: "Throughput" }, { title: "Color Adjustment", type: "Throughput" }],
                 "Filter": [{ title: "Convolution", type: "Throughput" }, { title: "Morphology / Rank", type: "Throughput" }],
                 "Render": [{ title: "Projection", type: "3DScene" }, { title: "Mapping / Lighting", type: "3DScene" }, { title: "Character Animation", type: "Character" }],
@@ -2090,6 +2286,19 @@
                     nodeData.mediaElement.src = URL.createObjectURL(file);
                     nodeData.videoUrl = file.name;
                     nodeData.mediaElement.play();
+                }
+                else if (event.target.classList.contains('text-font-selector')) {
+                    if (nodeData.changeFont) {
+                        nodeData.changeFont(event.target.value);
+                    }
+                }
+                else if (event.target.classList.contains('curve-type-selector')) {
+                    nodeData.curveName = event.target.value;
+                }
+                else if (event.target.classList.contains('curve-style')) {
+                    nodeData.curveType = ["", "", "checked"];
+                    if (document.getElementById('curvePoints').checked) nodeData.curveType = ["checked", "", ""];
+                    else if (document.getElementById('curveLines').checked) nodeData.curveType = ["", "checked", ""];
                 }
                 else if (event.target.classList.contains('character-model-loader')) {
                     const file = event.target.files[0];
@@ -2298,6 +2507,34 @@
                 nodes.push(createNodeData(Math.round(Math.random() * 999999), nodeTitle, nodeType, event.clientX - rect.left - 30, event.clientY - rect.top - 10));
                 renderGraph();
             });
+            graphContainer.addEventListener('input', (event) => {
+                const target = event.target;
+                const nodeId = parseInt(target.dataset.nodeId);
+                const nodeData = nodes.find(n => n.id === nodeId);
+                if (!nodeData) return;
+
+                if (target.classList.contains('text-color-input')) {
+                    nodeData.textColor = target.value;
+                    nodeData.needsUpdate = true;
+                }
+                if (target.classList.contains('text-size-input')) {
+                    nodeData.textSize = parseInt(target.value);
+                    nodeData.needsUpdate = true;
+                }
+                if (target.classList.contains('text-size-height')) {
+                    nodeData.textHeight = parseInt(target.value);
+                    nodeData.needsUpdate = true;
+                }
+                if (target.classList.contains('curve-color-input')) {
+                    nodeData.curveColor = target.value;
+                }
+                if (target.classList.contains('curve-A-input')) {
+                    nodeData.paramA = parseInt(target.value);
+                }
+                if (target.classList.contains('curve-B-input')) {
+                    nodeData.paramB = parseInt(target.value);
+                }
+            });
             document.addEventListener('mousedown', (event) => {
                 if (event.target.classList.contains('port-output')) {
                     const fromNodeId = parseInt(event.target.dataset.nodeId);
@@ -2387,6 +2624,14 @@
                     const nodeData = nodes.find(n => n.id === nodeId);
                     nodeData.customKernel = inputEl.value.split(",");
                 }
+                else if (event.target.classList.contains('text-input')) {
+                    const nodeId = parseInt(event.target.dataset.nodeId);
+                    const nodeData = nodes.find(n => n.id === nodeId);
+                    if (nodeData) {
+                        nodeData.text = event.target.value;
+                        nodeData.needsUpdate = true;
+                    }
+                }
             });
             graphContainer.addEventListener('contextmenu', (event) => {
                 event.preventDefault();
@@ -2434,6 +2679,8 @@
                 nodes: nodes.map(n => ({
                     id: n.id, title: n.title, type: n.type, x: n.x, y: n.y,
                     imageUrl: n.imageUrl, videoUrl: n.videoUrl,
+                    nodeText: n.text, textColor: n.textColor, textSize: n.textSize, textHeight: n.textHeight, fontName: n.fontName,
+                    curveColor: n.curveColor, paramA: n.paramA, paramB: n.paramB, curveName: n.curveName, curveType: n.curveType,
                     primitiveType: n.primitiveType, isCustomModel: n.isCustomModel, loadedModel: n.loadedModel, currentVrm: n.currentVrm,
                     camera: n.camera, projectorCamera: n.projectorCamera, ambientLight: n.ambientLight, pointLight: n.pointLight,
                     checkFirstFrame: n.checkFirstFrame, gridSize: n.gridSize, gammaValue: n.gammaValue,
@@ -2541,6 +2788,16 @@
                     if (n.concatenationChecked) nd.concatenationChecked = n.concatenationChecked;
                     if (n.transitionType) nd.transitionType = n.transitionType;
                     if (n.transitionDuration) nd.transitionDuration = n.transitionDuration;
+                    if (n.nodeText) nd.nodeText = n.nodeText;
+                    if (n.textColor) nd.textColor = n.textColor;
+                    if (n.textSize) nd.textSize = n.textSize;
+                    if (n.textHeight) nd.textHeight = n.textHeight;
+                    if (n.fontName) nd.fontName = n.fontName;
+                    if (n.curveColor) nd.curveColor = n.curveColor;
+                    if (n.paramA) nd.paramA = n.paramA;
+                    if (n.paramB) nd.paramB = n.paramB;
+                    if (n.curveName) nd.curveName = n.curveName;
+                    if (n.curveType) nd.curveType = n.curveType;
                     nodes.push(nd);
                 });
                 renderGraph();
