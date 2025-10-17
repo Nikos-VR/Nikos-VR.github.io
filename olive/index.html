@@ -656,7 +656,6 @@
                 node.inputs.push({ name: 'input' });
                 node.canvas = document.createElement('canvas');
                 node.canvas.width = 190;
-                node.canvas.height = 240;
                 node.ctx = node.canvas.getContext('2d', { willReadFrequently: true });
 
                 node.canvas.addEventListener("fullscreenchange", function () { for (var i = 0; i < 10; i++) setTimeout(renderWires, i * 100); });
@@ -1568,11 +1567,14 @@
                     const sourceElement = getInputData(node, 0);
                     const sourceIsValid = sourceElement && (sourceElement.naturalWidth > 0 || sourceElement.videoWidth > 0 || sourceElement.tagName === 'CANVAS');
                     if (sourceIsValid) {
+                        let width = sourceElement.naturalWidth || sourceElement.videoWidth || sourceElement.width;
+                        let height = sourceElement.naturalHeight || sourceElement.videoHeight || sourceElement.height;
+
+                        if (node.canvas.width !== width) node.canvas.width = width;
+                        if (node.canvas.height !== height) node.canvas.height = height;
+
                         try {
                             if (node.checkFirstFrame) {
-                                node.canvas.width = sourceElement.naturalWidth || sourceElement.videoWidth || sourceElement.width;
-                                node.canvas.height = sourceElement.naturalHeight || sourceElement.videoHeight || sourceElement.height;
-
                                 node.pose.setOptions({
                                     modelComplexity: 1,
                                     smoothLandmarks: true,
