@@ -656,6 +656,7 @@
                 node.inputs.push({ name: 'input' });
                 node.canvas = document.createElement('canvas');
                 node.canvas.width = 190;
+                node.canvas.height = 240;
                 node.ctx = node.canvas.getContext('2d', { willReadFrequently: true });
 
                 node.canvas.addEventListener("fullscreenchange", function () { for (var i = 0; i < 10; i++) setTimeout(renderWires, i * 100); });
@@ -1533,8 +1534,6 @@
                 node.outputs.push({ name: 'output' });
                 node.canvas = document.createElement('canvas');
                 node.canvas.className = 'inner-canvas';
-                node.canvas.width = 240;
-                node.canvas.height = 291;
                 node.ctx = node.canvas.getContext('2d', { willReadFrequently: true });
 
                 node.checkFirstFrame = true;
