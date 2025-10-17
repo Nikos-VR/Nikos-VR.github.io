@@ -1536,6 +1536,7 @@
                 node.ctx = node.canvas.getContext('2d', { willReadFrequently: true });
 
                 node.checkFirstFrame = true;
+                node.detectionConfidence = 0.5;
 
                 const statusEl = document.getElementById('opencv-status');
                 statusEl.textContent = 'Loading MediaPipe...';
@@ -1551,8 +1552,8 @@
                     smoothLandmarks: true,
                     enableSegmentation: true,
                     smoothSegmentation: true,
-                    minDetectionConfidence: 0.1,
-                    minTrackingConfidence: 0.1
+                    minDetectionConfidence: node.detectionConfidence,
+                    minTrackingConfidence: 0.5
                 });
                 function onResults(results) {
                     if (statusEl.style.display == 'block') {
@@ -1580,6 +1581,7 @@
                                 node.canvas.height = sourceElement.naturalHeight || sourceElement.videoHeight || sourceElement.height;
 
                                 async function mediaP() {
+                                    node.pose.minDetectionConfidence = node.detectionConfidence;
                                     await node.pose.send({ image: sourceElement });
                                     setTimeout(mediaP, 100);
                                 }
@@ -2076,6 +2078,12 @@
                                 <button class="node-fullscreen-button" onclick="this.nextElementSibling.requestFullscreen();">Render 3D Scene</button>
                             </div>`;
                         break;
+                    case 'Human Pose':
+                        specificContentHTML = `
+                            <div class="node-content node-viewer-content-container">
+                                <input type="range" data-node-id="${nodeData.id}" title="Detection confidence: ${nodeData.detectionConfidence}" class="node-input-range confidence-range" min="0" max="1" step="0.1" value="${nodeData.detectionConfidence}">
+                            </div>`;
+                        break;
                     case 'Optical Flow':
                         specificContentHTML = `
                             <div class="node-content">
@@ -2504,6 +2512,10 @@
                     nodeData.transitionDuration = event.target.value * 1.0;
                     event.target.title = "Duration: " + event.target.value + "s";
                 }
+                else if (event.target.classList.contains('confidence-range')) {
+                    nodeData.detectionConfidence = event.target.value * 1.0;
+                    event.target.title = "Detection confidence: " + nodeData.detectionConfidence;
+                }
                 renderGraph();
             });
             graphContainer.addEventListener('dragover', (event) => event.preventDefault());
@@ -2700,7 +2712,7 @@
                     polarEffectSize: n.polarEffectSize, polarEffectType: n.polarEffectType, glitchEffectSize: n.glitchEffectSize, glitchEffectType: n.glitchEffectType,
                     channelMixerValues: n.channelMixerValues, opticalFlowSize: n.opticalFlowSize,
                     thresholdValue: n.thresholdValue, thresholdingChecked: n.thresholdingChecked, connectedComponentsSize: n.connectedComponentsSize,
-                    operationType: n.operationType, operationWeight: n.operationWeight,
+                    operationType: n.operationType, operationWeight: n.operationWeight, detectionConfidence: n.detectionConfidence,
                     hueBlendChecked: n.hueBlendChecked, satBlendChecked: n.satBlendChecked, valBlendChecked: n.valBlendChecked,
                     concatenationAlignment: n.concatenationAlignment, concatenationChecked: n.concatenationChecked,
                     transitionType: n.transitionType, transitionDuration: n.transitionDuration
@@ -2800,6 +2812,7 @@
                     if (n.paramB) nd.paramB = n.paramB;
                     if (n.curveName) nd.curveName = n.curveName;
                     if (n.curveType) nd.curveType = n.curveType;
+                    if (n.detectionConfidence) nd.detectionConfidence = n.detectionConfidence;
 
                     nd.fullRangeChecked = n.fullRangeChecked;
                     nd.colorRangeChecked = n.colorRangeChecked;
