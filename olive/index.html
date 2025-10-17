@@ -2771,9 +2771,6 @@
                     if (n.selectedColor) nd.selectedColor = n.selectedColor;
                     if (n.oldHSV) nd.oldHSV = n.oldHSV;
                     if (n.newHSV) nd.newHSV = n.newHSV;
-                    if (n.fullRangeChecked) nd.fullRangeChecked = n.fullRangeChecked;
-                    if (n.colorRangeChecked) nd.colorRangeChecked = n.colorRangeChecked;
-                    if (n.colorInvertChecked) nd.colorInvertChecked = n.colorInvertChecked;
                     if (n.convolutionType) nd.convolutionType = n.convolutionType;
                     if (n.convolutionalFilterSize) nd.convolutionalFilterSize = n.convolutionalFilterSize;
                     if (n.customKernel) nd.customKernel = n.customKernel;
@@ -2787,15 +2784,10 @@
                     if (n.channelMixerValues) nd.channelMixerValues = n.channelMixerValues;
                     if (n.opticalFlowSize) nd.opticalFlowSize = n.opticalFlowSize;
                     if (n.thresholdValue) nd.thresholdValue = n.thresholdValue;
-                    if (n.thresholdingChecked) nd.thresholdingChecked = n.thresholdingChecked;
                     if (n.connectedComponentsSize) nd.connectedComponentsSize = n.connectedComponentsSize;
                     if (n.operationType) nd.operationType = n.operationType;
                     if (n.operationWeight) nd.operationWeight = n.operationWeight;
-                    if (n.hueBlendChecked) nd.hueBlendChecked = n.hueBlendChecked;
-                    if (n.satBlendChecked) nd.satBlendChecked = n.satBlendChecked;
-                    if (n.valBlendChecked) nd.valBlendChecked = n.valBlendChecked;
                     if (n.concatenationAlignment) nd.concatenationAlignment = n.concatenationAlignment;
-                    if (n.concatenationChecked) nd.concatenationChecked = n.concatenationChecked;
                     if (n.transitionType) nd.transitionType = n.transitionType;
                     if (n.transitionDuration) nd.transitionDuration = n.transitionDuration;
                     if (n.nodeText) nd.nodeText = n.nodeText;
@@ -2808,6 +2800,16 @@
                     if (n.paramB) nd.paramB = n.paramB;
                     if (n.curveName) nd.curveName = n.curveName;
                     if (n.curveType) nd.curveType = n.curveType;
+
+                    nd.fullRangeChecked = n.fullRangeChecked;
+                    nd.colorRangeChecked = n.colorRangeChecked;
+                    nd.colorInvertChecked = n.colorInvertChecked;
+                    nd.thresholdingChecked = n.thresholdingChecked;
+                    nd.hueBlendChecked = n.hueBlendChecked;
+                    nd.satBlendChecked = n.satBlendChecked;
+                    nd.valBlendChecked = n.valBlendChecked;
+                    nd.concatenationChecked = n.concatenationChecked;
+
                     nodes.push(nd);
                 });
                 renderGraph();
