@@ -2754,13 +2754,13 @@
                         nd.buttonDisabled = "disabled";
                         nd.three.scene.add(nd.currentVrm.scene);
                     }
+                    if (n.primitiveType) { nd.primitiveType = n.primitiveType; nd.three.updateObject(); }
                     if (n.isCustomModel) {
                         nd.isCustomModel = n.isCustomModel;
                         if (n.loadedModel) {
                             const jsonLoader = new THREE.ObjectLoader();
                             jsonLoader.parse(n.loadedModel, function (obj) { nd.loadedModel = obj; });
                         }
-                        else nd.primitiveType = n.primitiveType;
                         nd.three.updateObject();
                     }
                     if (n.ambientLight) {
