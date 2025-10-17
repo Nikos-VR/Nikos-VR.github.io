@@ -2816,6 +2816,8 @@
                     if (n.curveName) nd.curveName = n.curveName;
                     if (n.curveType) nd.curveType = n.curveType;
                     if (n.detectionConfidence) nd.detectionConfidence = n.detectionConfidence;
+                    if (n.width) nd.canvas.width = n.width;
+                    if (n.height) nd.canvas.height = n.height;
 
                     nd.fullRangeChecked = n.fullRangeChecked;
                     nd.colorRangeChecked = n.colorRangeChecked;
@@ -2825,8 +2827,6 @@
                     nd.satBlendChecked = n.satBlendChecked;
                     nd.valBlendChecked = n.valBlendChecked;
                     nd.concatenationChecked = n.concatenationChecked;
-                    nd.canvas.width = n.width;
-                    nd.canvas.height = n.height;
 
                     nodes.push(nd);
                 });
