@@ -2816,8 +2816,8 @@
                     if (n.curveName) nd.curveName = n.curveName;
                     if (n.curveType) nd.curveType = n.curveType;
                     if (n.detectionConfidence) nd.detectionConfidence = n.detectionConfidence;
-                    if (n.width) nd.canvas.width = n.width;
-                    if (n.height) nd.canvas.height = n.height;
+                    if (n.width) nd.canvas.width = n.width + "px";
+                    if (n.height) nd.canvas.height = n.height + "px";
 
                     nd.fullRangeChecked = n.fullRangeChecked;
                     nd.colorRangeChecked = n.colorRangeChecked;
