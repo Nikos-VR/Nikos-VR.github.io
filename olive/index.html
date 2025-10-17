@@ -1571,6 +1571,8 @@
                             if (node.checkFirstFrame) {
                                 node.canvas.width = sourceElement.naturalWidth || sourceElement.videoWidth || sourceElement.width;
                                 node.canvas.height = sourceElement.naturalHeight || sourceElement.videoHeight || sourceElement.height;
+                                node.width = node.canvas.width;
+                                node.height = node.canvas.height;
 
                                 node.pose.setOptions({
                                     modelComplexity: 1,
@@ -2700,7 +2702,7 @@
         function saveProject() {
             const payload = {
                 nodes: nodes.map(n => ({
-                    id: n.id, title: n.title, type: n.type, x: n.x, y: n.y,
+                    id: n.id, title: n.title, type: n.type, x: n.x, y: n.y, width: n.width, height: n.height,
                     imageUrl: n.imageUrl, videoUrl: n.videoUrl,
                     nodeText: n.text, textColor: n.textColor, textSize: n.textSize, textHeight: n.textHeight, fontName: n.fontName,
                     curveColor: n.curveColor, paramA: n.paramA, paramB: n.paramB, curveName: n.curveName, curveType: n.curveType,
@@ -2814,6 +2816,8 @@
                     if (n.curveName) nd.curveName = n.curveName;
                     if (n.curveType) nd.curveType = n.curveType;
                     if (n.detectionConfidence) nd.detectionConfidence = n.detectionConfidence;
+                    if (n.width) nd.canvas.width = n.width;
+                    if (n.height) nd.canvas.height = n.height;
 
                     nd.fullRangeChecked = n.fullRangeChecked;
                     nd.colorRangeChecked = n.colorRangeChecked;
