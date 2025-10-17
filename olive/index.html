@@ -1542,22 +1542,19 @@
                 statusEl.textContent = 'Loading MediaPipe...';
                 statusEl.style.backgroundColor = 'goldenrod';
 
-                node.pose = null;
-                node.createPose = function () {
-                    node.pose = new Pose({
-                        locateFile: (file) => {
-                            return `js/pose/${file}`;
-                        }
-                    });
-                    node.pose.setOptions({
-                        modelComplexity: 1,
-                        smoothLandmarks: true,
-                        enableSegmentation: true,
-                        smoothSegmentation: true,
-                        minDetectionConfidence: node.detectionConfidence,
-                        minTrackingConfidence: 0.5
-                    });
-                };
+                node.pose = new Pose({
+                    locateFile: (file) => {
+                        return `js/pose/${file}`;
+                    }
+                });
+                node.pose.setOptions({
+                    modelComplexity: 1,
+                    smoothLandmarks: true,
+                    enableSegmentation: true,
+                    smoothSegmentation: true,
+                    minDetectionConfidence: node.detectionConfidence,
+                    minTrackingConfidence: 0.5
+                });
                 function onResults(results) {
                     if (statusEl.style.display == 'block') {
                         statusEl.textContent = 'MediaPipe Ready';
@@ -1572,7 +1569,6 @@
                     node.ctx.drawImage(results.segmentationMask, 0, 0);
                     node.ctx.restore();
                 }
-                node.createPose();
                 node.pose.onResults(onResults);
 
                 node.onExecute = () => {
@@ -1583,6 +1579,7 @@
                             if (node.checkFirstFrame) {
                                 node.canvas.width = sourceElement.naturalWidth || sourceElement.videoWidth || sourceElement.width;
                                 node.canvas.height = sourceElement.naturalHeight || sourceElement.videoHeight || sourceElement.height;
+                                document.getElementById('confidenceRange' + node.id).disabled = true;
 
                                 async function mediaP() {
                                     await node.pose.send({ image: sourceElement });
@@ -2084,7 +2081,7 @@
                     case 'Human Pose':
                         specificContentHTML = `
                             <div class="node-content node-viewer-content-container">
-                                <input type="range" data-node-id="${nodeData.id}" title="Detection confidence: ${nodeData.detectionConfidence}" class="node-input-range confidence-range" min="0" max="1" step="0.1" value="${nodeData.detectionConfidence}">
+                                <input type="range" id="confidenceRange${nodeData.id}" data-node-id="${nodeData.id}" title="Detection confidence: ${nodeData.detectionConfidence}" class="node-input-range confidence-range" min="0" max="1" step="0.1" value="${nodeData.detectionConfidence}">
                             </div>`;
                         break;
                     case 'Optical Flow':
@@ -2518,7 +2515,6 @@
                 else if (event.target.classList.contains('confidence-range')) {
                     nodeData.detectionConfidence = event.target.value * 1.0;
                     event.target.title = "Detection confidence: " + nodeData.detectionConfidence;
-                    nodeData.createPose();
                 }
                 renderGraph();
             });
