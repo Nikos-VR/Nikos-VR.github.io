@@ -658,7 +658,7 @@
                 node.canvas.width = 190;
                 node.ctx = node.canvas.getContext('2d', { willReadFrequently: true });
 
-                node.canvas.addEventListener("fullscreenchange", renderWires);
+                node.canvas.addEventListener("fullscreenchange", setTimeout(renderWires, 500));
 
                 node.onExecute = () => {
                     if (!openCvReady) return;
