@@ -426,11 +426,18 @@
                 node.canvas.height = 600;
                 node.ctx = node.canvas.getContext('2d', { willReadFrequently: true });
 
-                node.curveColor = '#cccccc';
-                node.paramA = Math.ceil(Math.random() * 600) + 10;
-                node.paramB = Math.ceil(Math.random() * 600) + 25;
-                node.curveName = 'rhodonea';
+                let A = [283, 433, 161, 544, 379, 232, 117, 61, 256, 583, 272, 253, 101, 456];
+                let B = [528, 142, 613, 282, 494, 430, 419, 87, 183, 604, 299, 167, 434, 369];
+                let rand = Math.floor(Math.random() * A.length);
+
+                node.curveColor = '#faf0a0';
+                node.paramA = A[rand];
+                node.paramB = B[rand];
+                node.curveName = 'combined';
+                if (rand > 0) node.curveName = 'astroid';
+                if (rand > 3) node.curveName = 'rhodonea';
                 node.curveType = ["", "", "checked"];
+                if (rand < 9) node.curveType = ["", "checked", ""];
                 node.timeIndex = 0;
 
                 function curve(t) {
@@ -465,7 +472,7 @@
                     node.ctx.moveTo(node.canvas.width / 2 * (1 + i[0]), node.canvas.width / 2 * (1 + i[1]));
 
                     node.ctx.strokeStyle = node.curveColor;
-                    node.ctx.fillStyle = 'white';
+                    node.ctx.fillStyle = node.curveColor;
 
                     for (var t = start; t < end; t += step) {
                         z = curve(t);
@@ -772,8 +779,8 @@
                                 else src.copyTo(dst);
                             }
                             else if (title === 'Color Adjustment') {
-                                document.getElementById('fullRange').checked = node.fullRangeChecked;
-                                document.getElementById('colorRange').checked = node.colorRangeChecked;
+                                document.getElementById('fullRange' + node.id).checked = node.fullRangeChecked;
+                                document.getElementById('colorRange' + node.id).checked = node.colorRangeChecked;
 
                                 if (node.colorInvertChecked) cv.bitwise_not(src, src);
                                 let adjusted = new cv.Mat();
@@ -872,8 +879,8 @@
                                 let ksize = new cv.Size(node.convolutionalFilterSize, node.convolutionalFilterSize);
                                 let index = node.convolutionalFilters.indexOf(node.convolutionType);
 
-                                document.getElementById('convolutionRange').disabled = false;
-                                document.getElementById('kernelInput').style.opacity = 0;
+                                document.getElementById('convolutionRange' + node.id).disabled = false;
+                                document.getElementById('kernelInput' + node.id).style.opacity = 0;
                                 switch (index) {
                                     case 0: cv.GaussianBlur(src, dst, ksize, 0, 0, cv.BORDER_DEFAULT);
                                         break;
@@ -943,8 +950,8 @@
                                         final.delete();
                                         break;
                                     default:
-                                        document.getElementById('convolutionRange').disabled = true;
-                                        document.getElementById('kernelInput').style.opacity = 1;
+                                        document.getElementById('convolutionRange' + node.id).disabled = true;
+                                        document.getElementById('kernelInput' + node.id).style.opacity = 1;
                                         try {
                                             cv.cvtColor(src, src, cv.COLOR_RGBA2RGB);
                                             let block = parseInt(Math.sqrt(node.customKernel.length));
@@ -973,9 +980,9 @@
                             else if (title === 'Polar Transformation') {
                                 let p = new cv.Mat.zeros(src.rows / 2, src.cols / 2, cv.CV_8UC3);
 
-                                document.getElementById('polarRange').style.opacity = 1;
+                                document.getElementById('polarRange' + node.id).style.opacity = 1;
                                 if (node.polarEffectType === "Polar Coordinates")
-                                    document.getElementById('polarRange').style.opacity = 0;
+                                    document.getElementById('polarRange' + node.id).style.opacity = 0;
 
                                 for (var x = 0; x < p.cols; x++) {
                                     for (var y = 0; y < p.rows; y++) {
@@ -1884,7 +1891,7 @@
                                 <input type="text" class="node-input-field" data-property="videoUrl" placeholder="Video URL..." value="${nodeData.videoUrl}">
                             </div>`;
                         break;
-                    case 'Text':
+                    case '3D Text':
                         const fontOptions = [
                             { value: 'helvetiker_regular', name: 'Helvetiker' },
                             { value: 'gentilis_regular', name: 'Gentilis' },
@@ -1905,7 +1912,7 @@
                                 <button class="node-fullscreen-button" onclick="this.nextElementSibling.requestFullscreen();">Render 3D Scene</button>
                             </div>`;
                         break;
-                    case 'Curves':
+                    case 'Parametric Lines':
                         const curveOptions = [
                             { value: 'rhodonea', name: 'Rhodonea' },
                             { value: 'astroid', name: 'Astroid' },
@@ -1918,34 +1925,34 @@
                             <div class="node-content">
                                 <select class="node-select-field curve-type-selector" data-node-id="${nodeData.id}">${curvesHTML}</select>
                                 <input type="color" class="node-input-color curve-color-input" data-node-id="${nodeData.id}" value="${nodeData.curveColor}">
-                                <input type="range" class="node-input-range curve-A-input" data-node-id="${nodeData.id}" min="10" max="610" value="${nodeData.paramA}" title="A: ${nodeData.paramA}" style="width:144px">
-                                <input type="range" class="node-input-range curve-B-input" data-node-id="${nodeData.id}" min="25" max="625" value="${nodeData.paramB}" title="B: ${nodeData.paramB}" style="width:144px">
-                                <p><input type="radio" id="curvePoints" data-node-id="${nodeData.id}" class="node-input-check curve-style" name="curveStyle" ${nodeData.curveType[0]}><small>Points</small>
-                                <input type="radio" id="curveLines" data-node-id="${nodeData.id}" class="node-input-check curve-style" name="curveStyle" ${nodeData.curveType[1]}><small>Lines</small>
-                                <input type="radio" data-node-id="${nodeData.id}" class="node-input-check curve-style" name="curveStyle" ${nodeData.curveType[2]}><small>Curves</small></p>
+                                <input type="range" class="node-input-range curve-A-input" data-node-id="${nodeData.id}" min="1" max="1000" value="${nodeData.paramA}" title="A: ${nodeData.paramA}" style="width:144px">
+                                <input type="range" class="node-input-range curve-B-input" data-node-id="${nodeData.id}" min="1" max="1000" value="${nodeData.paramB}" title="B: ${nodeData.paramB}" style="width:144px">
+                                <p><input type="radio" id="curvePoints${nodeData.id}" data-node-id="${nodeData.id}" class="node-input-check curve-style" name="curveStyle${nodeData.id}" ${nodeData.curveType[0]}><small>Points</small>
+                                <input type="radio" id="curveLines${nodeData.id}" data-node-id="${nodeData.id}" class="node-input-check curve-style" name="curveStyle${nodeData.id}" ${nodeData.curveType[1]}><small>Lines</small>
+                                <input type="radio" data-node-id="${nodeData.id}" class="node-input-check curve-style" name="curveStyle${nodeData.id}" ${nodeData.curveType[2]}><small>Curves</small></p>
                             </div>`;
                         break;
                     case 'Histogram Equalization':
                         specificContentHTML = `
                             <div class="node-content node-viewer-content-container">
-                                <input type="range" id="claheRange" data-node-id="${nodeData.id}" title="CLAHE grid size: ${nodeData.gridSize}" class="node-input-range hist-range" min="0" max="16" value="${nodeData.gridSize}">
+                                <input type="range" data-node-id="${nodeData.id}" title="CLAHE grid size: ${nodeData.gridSize}" class="node-input-range hist-range" min="0" max="16" value="${nodeData.gridSize}">
                             </div>`;
                         break;
                     case 'Color Adjustment':
                         specificContentHTML = `
                             <div class="node-content node-viewer-content-container">
-                                <input type="color" class="node-input-color color-picker" id="colorSelect" title="Selected Color" data-node-id="${nodeData.id}" value="${nodeData.selectedColor}">
-                                <input type="range" class="node-input-range hue-adjustment" id="hueValue" title="Adjust Color Hue" data-node-id="${nodeData.id}" min="-180" max="180" value="${nodeData.newHSV[0]}" style="width:144px">
-                                <input type="range" class="node-input-range saturation-adjustment" id="satValue" title="Adjust Color Saturation" data-node-id="${nodeData.id}" min="-255" max="255" value="${nodeData.newHSV[1]}" style="width:144px">
-                                <p><input type="checkbox" class="node-input-check full-range" id="fullRange" data-node-id="${nodeData.id}" ${nodeData.fullRangeChecked}><small>Apply to all the colors</small><br>
-                                <input type="checkbox" class="node-input-check color-range" id="colorRange" data-node-id="${nodeData.id}" ${nodeData.colorRangeChecked}><small>Select a range of colors</small><br>
-                                <input type="checkbox" class="node-input-check color-invert" id="colorInvert" data-node-id="${nodeData.id}" ${nodeData.colorInvertChecked}><small>Invert the image colors</small></p>
+                                <input type="color" class="node-input-color color-picker" title="Selected Color" data-node-id="${nodeData.id}" value="${nodeData.selectedColor}">
+                                <input type="range" class="node-input-range hue-adjustment" id="hueValue${nodeData.id}" title="Adjust Color Hue" data-node-id="${nodeData.id}" min="-180" max="180" value="${nodeData.newHSV[0]}" style="width:144px">
+                                <input type="range" class="node-input-range saturation-adjustment" id="satValue${nodeData.id}" title="Adjust Color Saturation" data-node-id="${nodeData.id}" min="-255" max="255" value="${nodeData.newHSV[1]}" style="width:144px">
+                                <p><input type="checkbox" class="node-input-check full-range" id="fullRange${nodeData.id}" data-node-id="${nodeData.id}" ${nodeData.fullRangeChecked}><small>Apply to all the colors</small><br>
+                                <input type="checkbox" class="node-input-check color-range" id="colorRange${nodeData.id}" data-node-id="${nodeData.id}" ${nodeData.colorRangeChecked}><small>Select a range of colors</small><br>
+                                <input type="checkbox" class="node-input-check color-invert" id="colorInvert${nodeData.id}" data-node-id="${nodeData.id}" ${nodeData.colorInvertChecked}><small>Invert the image colors</small></p>
                             </div>`;
                         break;
                     case 'Gamma Correction':
                         specificContentHTML = `
                             <div class="node-content node-viewer-content-container">
-                                <input type="range" id="gammaRange" data-node-id="${nodeData.id}" title="Gamma value: ${nodeData.gammaValue}" class="node-input-range gamma-range" min="0.01" max="10" step="0.01" value="${nodeData.gammaValue}">
+                                <input type="range" data-node-id="${nodeData.id}" title="Gamma value: ${nodeData.gammaValue}" class="node-input-range gamma-range" min="0.01" max="10" step="0.01" value="${nodeData.gammaValue}">
                             </div>`;
                         break;
                     case 'Convolution':
@@ -1953,8 +1960,8 @@
                         specificContentHTML = `
                             <div class="node-content">
                                 <select class="node-select-field convolutional-filter-selector" data-node-id="${nodeData.id}">${convolutionOptions}</select>
-                                <input type="range" id="convolutionRange" data-node-id="${nodeData.id}" title="Kernel size: ${nodeData.convolutionalFilterSize}X${nodeData.convolutionalFilterSize}" class="node-input-range convolution-range" min="3" max="25" step="2" value="${nodeData.convolutionalFilterSize}">
-                                <p><textarea id="kernelInput" type="text" class="node-input-field custom-kernel-field" data-node-id="${nodeData.id}">${nodeData.customKernel.toString()}</textarea></p>
+                                <input type="range" id="convolutionRange${nodeData.id}" data-node-id="${nodeData.id}" title="Kernel size: ${nodeData.convolutionalFilterSize}X${nodeData.convolutionalFilterSize}" class="node-input-range convolution-range" min="3" max="25" step="2" value="${nodeData.convolutionalFilterSize}">
+                                <p><textarea id="kernelInput${nodeData.id}" type="text" class="node-input-field custom-kernel-field" data-node-id="${nodeData.id}">${nodeData.customKernel.toString()}</textarea></p>
                             </div>`;
                         break;
                     case 'Morphology / Rank':
@@ -1962,10 +1969,10 @@
                         specificContentHTML = `
                             <div class="node-content">
                                 <select class="node-select-field morphological-filter-selector" data-node-id="${nodeData.id}">${morphologyOptions}</select>
-                                <input type="range" id="morphologyRange" data-node-id="${nodeData.id}" title="Kernel size: ${nodeData.morphologicalFilterSize}X${nodeData.morphologicalFilterSize}" class="node-input-range morphology-range" min="3" max="25" step="2" value="${nodeData.morphologicalFilterSize}">
-                                <p><input type="radio" id="squareKernel" data-node-id="${nodeData.id}" class="node-input-check morphology-kernel-type" name="morphKernel" ${nodeData.morphologyKernelType[0]}><small>Square</small>
-                                <input type="radio" data-node-id="${nodeData.id}" class="node-input-check morphology-kernel-type" name="morphKernel" ${nodeData.morphologyKernelType[1]}><small>Disk</small>
-                                <input type="radio" id="crossKernel" data-node-id="${nodeData.id}" class="node-input-check morphology-kernel-type" name="morphKernel" ${nodeData.morphologyKernelType[2]}><small>Cross</small></p>
+                                <input type="range" data-node-id="${nodeData.id}" title="Kernel size: ${nodeData.morphologicalFilterSize}X${nodeData.morphologicalFilterSize}" class="node-input-range morphology-range" min="3" max="25" step="2" value="${nodeData.morphologicalFilterSize}">
+                                <p><input type="radio" id="squareKernel${nodeData.id}" data-node-id="${nodeData.id}" class="node-input-check morphology-kernel-type" name="morphKernel${nodeData.id}" ${nodeData.morphologyKernelType[0]}><small>Square</small>
+                                <input type="radio" data-node-id="${nodeData.id}" class="node-input-check morphology-kernel-type" name="morphKernel${nodeData.id}" ${nodeData.morphologyKernelType[1]}><small>Disk</small>
+                                <input type="radio" id="crossKernel${nodeData.id}" data-node-id="${nodeData.id}" class="node-input-check morphology-kernel-type" name="morphKernel${nodeData.id}" ${nodeData.morphologyKernelType[2]}><small>Cross</small></p>
                             </div>`;
                         break;
                     case 'Polar Transformation':
@@ -1973,7 +1980,7 @@
                         specificContentHTML = `
                             <div class="node-content">
                                 <select class="node-select-field polar-effect-selector" data-node-id="${nodeData.id}">${polarOptions}</select>
-                                <input type="range" id="polarRange" data-node-id="${nodeData.id}" title="Distortion ammount" class="node-input-range polar-range" min="1" max="1000" value="${nodeData.polarEffectSize}">
+                                <input type="range" id="polarRange${nodeData.id}" data-node-id="${nodeData.id}" title="Distortion ammount" class="node-input-range polar-range" min="1" max="1000" value="${nodeData.polarEffectSize}">
                             </div>`;
                         break;
                     case 'Glitch Effects':
@@ -1981,7 +1988,7 @@
                         specificContentHTML = `
                             <div class="node-content">
                                 <select class="node-select-field glitch-effect-selector" data-node-id="${nodeData.id}">${glitchOptions}</select>
-                                <input type="range" id="glitchRange" data-node-id="${nodeData.id}" title="Distortion ammount" class="node-input-range glitch-range" min="1" max="25" value="${nodeData.glitchEffectSize}">
+                                <input type="range" data-node-id="${nodeData.id}" title="Distortion ammount" class="node-input-range glitch-range" min="1" max="25" value="${nodeData.glitchEffectSize}">
                             </div>`;
                         break;
                     case 'Projection':
@@ -2017,46 +2024,46 @@
                     case 'Channel Mixer':
                         specificContentHTML = `
                             <div class="node-content node-viewer-content-container">
-                                <input type="range" id="channelRR" data-node-id="${nodeData.id}" title="R: ${nodeData.channelMixerValues[0] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[0]}" style="accent-color:indianred">
-                                <input type="range" id="channelRG" data-node-id="${nodeData.id}" title="G: ${nodeData.channelMixerValues[1] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[1]}" style="accent-color:indianred">
-                                <input type="range" id="channelRB" data-node-id="${nodeData.id}" title="B: ${nodeData.channelMixerValues[2] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[2]}" style="accent-color:indianred">
-                                <input type="range" id="channelGR" data-node-id="${nodeData.id}" title="R: ${nodeData.channelMixerValues[3] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[3]}" style="accent-color:darkolivegreen">
-                                <input type="range" id="channelGG" data-node-id="${nodeData.id}" title="G: ${nodeData.channelMixerValues[4] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[4]}" style="accent-color:darkolivegreen">
-                                <input type="range" id="channelGB" data-node-id="${nodeData.id}" title="B: ${nodeData.channelMixerValues[5] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[5]}" style="accent-color:darkolivegreen">
-                                <input type="range" id="channelBR" data-node-id="${nodeData.id}" title="R: ${nodeData.channelMixerValues[6] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[6]}" style="accent-color:cadetblue">
-                                <input type="range" id="channelBG" data-node-id="${nodeData.id}" title="G: ${nodeData.channelMixerValues[7] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[7]}" style="accent-color:cadetblue">
-                                <input type="range" id="channelBB" data-node-id="${nodeData.id}" title="B: ${nodeData.channelMixerValues[8] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[8]}" style="accent-color:cadetblue">
+                                <input type="range" id="channelRR${nodeData.id}" data-node-id="${nodeData.id}" title="R: ${nodeData.channelMixerValues[0] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[0]}" style="accent-color:indianred">
+                                <input type="range" id="channelRG${nodeData.id}" data-node-id="${nodeData.id}" title="G: ${nodeData.channelMixerValues[1] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[1]}" style="accent-color:indianred">
+                                <input type="range" id="channelRB${nodeData.id}" data-node-id="${nodeData.id}" title="B: ${nodeData.channelMixerValues[2] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[2]}" style="accent-color:indianred">
+                                <input type="range" id="channelGR${nodeData.id}" data-node-id="${nodeData.id}" title="R: ${nodeData.channelMixerValues[3] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[3]}" style="accent-color:darkolivegreen">
+                                <input type="range" id="channelGG${nodeData.id}" data-node-id="${nodeData.id}" title="G: ${nodeData.channelMixerValues[4] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[4]}" style="accent-color:darkolivegreen">
+                                <input type="range" id="channelGB${nodeData.id}" data-node-id="${nodeData.id}" title="B: ${nodeData.channelMixerValues[5] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[5]}" style="accent-color:darkolivegreen">
+                                <input type="range" id="channelBR${nodeData.id}" data-node-id="${nodeData.id}" title="R: ${nodeData.channelMixerValues[6] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[6]}" style="accent-color:cadetblue">
+                                <input type="range" id="channelBG${nodeData.id}" data-node-id="${nodeData.id}" title="G: ${nodeData.channelMixerValues[7] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[7]}" style="accent-color:cadetblue">
+                                <input type="range" id="channelBB${nodeData.id}" data-node-id="${nodeData.id}" title="B: ${nodeData.channelMixerValues[8] * 100}%" class="node-input-range channel-mixer-range" min="0" max="1" step="0.01" value="${nodeData.channelMixerValues[8]}" style="accent-color:cadetblue">
                             </div>`;
                         break;
                     case 'Color Blending':
                         specificContentHTML = `
                             <div class="node-content node-viewer-content-container">
-                                <p><input type="checkbox" class="node-input-check hue-blending" id="hueBlend" data-node-id="${nodeData.id}" ${nodeData.hueBlendChecked}>Hue<br>
-                                <input type="checkbox" class="node-input-check saturation-blending" id="satBlend" data-node-id="${nodeData.id}" ${nodeData.satBlendChecked}>Saturation<br>
-                                <input type="checkbox" class="node-input-check value-blending" id="valBlend" data-node-id="${nodeData.id}" ${nodeData.valBlendChecked}>Value</p>
+                                <p><input type="checkbox" class="node-input-check hue-blending" id="hueBlend${nodeData.id}" data-node-id="${nodeData.id}" ${nodeData.hueBlendChecked}>Hue<br>
+                                <input type="checkbox" class="node-input-check saturation-blending" id="satBlend${nodeData.id}" data-node-id="${nodeData.id}" ${nodeData.satBlendChecked}>Saturation<br>
+                                <input type="checkbox" class="node-input-check value-blending" id="valBlend${nodeData.id}" data-node-id="${nodeData.id}" ${nodeData.valBlendChecked}>Value</p>
                             </div>`;
                         break;
                     case 'Concatenation':
                         specificContentHTML = `
                             <div class="node-content">
-                                <input type="range" id="concatenationRange" data-node-id="${nodeData.id}" title="Overlap" class="node-input-range concatenation-range" min="0" max="1" step="0.01" value="${nodeData.concatenationAlignment}">
-                                <p><input type="radio" id="concatenationCheck" data-node-id="${nodeData.id}" class="node-input-check concatenation-check" name="concatenation" ${nodeData.concatenationChecked[0]}>Horizontal&nbsp;
-                                <input type="radio" data-node-id="${nodeData.id}" class="node-input-check concatenation-check" name="concatenation" ${nodeData.concatenationChecked[1]}>Vertical</p>
+                                <input type="range" data-node-id="${nodeData.id}" title="Overlap" class="node-input-range concatenation-range" min="0" max="1" step="0.01" value="${nodeData.concatenationAlignment}">
+                                <p><input type="radio" id="concatenationCheck${nodeData.id}" data-node-id="${nodeData.id}" class="node-input-check concatenation-check" name="concatenation${nodeData.id}" ${nodeData.concatenationChecked[0]}>Horizontal&nbsp;
+                                <input type="radio" data-node-id="${nodeData.id}" class="node-input-check concatenation-check" name="concatenation${nodeData.id}" ${nodeData.concatenationChecked[1]}>Vertical</p>
                             </div>`;
                         break;
                     case 'Thresholding':
                         specificContentHTML = `
                             <div class="node-content">
-                                <input type="range" id="thresholdRange" data-node-id="${nodeData.id}" title="Threshold / Intensity / Block size" class="node-input-range thresholding-range" min="1" max="255" value="${nodeData.thresholdValue}">
-                                <p><input type="radio" data-node-id="${nodeData.id}" class="node-input-check binary-threshold-check" name="thresholdRadio" ${nodeData.thresholdingChecked[0]}><small style="margin:-1px">Binary</small>
-                                <input type="radio" data-node-id="${nodeData.id}" class="node-input-check otsu-threshold-check" name="thresholdRadio" ${nodeData.thresholdingChecked[1]}><small style="margin:-1px">Otsu</small>
-                                <input type="radio" data-node-id="${nodeData.id}" class="node-input-check adaptive-threshold-check" name="thresholdRadio" ${nodeData.thresholdingChecked[2]}><small style="margin:-1px">Adaptive</small></p>
+                                <input type="range" data-node-id="${nodeData.id}" title="Threshold / Intensity / Block size" class="node-input-range thresholding-range" min="1" max="255" value="${nodeData.thresholdValue}">
+                                <p><input type="radio" data-node-id="${nodeData.id}" class="node-input-check binary-threshold-check" name="thresholdRadio${nodeData.id}" ${nodeData.thresholdingChecked[0]}><small style="margin:-1px">Binary</small>
+                                <input type="radio" data-node-id="${nodeData.id}" class="node-input-check otsu-threshold-check" name="thresholdRadio${nodeData.id}" ${nodeData.thresholdingChecked[1]}><small style="margin:-1px">Otsu</small>
+                                <input type="radio" data-node-id="${nodeData.id}" class="node-input-check adaptive-threshold-check" name="thresholdRadio${nodeData.id}" ${nodeData.thresholdingChecked[2]}><small style="margin:-1px">Adaptive</small></p>
                             </div>`;
                         break;
                     case 'Connected Components':
                         specificContentHTML = `
                             <div class="node-content node-viewer-content-container">
-                                <input type="range" id="connectedComponentsRange" data-node-id="${nodeData.id}" title="Threshold: ${nodeData.connectedComponentsSize}" class="node-input-range connected-components-range" min="0" max="255" value="${nodeData.connectedComponentsSize}">
+                                <input type="range" data-node-id="${nodeData.id}" title="Threshold: ${nodeData.connectedComponentsSize}" class="node-input-range connected-components-range" min="0" max="255" value="${nodeData.connectedComponentsSize}">
                             </div>`;
                         break;
                     case 'Character Animation':
@@ -2069,7 +2076,7 @@
                     case 'Optical Flow':
                         specificContentHTML = `
                             <div class="node-content">
-                                <input type="range" id="opticalFlowRange" data-node-id="${nodeData.id}" title="Block size: ${nodeData.opticalFlowSize}X${nodeData.opticalFlowSize}" class="node-input-range optical-flow-range" min="3" max="33" value="${nodeData.opticalFlowSize}">
+                                <input type="range" data-node-id="${nodeData.id}" title="Block size: ${nodeData.opticalFlowSize}X${nodeData.opticalFlowSize}" class="node-input-range optical-flow-range" min="3" max="33" value="${nodeData.opticalFlowSize}">
                             </div>`;
                         break;
                     case 'Transitions':
@@ -2231,7 +2238,7 @@
             paletteContainer.style.display = 'block';
             const paletteNodes = {
                 "Capture": [{ title: "Image", type: "Input" }, { title: "Video", type: "Input" }, { title: "Camera", type: "Input" }],
-                "Generate": [{ title: "Text", type: "Text" }, { title: "Curves", type: "Parametric" }],
+                "Generate": [{ title: "3D Text", type: "Text" }, { title: "Parametric Lines", type: "Parametric" }],
                 "Enhance": [{ title: "Gamma Correction", type: "Throughput" }, { title: "Histogram Equalization", type: "Throughput" }, { title: "Color Adjustment", type: "Throughput" }],
                 "Filter": [{ title: "Convolution", type: "Throughput" }, { title: "Morphology / Rank", type: "Throughput" }],
                 "Render": [{ title: "Projection", type: "3DScene" }, { title: "Mapping / Lighting", type: "3DScene" }, { title: "Character Animation", type: "Character" }],
@@ -2297,8 +2304,8 @@
                 }
                 else if (event.target.classList.contains('curve-style')) {
                     nodeData.curveType = ["", "", "checked"];
-                    if (document.getElementById('curvePoints').checked) nodeData.curveType = ["checked", "", ""];
-                    else if (document.getElementById('curveLines').checked) nodeData.curveType = ["", "checked", ""];
+                    if (document.getElementById('curvePoints' + nodeId).checked) nodeData.curveType = ["checked", "", ""];
+                    else if (document.getElementById('curveLines' + nodeId).checked) nodeData.curveType = ["", "checked", ""];
                 }
                 else if (event.target.classList.contains('character-model-loader')) {
                     const file = event.target.files[0];
@@ -2354,8 +2361,8 @@
                     hsvColor.delete(); tmp.delete();
 
                     nodeData.newHSV = [0.0, 0.0];
-                    document.getElementById('hueValue').value = 0;
-                    document.getElementById('satValue').value = 0;
+                    document.getElementById('hueValue' + nodeId).value = 0;
+                    document.getElementById('satValue' + nodeId).value = 0;
                 }
                 else if (event.target.classList.contains('hue-adjustment')) {
                     nodeData.newHSV[0] = event.target.value * 1.0;
@@ -2405,8 +2412,8 @@
                 }
                 else if (event.target.classList.contains('morphology-kernel-type')) {
                     nodeData.morphologyKernelType = ["", "checked", ""];
-                    if (document.getElementById('squareKernel').checked) nodeData.morphologyKernelType = ["checked", "", ""];
-                    else if (document.getElementById('crossKernel').checked) nodeData.morphologyKernelType = ["", "", "checked"];
+                    if (document.getElementById('squareKernel' + nodeId).checked) nodeData.morphologyKernelType = ["checked", "", ""];
+                    else if (document.getElementById('crossKernel' + nodeId).checked) nodeData.morphologyKernelType = ["", "", "checked"];
                 }
                 else if (event.target.classList.contains('polar-effect-selector')) {
                     nodeData.polarEffectType = event.target.value;
@@ -2425,28 +2432,28 @@
                 }
                 else if (event.target.classList.contains('matrix-operation-range')) {
                     nodeData.operationWeight = event.target.value * 1.0;
-                    event.target.title = "Weights: " + nodeData.operationWeight + ", " + Math.round(100 - nodeData.operationWeight * 100) / 100;
+                    event.target.title = "Weights: " + nodeData.operationWeight + ", " + (1 - nodeData.operationWeight);
                 }
                 else if (event.target.classList.contains('channel-mixer-range')) {
-                    let RR = document.getElementById('channelRR').value * 1.0;
-                    let RG = document.getElementById('channelRG').value * 1.0;
-                    let RB = document.getElementById('channelRB').value * 1.0;
-                    let GR = document.getElementById('channelGR').value * 1.0;
-                    let GG = document.getElementById('channelGG').value * 1.0;
-                    let GB = document.getElementById('channelGB').value * 1.0;
-                    let BR = document.getElementById('channelBR').value * 1.0;
-                    let BG = document.getElementById('channelBG').value * 1.0;
-                    let BB = document.getElementById('channelBB').value * 1.0;
+                    let RR = document.getElementById('channelRR' + nodeId).value * 1.0;
+                    let RG = document.getElementById('channelRG' + nodeId).value * 1.0;
+                    let RB = document.getElementById('channelRB' + nodeId).value * 1.0;
+                    let GR = document.getElementById('channelGR' + nodeId).value * 1.0;
+                    let GG = document.getElementById('channelGG' + nodeId).value * 1.0;
+                    let GB = document.getElementById('channelGB' + nodeId).value * 1.0;
+                    let BR = document.getElementById('channelBR' + nodeId).value * 1.0;
+                    let BG = document.getElementById('channelBG' + nodeId).value * 1.0;
+                    let BB = document.getElementById('channelBB' + nodeId).value * 1.0;
                     nodeData.channelMixerValues = [RR, RG, RB, GR, GG, GB, BR, BG, BB];
-                    document.getElementById('channelRR').title = "R: " + Math.round(RR * 100) + "%";
-                    document.getElementById('channelRG').title = "G: " + Math.round(RG * 100) + "%";
-                    document.getElementById('channelRB').title = "B: " + Math.round(RB * 100) + "%";
-                    document.getElementById('channelGR').title = "R: " + Math.round(GR * 100) + "%";
-                    document.getElementById('channelGG').title = "G: " + Math.round(GG * 100) + "%";
-                    document.getElementById('channelGB').title = "B: " + Math.round(GB * 100) + "%";
-                    document.getElementById('channelBR').title = "R: " + Math.round(BR * 100) + "%";
-                    document.getElementById('channelBG').title = "G: " + Math.round(BG * 100) + "%";
-                    document.getElementById('channelBB').title = "B: " + Math.round(BB * 100) + "%";
+                    document.getElementById('channelRR' + nodeId).title = "R: " + Math.round(RR * 100) + "%";
+                    document.getElementById('channelRG' + nodeId).title = "G: " + Math.round(RG * 100) + "%";
+                    document.getElementById('channelRB' + nodeId).title = "B: " + Math.round(RB * 100) + "%";
+                    document.getElementById('channelGR' + nodeId).title = "R: " + Math.round(GR * 100) + "%";
+                    document.getElementById('channelGG' + nodeId).title = "G: " + Math.round(GG * 100) + "%";
+                    document.getElementById('channelGB' + nodeId).title = "B: " + Math.round(GB * 100) + "%";
+                    document.getElementById('channelBR' + nodeId).title = "R: " + Math.round(BR * 100) + "%";
+                    document.getElementById('channelBG' + nodeId).title = "G: " + Math.round(BG * 100) + "%";
+                    document.getElementById('channelBB' + nodeId).title = "B: " + Math.round(BB * 100) + "%";
                 }
                 else if (event.target.classList.contains('hue-blending')) {
                     nodeData.hueBlendChecked = "";
@@ -2465,7 +2472,7 @@
                 }
                 else if (event.target.classList.contains('concatenation-check')) {
                     nodeData.concatenationChecked = ["", "checked"];
-                    if (document.getElementById('concatenationCheck').checked) nodeData.concatenationChecked = ["checked", ""];
+                    if (document.getElementById('concatenationCheck' + nodeId).checked) nodeData.concatenationChecked = ["checked", ""];
                 }
                 else if (event.target.classList.contains('thresholding-range')) {
                     nodeData.thresholdValue = event.target.value * 1;
@@ -2652,7 +2659,7 @@
             requestAnimationFrame(update);
         }
 
-        function update(time) {
+        function update() {
             if (!openCvReady) {
                 if (typeof cv !== 'undefined' && cv.imread) {
                     openCvReady = true;
@@ -2664,7 +2671,7 @@
             }
             nodes.forEach(nodeData => {
                 if (nodeData.onExecute) {
-                    nodeData.onExecute(time);
+                    nodeData.onExecute();
                 }
             });
             requestAnimationFrame(update);
