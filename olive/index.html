@@ -1572,7 +1572,7 @@
                     node.ctx.drawImage(results.segmentationMask, 0, 0);
                     node.ctx.restore();
                 }
-                createPose();
+                node.createPose();
                 node.pose.onResults(onResults);
 
                 node.onExecute = () => {
