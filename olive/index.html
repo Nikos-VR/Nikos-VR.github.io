@@ -1547,14 +1547,6 @@
                         return `js/pose/${file}`;
                     }
                 });
-                node.pose.setOptions({
-                    modelComplexity: 1,
-                    smoothLandmarks: true,
-                    enableSegmentation: true,
-                    smoothSegmentation: true,
-                    minDetectionConfidence: node.detectionConfidence,
-                    minTrackingConfidence: 0.5
-                });
                 function onResults(results) {
                     if (statusEl.style.display == 'block') {
                         statusEl.textContent = 'MediaPipe Ready';
@@ -1579,6 +1571,15 @@
                             if (node.checkFirstFrame) {
                                 node.canvas.width = sourceElement.naturalWidth || sourceElement.videoWidth || sourceElement.width;
                                 node.canvas.height = sourceElement.naturalHeight || sourceElement.videoHeight || sourceElement.height;
+
+                                node.pose.setOptions({
+                                    modelComplexity: 1,
+                                    smoothLandmarks: true,
+                                    enableSegmentation: true,
+                                    smoothSegmentation: true,
+                                    minDetectionConfidence: node.detectionConfidence,
+                                    minTrackingConfidence: 0.5
+                                });
                                 document.getElementById('confidenceRange' + node.id).disabled = true;
 
                                 async function mediaP() {
