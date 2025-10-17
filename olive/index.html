@@ -657,6 +657,9 @@
                 node.canvas = document.createElement('canvas');
                 node.canvas.width = 190;
                 node.ctx = node.canvas.getContext('2d', { willReadFrequently: true });
+
+                node.canvas.addEventListener("fullscreenchange", renderWires);
+
                 node.onExecute = () => {
                     if (!openCvReady) return;
                     const sourceElement = getInputData(node, 0);
