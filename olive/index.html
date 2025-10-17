@@ -1542,19 +1542,22 @@
                 statusEl.textContent = 'Loading MediaPipe...';
                 statusEl.style.backgroundColor = 'goldenrod';
 
-                node.pose = new Pose({
-                    locateFile: (file) => {
-                        return `js/pose/${file}`;
-                    }
-                });
-                node.pose.setOptions({
-                    modelComplexity: 1,
-                    smoothLandmarks: true,
-                    enableSegmentation: true,
-                    smoothSegmentation: true,
-                    minDetectionConfidence: node.detectionConfidence,
-                    minTrackingConfidence: 0.5
-                });
+                node.pose = null;
+                node.createPose = function () {
+                    node.pose = new Pose({
+                        locateFile: (file) => {
+                            return `js/pose/${file}`;
+                        }
+                    });
+                    node.pose.setOptions({
+                        modelComplexity: 1,
+                        smoothLandmarks: true,
+                        enableSegmentation: true,
+                        smoothSegmentation: true,
+                        minDetectionConfidence: node.detectionConfidence,
+                        minTrackingConfidence: 0.5
+                    });
+                };
                 function onResults(results) {
                     if (statusEl.style.display == 'block') {
                         statusEl.textContent = 'MediaPipe Ready';
@@ -1569,6 +1572,7 @@
                     node.ctx.drawImage(results.segmentationMask, 0, 0);
                     node.ctx.restore();
                 }
+                createPose();
                 node.pose.onResults(onResults);
 
                 node.onExecute = () => {
@@ -1581,7 +1585,6 @@
                                 node.canvas.height = sourceElement.naturalHeight || sourceElement.videoHeight || sourceElement.height;
 
                                 async function mediaP() {
-                                    node.pose.minDetectionConfidence = node.detectionConfidence;
                                     await node.pose.send({ image: sourceElement });
                                     setTimeout(mediaP, 100);
                                 }
@@ -2515,6 +2518,7 @@
                 else if (event.target.classList.contains('confidence-range')) {
                     nodeData.detectionConfidence = event.target.value * 1.0;
                     event.target.title = "Detection confidence: " + nodeData.detectionConfidence;
+                    nodeData.createPose();
                 }
                 renderGraph();
             });
