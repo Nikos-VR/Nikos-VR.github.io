@@ -1533,8 +1533,8 @@
                 node.outputs.push({ name: 'output' });
                 node.canvas = document.createElement('canvas');
                 node.canvas.className = 'inner-canvas';
-                node.canvas.width = screen.width;
-                node.canvas.height = screen.height;
+                node.canvas.width = 240;
+                node.canvas.height = 291;
                 node.ctx = node.canvas.getContext('2d', { willReadFrequently: true });
 
                 node.checkFirstFrame = true;
@@ -2780,6 +2780,7 @@
                     if (n.camera) {
                         nd.camera.position.set(n.camera.object.matrix[12], n.camera.object.matrix[13], n.camera.object.matrix[14]);
                         nd.camera.zoom = n.camera.object.zoom;
+                        nd.camera.updateProjectionMatrix();
                     }
                     if (n.checkFirstFrame) nd.checkFirstFrame = n.checkFirstFrame;
                     if (n.gridSize) nd.gridSize = n.gridSize;
