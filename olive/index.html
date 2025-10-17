@@ -1533,6 +1533,8 @@
                 node.outputs.push({ name: 'output' });
                 node.canvas = document.createElement('canvas');
                 node.canvas.className = 'inner-canvas';
+                node.canvas.width = screen.width;
+                node.canvas.height = screen.height;
                 node.ctx = node.canvas.getContext('2d', { willReadFrequently: true });
 
                 node.checkFirstFrame = true;
@@ -1571,8 +1573,6 @@
                             if (node.checkFirstFrame) {
                                 node.canvas.width = sourceElement.naturalWidth || sourceElement.videoWidth || sourceElement.width;
                                 node.canvas.height = sourceElement.naturalHeight || sourceElement.videoHeight || sourceElement.height;
-                                node.width = node.canvas.width;
-                                node.height = node.canvas.height;
 
                                 node.pose.setOptions({
                                     modelComplexity: 1,
@@ -2702,7 +2702,7 @@
         function saveProject() {
             const payload = {
                 nodes: nodes.map(n => ({
-                    id: n.id, title: n.title, type: n.type, x: n.x, y: n.y, width: n.width, height: n.height,
+                    id: n.id, title: n.title, type: n.type, x: n.x, y: n.y,
                     imageUrl: n.imageUrl, videoUrl: n.videoUrl,
                     nodeText: n.text, textColor: n.textColor, textSize: n.textSize, textHeight: n.textHeight, fontName: n.fontName,
                     curveColor: n.curveColor, paramA: n.paramA, paramB: n.paramB, curveName: n.curveName, curveType: n.curveType,
@@ -2779,6 +2779,7 @@
                     }
                     if (n.camera) {
                         nd.camera.position.set(n.camera.object.matrix[12], n.camera.object.matrix[13], n.camera.object.matrix[14]);
+                        nd.camera.zoom = n.camera.object.zoom;
                     }
                     if (n.checkFirstFrame) nd.checkFirstFrame = n.checkFirstFrame;
                     if (n.gridSize) nd.gridSize = n.gridSize;
@@ -2816,8 +2817,6 @@
                     if (n.curveName) nd.curveName = n.curveName;
                     if (n.curveType) nd.curveType = n.curveType;
                     if (n.detectionConfidence) nd.detectionConfidence = n.detectionConfidence;
-                    if (n.width) nd.canvas.width = n.width + "px";
-                    if (n.height) nd.canvas.height = n.height + "px";
 
                     nd.fullRangeChecked = n.fullRangeChecked;
                     nd.colorRangeChecked = n.colorRangeChecked;
