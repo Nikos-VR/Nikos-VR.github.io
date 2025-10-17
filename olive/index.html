@@ -2760,7 +2760,7 @@
                             const jsonLoader = new THREE.ObjectLoader();
                             jsonLoader.parse(n.loadedModel, function (obj) { nd.loadedModel = obj; });
                         }
-                        else if (n.primitiveType) nd.primitiveType = n.primitiveType;
+                        else nd.primitiveType = n.primitiveType;
                         nd.three.updateObject();
                     }
                     if (n.ambientLight) {
