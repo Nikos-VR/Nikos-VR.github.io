@@ -1,0 +1,83 @@
+<html>
+
+<head>
+    <title>The Battle of the Primitives</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
+    <script>
+        // UNIT PARAMETERS: the model is used if available, otherwise the shape is applied
+        const UNITS = {
+            1: { name: 'Cube', range: 1, power: 8, shape: 'box', model: '' },
+            2: { name: 'Tetrahedron', range: 2, power: 7, shape: 'tetrahedron', model: '' },
+            3: { name: 'Octahedron', range: 3, power: 6, shape: 'octahedron', model: '' },
+            4: { name: 'Dodecahedron', range: 4, power: 5, shape: 'dodecahedron', model: '' },
+            5: { name: 'Icosahedron', range: 5, power: 4, shape: 'icosahedron', model: '' },
+            6: { name: 'Cone', range: 6, power: 3, shape: 'cone', model: '' },
+            7: { name: 'Cylinder', range: 7, power: 2, shape: 'cylinder', model: '' },
+            8: { name: 'Sphere', range: 8, power: 1, shape: 'sphere', model: '' }
+        };
+
+        // BOARD LAYOUT: one team on the left side and the other on the right
+        const BOARD = [
+            [4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5],
+            [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4],
+            [5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0],
+            [3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 8],
+            [8, 7, 0, 0, 0, 0, 0, 0, 0, 0, 6, 3],
+            [8, 7, 0, 0, 0, 0, 0, 0, 0, 0, 6, 3],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 8],
+            [3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0],
+            [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4],
+            [4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5]
+        ];
+
+        // GAME PARAMETERS: the attacking force factor multiplies the power of the attacker
+        const GAME = {
+            teamTurn: 0,
+            teamNames: ['Gold', 'Fire'],
+            statusText: [' Play First', 'Not Your Turn', 'Invalid Move', ' Selected', 'Turn: ', ' vs ', ' Wins'],
+            boardColors: ['#CCCCCC', '#333333', 'slategray', 'lime'],
+            boardScale: '1 0.5 1',
+            unitsColors: ['goldenrod', 'firebrick'],
+            unitsScale: '0.3 1.2 0.3',
+            selectedUnit: null,
+            validMoves: [],
+            moveTimes: [500, 2000],
+            attackForce: 3,
+            combatData: null
+        };
+    </script>
+    <script src="scripts/create-board.js"></script>
+    <script src="scripts/game-logic.js"></script>
+</head>
+
+<body>
+    <a-scene background="color: black" cursor="rayOrigin: mouse" raycaster="objects: .interactive" game-logic>
+
+        <!-- CUSTOM UNITS -->
+        <a-assets>
+            <a-asset-item id="model1" src="assets/spacecraft.glb"></a-asset-item>
+        </a-assets>
+
+        <!-- CAMERA & STATUS -->
+        <a-entity id="rig" position="0 1.5 10">
+            <a-camera>
+                <a-cursor color="white" fuse="true"></a-cursor>
+                <a-text id="status" color="silver" position="0 0.75 -1" align="center" width="2" font="monoid"></a-text>
+                <a-cylinder id="pLeft" position="-0.25 0.63 -1" rotation="0 0 -90" radius="0.005" height="0.5"></a-cylinder>
+                <a-cylinder id="pIndex" color="silver" position="-0.01 0.63 -1" rotation="0 0 -90" radius="0.01" height="0.02"></a-cylinder>
+                <a-cylinder id="pRight" position="0.25 0.63 -1" rotation="0 0 -90" radius="0.005" height="0.5"></a-cylinder>
+            </a-camera>
+            <a-entity oculus-touch-controls="hand: left" oculus-thumbstick-controls></a-entity>
+        </a-entity>
+
+        <!-- BOARD & UNITS CONTAINERS -->
+        <a-entity id="board"></a-entity>
+        <a-entity id="units"></a-entity>
+
+    </a-scene>
+</body>
+
+</html>
