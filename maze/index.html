@@ -1,0 +1,80 @@
+<html>
+
+<head>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
+  <script src="random-map.js"></script>
+  <script src="custom-objects.js"></script>
+  <script src="build-maze.js"></script>
+  <script>
+    // CUSTOM MAP: starting point (-1), open space (0), walls (1-2), cameras (3), floor exits (5)
+    let MAP = [[
+      [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+      [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+      [1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2]
+    ], [
+      [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2],
+      [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 5, 1],
+      [1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1],
+      [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 1],
+      [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2]
+    ], [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+      [0, 0, 0, 5, 0, 1, 1, 1, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ]];
+    // MAP GENERATOR: enter number of levels, floor dimensions and cameras per level (or use the custom map instead)
+    MAP = randomMap(5, 10, 10, 3);
+
+    // GENERAL PARAMETERS: time available (-1 for no limit), block dimensions (width, height), custom colors and messages
+    const GAME = {
+      timeLeft: -1,
+      cellSize: [4, 4],
+      statusText: ['GAME OVER', 'WELL DONE', 'LEVEL:', 'TIME:'],
+      textColors: ['firebrick', 'goldenrod', 'white', 'white']
+    };
+  </script>
+  <script src="game-logic.js"></script>
+</head>
+
+<body>
+  <a-scene background="color: skyblue" game-logic>
+
+    <!-- DAYLIGHT -->
+    <a-light type="ambient" intensity="0.1"></a-light>
+    <a-light type="directional" position="100 100 100" intensity="0.2"></a-light>
+
+    <!-- BUILDING -->
+    <a-entity id="maze"></a-entity>
+
+    <!-- CAMERA & INFO -->
+    <a-entity id="rig">
+      <a-camera>
+        <a-text id="floor" position="0 0.007 -0.01" align="center" width="0.015" font="monoid"></a-text>
+        <a-text id="message" value="" position="0 0 -0.01" align="center" width="0.05" font="monoid"></a-text>
+      </a-camera>
+      <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
+    </a-entity>
+
+    <!-- SOUND FX -->
+    <a-sound id="fall" src="mixkit-falling-on-foil-748.wav"></a-sound>
+  </a-scene>
+</body>
+
+</html>
