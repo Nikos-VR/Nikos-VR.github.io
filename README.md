@@ -2,12 +2,14 @@ The repository includes works created for the teaching needs of the course "Virt
 
 ...
 
-Board Game: a two player chess like game where each unit has different attributes (https://nikos-vr.github.io/boardgame)
+Board Game: two player chess like game where each unit has different attributes (https://nikos-vr.github.io/boardgame)
 
 Escape Room: simulation in a virtual reality environment of an escape room (https://nikos-vr.github.io/escape)
 
 Jenga: virtual reality simulation of the popular puzzle game (https://nikos-vr.github.io/jenga)
 
-Maze Simulation: a template for generating buildings with random layouts (https://nikos-vr.github.io/maze)
+Maze Simulation: template for generating buildings with random layouts (https://nikos-vr.github.io/maze)
 
-Text-based Adventure: a retro adventure game with gemini generated 360 images (https://nikos-vr.github.io/adventure)
+Roller Coaster: simulation of riding a roller coaster (https://nikos-vr.github.io/rollercoaster)
+
+Text-based Adventure: retro adventure game with gemini generated 360 images (https://nikos-vr.github.io/adventure)
