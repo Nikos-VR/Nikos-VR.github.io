@@ -12,4 +12,4 @@ Maze Simulation: template for generating buildings with random layouts (https://
 
 Roller Coaster: simulation of riding a roller coaster (https://nikos-vr.github.io/rollercoaster)
 
-Text-based Adventure: retro adventure game with gemini generated 360 images (https://nikos-vr.github.io/adventure)
+Adventure Demo: retro text-based game with gemini generated 360 images (https://nikos-vr.github.io/adventure)
