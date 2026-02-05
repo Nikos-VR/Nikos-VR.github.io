@@ -2,6 +2,8 @@
 
 <head>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/@croquet/croquet"></script>
+    <script src="https://unpkg.com/aframe-croquet-component/public/lib/aframe-croquet-component.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
         // UNIT PARAMETERS: the model is used if available, otherwise the shape is applied
@@ -53,6 +55,7 @@
 </head>
 
 <body>
+    <template id="avatarTemplate"></template>
     <a-scene background="color: black" cursor="rayOrigin: mouse" raycaster="objects: .interactive" game-logic>
 
         <!-- CAMERA & STATUS -->
