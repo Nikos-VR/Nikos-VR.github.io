@@ -1,0 +1,101 @@
+<html>
+
+<head>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script>
+        // NAVIGATION: define the place of each scene on the graph
+        const MAP = [
+            [0, 5, 6],
+            [2, 1, 0],
+            [0, 3, 4]
+        ];
+
+        // INVENTORY: add any items available when the game starts
+        let ITEMS = ['a watch'];
+
+        // MAIN INFO: enter the scenes welcome text (ascending order)
+        const TEXT = [
+            'You are walking on a narrow path.\nThere is an old store house beside.',
+            'A man is sitting behind a table:\n"Hi, do you have something for me?"',
+            'You are in the middle of a field.\nA policeman is standing by his car.',
+            'There is a small harbor here.\nThe sailor is ready to depart...',
+            'You are at the center of a village.\nA begar is asking for help!',
+            'You are standing inside a church.\nThe priest is silently praying...'
+        ];
+    </script>
+    <script src="game-logic.js"></script>
+</head>
+
+<body>
+    <a-scene cursor="rayOrigin: mouse" raycaster="objects: .interactive" game-logic>
+
+        <!-- SKY IMAGES -->
+        <a-assets>
+            <img id="sky1" src="scene1.png">
+            <img id="sky2" src="scene2.png">
+            <img id="sky3" src="scene3.png">
+            <img id="sky4" src="scene4.png">
+            <img id="sky5" src="scene5.png">
+            <img id="sky6" src="scene6.png">
+        </a-assets>
+        <a-sky id="sky" rotation="0 -90 0"></a-sky>
+
+        <!-- CAMERA & STORYBOARD -->
+        <a-camera wasd-controls="acceleration:1">
+            <a-plane color="#000" height="0.3" opacity="0.25" position="0 -0.6 -1">
+                <a-text id="info" width="1" value="" font="monoid" align="center"></a-text>
+                <a-cone id="east" scale="0.05 0.05 0.05" position="0.55 0 0" rotation="0 -30 -88"></a-cone>
+                <a-cone id="west" scale="0.05 0.05 0.05" position="-0.55 0 0" rotation="0 30 88"></a-cone>
+                <a-cone id="north" scale="0.05 0.05 0.05" position="0 0.2 0" rotation="-20 0 0"></a-cone>
+                <a-cone id="south" scale="0.05 0.05 0.05" position="0 -0.2 0" rotation="-40 0 180"></a-cone>
+            </a-plane>
+            <a-cursor fuse="true"></a-cursor>
+        </a-camera>
+
+        <!-- 1st SCENE -->
+        <a-entity id="scene1" class="scene"></a-entity>
+
+        <!-- 2nd SCENE -->
+        <a-entity id="scene2" class="scene" visible="false">
+            <a-cylinder class="interactive" position="-3 1 -4" scale="0.5 2 0.5" visible="false" drop="a watch"
+                pick="some money" goal='"Nice stuff,\nI will pay for it!"'
+                fail='"Have a nice day foreigner,\nI need to work now."'>
+            </a-cylinder>
+        </a-entity>
+
+        <!-- 3rd SCENE -->
+        <a-entity id="scene3" class="scene" visible="false">
+            <a-cylinder class="interactive" position="-1.25 0.75 -4" scale="0.5 3 0.5" visible="false" drop="a cross"
+                over="goal" goal='"Well, seems we have a thief here!\nYou are under arrest..."'
+                fail='"Goodmorning!\nEverything looks perfect today..."'>
+            </a-cylinder>
+        </a-entity>
+
+        <!-- 4th SCENE -->
+        <a-entity id="scene4" class="scene" visible="false">
+            <a-cylinder class="interactive" position="4 2 1" scale="0.5 1 0.5" visible="false" drop="some money"
+                over="goal" goal="You made it...\nYou are free to sail away!"
+                fail='"Hello there,\nno place for you on my boat..."'>
+            </a-cylinder>
+        </a-entity>
+
+        <!-- 5th SCENE -->
+        <a-entity id="scene5" class="scene" visible="false">
+            <a-cylinder class="interactive" position="-4 -1.5 2.5" visible="false" drop="some money"
+                goal='"God bless you stranger!"\n' fail='"I am old, sick and hungry..."\n'>
+            </a-cylinder>
+        </a-entity>
+
+        <!-- 6th SCENE -->
+        <a-entity id="scene6" class="scene" visible="false">
+            <a-cylinder class="interactive" position="60 5 85" rotation="0 -150 0" radius="3" height="30"
+                color="goldenrod" pick="a cross">
+                <a-cylinder position="0 6 0" radius="3" height="15" rotation="0 0 90" color="goldenrod"></a-cylinder>
+                <a-cylinder position="0 -15 0" color="goldenrod" radius="5" height="2"></a-cylinder>
+            </a-cylinder>
+        </a-entity>
+
+    </a-scene>
+</body>
+
+</html>
