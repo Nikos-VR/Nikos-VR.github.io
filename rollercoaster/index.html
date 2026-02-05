@@ -1,0 +1,120 @@
+<html>
+<head>
+    <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
+    <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
+    <script src="https://unpkg.com/aframe-spe-particles-component@^1.0.4/dist/aframe-spe-particles-component.min.js"></script>
+    <script>
+        function curve(t) {
+            var x = 40 * Math.cos(t) * (1 + Math.sin(t));
+            var y = 20 * Math.cos(3 * t) + 20.5;
+            var z = 30 * Math.sin(t) * (1 + Math.cos(t));
+            return [x, y, z];
+        }
+        function rc(t) {
+            var curr = curve(t), next = curve(t + 0.001);
+            var acc = curr[1] - next[1];
+            var vec = [next[0] - curr[0], next[1] - curr[1], next[2] - curr[2]];
+            var r = Math.sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
+            var rotx = Math.asin(-vec[1] / r) * 180 / Math.PI;
+            var roty = Math.atan2(vec[0], vec[2]) * 180 / Math.PI;
+            return [curr, acc, rotx, roty];
+        }
+        var time = 6;
+        AFRAME.registerComponent('rolling', {
+            tick: function () {
+                var coaster = rc(time);
+                time += (0.067 + coaster[1]) / 3;
+
+                this.el.setAttribute('position', coaster[0].join(' '));
+                this.el.setAttribute('rotation', coaster[2] + ' ' + coaster[3] + ' 10');
+
+                if (Math.random() < 0.01) {
+                    var firework = document.createElement('a-entity');
+                    var params = 'radius:5;distribution:sphere;particle-count:1000;velocity:3;duration:5;max-age:10;';
+                    var colors = ['red', 'green', 'yellow', 'cyan', 'magenta'];
+                    var position = (Math.random() * 200 - 100) + ' ' + (Math.random() * 50 + 100) + ' ' + (Math.random() * 200 - 100);
+
+                    params += 'color:' + colors[Math.floor(Math.random() * colors.length)];
+                    firework.setAttribute('spe-particles', params);
+                    firework.setAttribute('position', position + '');
+                    document.querySelector('a-scene').appendChild(firework);
+
+                    var sound = document.getElementById('bang');
+                    sound.setAttribute('position', position);
+                    sound.components.sound.playSound();
+                }
+                if (coaster[0][1] < 1) {
+                    var cam = document.querySelector('a-camera');
+                    var campos = cam.getAttribute('position') || document.getElementById('rig').getAttribute('position');
+
+                    var diffX = Math.abs(campos.x - coaster[0][0] + 15) < 3;
+                    var diffZ = Math.abs(campos.z - coaster[0][2] + 60) < 3;
+
+                    if (diffX && diffZ) cam.setAttribute('active', false);
+                }
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <a-scene id="s1" background="color:#0d0928" shadow="type: pcfsoft">
+        <a-plane color="#2a1c0e" height="5000" width="5000" rotation="-90 0 0" shadow></a-plane>
+        <a-entity id="rig" position="15 0 60">
+            <a-camera active="true"></a-camera>
+            <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
+        </a-entity>
+        <a-sphere radius="500" position="500 5000 1000"></a-sphere>
+        <a-entity position="5 50 10"
+            light="type: directional; intensity: 0.9; castShadow: true; shadowCameraBottom: -250; shadowCameraTop: 250; shadowCameraLeft: -250; shadowCameraRight: 250">
+        </a-entity>
+        <a-light type="ambient" intensity="0.1"></a-light>
+        <a-entity id="vagon" shadow="receive: false" rolling>
+            <a-box scale="2.5 0.5 2" position="0 0.4 0" rotation="0 -90 0" material="metalness: 1"></a-box>
+            <a-cylinder scale="0.2 2.2 0.2" position="0 0.25 1" rotation="0 0 90"></a-cylinder>
+            <a-cylinder scale="0.2 2.2 0.2" position="0 0.25 -1" rotation="0 0 90"></a-cylinder>
+            <a-entity camera position="0 1 2" rotation="0 180 0"></a-entity>
+        </a-entity>
+        <a-box id="rail" width="2.2" height="0.1" depth="0.3" color="silver" position="0 -1 0" shadow="receive: false">
+            <a-cylinder radius="0.01" height="0.6" position="-1 0 0" rotation="90 0 0"></a-cylinder>
+            <a-cylinder radius="0.01" height="0.6" position="1 0 0" rotation="90 0 0"></a-cylinder>
+        </a-box>
+        <a-entity id="bang" sound="src:url(assets/mixkit-fireworks-bang-in-sky-2989.wav); poolSize:3"></a-entity>
+    </a-scene>
+    <script>
+        var scene = document.querySelector('a-scene');
+
+        for (var t = 0; t < 2 * Math.PI; t += 0.005) {
+            var trace = rc(t);
+            var track = document.getElementById('rail').cloneNode(true);
+            track.setAttribute('position', trace[0].join(' '));
+            track.setAttribute('rotation', trace[2] + ' ' + trace[3] + ' 10');
+            track.setAttribute('color', '#333');
+            scene.appendChild(track);
+
+            if (trace[0][1] < 0.51 || trace[0][1] > 40.49) {
+                var bar = document.createElement('a-cylinder');
+                bar.setAttribute('height', trace[0][1] + '');
+                bar.setAttribute('position', trace[0][0] + ' ' + (trace[0][1] / 2 - 0.1) + ' ' + trace[0][2]);
+                bar.setAttribute('color', '#111');
+                bar.setAttribute('shadow', 'receive: false');
+                scene.appendChild(bar);
+            }
+        }
+        function pyramid(a, level, pos) {
+            var box = document.createElement('a-box');
+            box.setAttribute('scale', a + ' 1 ' + a);
+            box.setAttribute('position', pos[0] + ' ' + (level + 0.5) + ' ' + pos[1]);
+            box.setAttribute('color', '#452c14');
+            scene.appendChild(box);
+
+            if (--a > 0) pyramid(a, ++level, pos);
+        }
+        for (var i = 0; i < 10; i++) {
+            var r = Math.random() * 250 + 500;
+            var s = Math.random() * 200 + 100;
+            pyramid(s, 0, [r * Math.cos(36 * i), r * Math.sin(36 * i)]);
+        }
+    </script>
+</body>
+</html>
