@@ -31,8 +31,16 @@ AFRAME.registerComponent('game-logic', {
         this.lastPos = buildMaze(MAP, GAME.cellSize[0], GAME.cellSize[1], document.querySelector('#maze'));
 
         coords = document.querySelector('a-camera');
-        document.querySelector('a-scene').addEventListener('enter-vr', function () { this.pause(); });
-        document.querySelector('a-scene').addEventListener('exit-vr', function () { this.play(); });
+        document.querySelector('a-scene').addEventListener('enter-vr', function () {
+            coords.setAttribute('position', '0 0 0');
+            coords = document.querySelector('#rig');
+            coords.setAttribute('position', this.lastPos);
+        });
+        document.querySelector('a-scene').addEventListener('exit-vr', function () {
+            coords.setAttribute('position', '0 0 0');
+            coords = document.querySelector('a-camera');
+            coords.setAttribute('position', this.lastPos);
+        });
         coords.setAttribute('position', this.lastPos);
     },
     tick: function () {
@@ -63,5 +71,4 @@ AFRAME.registerComponent('game-logic', {
         document.querySelector('#message').setAttribute('color', gameOver ? GAME.textColors[0] : GAME.textColors[1]);
         coords.removeAttribute('wasd-controls');
     }
-
 });
