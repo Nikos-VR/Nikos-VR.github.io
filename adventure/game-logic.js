@@ -30,46 +30,43 @@ AFRAME.registerComponent('game-logic', {
                     ITEMS.push(pick);
                     this.updateText(TEXT[this.scene - 1]);
                 }
+                this.timer = 250;
             }
         });
         this.loadScene(1);
     },
     tick: function () {
-        const pos = this.cam.getAttribute('position');
-        const rot = this.cam.getAttribute('rotation');
-
-        if (pos.x > 0.25) {
-            if (this.xi < MAP[0].length - 1 && MAP[this.yi][this.xi + 1] > 0) this.loadScene(MAP[this.yi][this.xi + 1]);
-            else this.cam.setAttribute('position', '0.25 1.5 ' + pos.z);
-        }
-        if (pos.x < -0.25) {
-            if (this.xi > 0 && MAP[this.yi][this.xi - 1] > 0) this.loadScene(MAP[this.yi][this.xi - 1]);
-            else this.cam.setAttribute('position', '-0.25 1.5 ' + pos.z);
-        }
-        if (pos.z < -0.25) {
-            if (this.yi > 0 && MAP[this.yi - 1][this.xi] > 0) this.loadScene(MAP[this.yi - 1][this.xi]);
-            else this.cam.setAttribute('position', pos.x + ' 1.5 -0.25');
-        }
-        if (pos.z > 0.25) {
-            if (this.yi < MAP.length - 1 && MAP[this.yi + 1][this.xi] > 0) this.loadScene(MAP[this.yi + 1][this.xi]);
-            else this.cam.setAttribute('position', pos.x + ' 1.5 0.25');
-        }
-        let checkE = false, checkW = false, checkN = false, checkS = false;
+        let checkE = false, checkW = false, checkN = false, checkS = false, dir;
 
         const E = this.xi < MAP[0].length - 1 && MAP[this.yi][this.xi + 1] > 0;
         const W = this.xi > 0 && MAP[this.yi][this.xi - 1] > 0;
         const N = this.yi > 0 && MAP[this.yi - 1][this.xi] > 0;
         const S = this.yi < MAP.length - 1 && MAP[this.yi + 1][this.xi] > 0;
+        const rot = this.cam.getAttribute('rotation');
 
-        if (Math.abs(rot.y) % 360 < 15 || Math.abs(rot.y) % 360 > 345) { checkE = E; checkW = W; checkN = N; checkS = S; }
-        if (Math.abs(rot.y + 90) % 360 < 15 || Math.abs(rot.y + 90) % 360 > 345) { checkN = E; checkS = W; checkW = N; checkE = S; }
-        if (Math.abs(rot.y - 90) % 360 < 15 || Math.abs(rot.y - 90) % 360 > 345) { checkS = E; checkN = W; checkE = N; checkW = S; }
-        if (Math.abs(rot.y + 180) % 360 < 15 || Math.abs(rot.y + 180) % 360 > 345) { checkW = E; checkE = W; checkS = N; checkN = S; }
+        if (Math.abs(rot.y) % 360 < 15 || Math.abs(rot.y) % 360 > 345) { checkE = E; checkW = W; checkN = N; checkS = S; dir = 2; }
+        if (Math.abs(rot.y + 90) % 360 < 15 || Math.abs(rot.y + 90) % 360 > 345) { checkN = E; checkS = W; checkW = N; checkE = S; dir = 0; }
+        if (Math.abs(rot.y - 90) % 360 < 15 || Math.abs(rot.y - 90) % 360 > 345) { checkS = E; checkN = W; checkE = N; checkW = S; dir = 1; }
+        if (Math.abs(rot.y + 180) % 360 < 15 || Math.abs(rot.y + 180) % 360 > 345) { checkW = E; checkE = W; checkS = N; checkN = S; dir = 3; }
 
         document.querySelector('#east').setAttribute('visible', checkE);
         document.querySelector('#west').setAttribute('visible', checkW);
         document.querySelector('#north').setAttribute('visible', checkN);
         document.querySelector('#south').setAttribute('visible', checkS);
+
+        if (checkN) {
+            if (--this.timer === 0) this.transportMove(dir);
+        }
+        else this.timer = 250;
+    },
+    transportMove: function (d) {
+        const pos = this.cam.getAttribute('position');
+        switch (d) {
+            case 0: this.loadScene(MAP[this.yi][this.xi + 1]); break;
+            case 1: this.loadScene(MAP[this.yi][this.xi - 1]); break;
+            case 2: this.loadScene(MAP[this.yi - 1][this.xi]); break;
+            default: this.loadScene(MAP[this.yi + 1][this.xi]);
+        }
     },
     updateCoords: function () {
         for (var i = 0; i < MAP.length; i++) {
@@ -94,7 +91,7 @@ AFRAME.registerComponent('game-logic', {
         document.querySelector('#sky').setAttribute('src', '#sky' + s);
         document.querySelector('#sky').setAttribute('opacity', '0');
         document.querySelector('#sky').setAttribute('animation', 'property: opacity; to: 1; dur: 500');
-        setTimeout(() => { document.querySelector('#sky').removeAttribute('animation'); }, 1000);
+        setTimeout(() => { document.querySelector('#sky').removeAttribute('animation'); this.timer = 250; }, 1000);
     },
     updateText: function (t) {
         const inventory = "\n\nYou are carrying " + (ITEMS.length > 0 ? ITEMS.join(' and ') : "nothing");
