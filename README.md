@@ -2,7 +2,7 @@ The repository includes works created for the teaching needs of the course "Virt
 
 ...
 
-Board Game: two player chess like game where each unit has different attributes (https://nikos-vr.github.io/boardgame)
+Board Game: two player chess like game where units have custom attributes (https://nikos-vr.github.io/boardgame)
 
 Escape Room: simulation in a virtual reality environment of an escape room (https://nikos-vr.github.io/escape)
 
