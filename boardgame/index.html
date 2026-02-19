@@ -3,7 +3,6 @@
 <head>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
-    <script src="https://unpkg.com/networked-aframe/dist/networked-aframe-webrtc.min.js"></script>
     <script>
         // UNIT PARAMETERS: the model is used if available, otherwise the shape is applied
         const UNITS = {
@@ -54,17 +53,10 @@
 </head>
 
 <body>
-    <template id="avatarTemplate"></template>
-    <a-scene background="color: black" cursor="rayOrigin: mouse" raycaster="objects: .interactive" game-logic
-        networked-scene="
-        room: myRoom; 
-        debug: true; 
-        adapter: webrtc; 
-        serverURL: https://naf-signaling.herokuapp.com/;
-      ">
+    <a-scene background="color: black" cursor="rayOrigin: mouse" raycaster="objects: .interactive" game-logic>
 
         <!-- CAMERA & STATUS -->
-        <a-entity id="rig" position="0 1.5 10" networked="template:#avatar-template; attachTemplateToLocal:true">
+        <a-entity id="rig" position="0 1.5 10">
             <a-camera look-controls="magicWindowTrackingEnabled:false">
                 <a-cursor color="white" fuse="true"></a-cursor>
                 <a-text id="status" color="silver" position="0 0.75 -1" align="center" width="2" font="monoid"></a-text>
@@ -79,12 +71,6 @@
         <a-entity id="board"></a-entity>
         <a-entity id="units"></a-entity>
 
-        <!-- Avatar Template -->
-        <template id="avatar-template">
-            <a-entity>
-                <a-sphere color="#FF0000" radius="0.25"></a-sphere>
-            </a-entity>
-        </template>
     </a-scene>
 </body>
 
