@@ -64,6 +64,7 @@ function createUnits(container) {
 
             unit.setAttribute('scale', GAME.unitsScale);
             unit.setAttribute('position', boardSize[0] * (x - BOARD[0].length / 2 + 0.5) + ' ' + unitSize[1] / 2 + ' ' + boardSize[2] * (z - BOARD.length / 2 + 0.5));
+            unit.setAttribute('networked', '');
 
             unit.classList.add('unit');
             unit.classList.add('interactive');
@@ -76,4 +77,5 @@ function createUnits(container) {
             container.appendChild(unit);
         }
     }
+
 }
