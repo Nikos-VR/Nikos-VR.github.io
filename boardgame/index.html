@@ -2,6 +2,7 @@
 
 <head>
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
     <script>
         // UNIT PARAMETERS: the model is used if available, otherwise the shape is applied
@@ -53,7 +54,7 @@
 </head>
 
 <body>
-    <a-scene background="color: black" cursor="rayOrigin: mouse" raycaster="objects: .interactive" game-logic>
+    <a-scene id="s1" background="color: black" cursor="rayOrigin: mouse" raycaster="objects: .interactive" game-logic>
 
         <!-- CAMERA & STATUS -->
         <a-entity id="rig" position="0 1.5 10">
@@ -71,7 +72,66 @@
         <a-entity id="board"></a-entity>
         <a-entity id="units"></a-entity>
 
+        <a-sphere id="remote" visible="false"></a-sphere>
     </a-scene>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        let room = params.get("room");
+
+        const peer = new Peer(); // auto-generated peer ID
+        let conn = null;
+
+        const scene = document.querySelector("#s1");
+        scene.addEventListener("loaded", () => {
+            const rig = document.querySelector("#rig");
+            const remote = document.querySelector("#remote");
+
+            peer.on("open", id => {
+                // Host
+                if (!room) {
+                    room = id;
+                    const newUrl = window.location.origin + window.location.pathname + "?room=" + room;
+                    window.history.replaceState({}, "", newUrl);
+                    console.log("You are host. Share URL:", newUrl);
+
+                    peer.on("connection", connection => {
+                        conn = connection;
+                        setupConnection();
+                    });
+
+                } else {
+                    // Guest
+                    conn = peer.connect(room);
+                    setupConnection();
+                }
+            });
+
+            function setupConnection() {
+                conn.on("open", () => {
+                    console.log("Connected!");
+                    remote.setAttribute("visible", true);
+                });
+
+                conn.on("data", data => {
+                    if (data.position) remote.setAttribute("position", data.position);
+                    if (data.rotation) remote.setAttribute("rotation", data.rotation);
+                });
+            }
+
+            // Send local position and rotation every 50ms
+            setInterval(() => {
+                if (!conn || !conn.open) return;
+                const pos = rig.object3D.position;
+                const rot = rig.object3D.rotation;
+
+                conn.send({
+                    position: { x: pos.x, y: pos.y, z: pos.z },
+                    rotation: { x: rot.x * (180 / Math.PI), y: rot.y * (180 / Math.PI), z: rot.z * (180 / Math.PI) }
+                });
+            }, 50);
+        });
+    </script>
 </body>
 
 </html>
