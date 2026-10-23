@@ -1,884 +1,483 @@
-<!DOCTYPE html>
-<html lang="el">
+<html>
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VR & Desktop Jigsaw Puzzle (A-Frame 1.6.0)</title>
-
-  <!-- Official A-Frame 1.6.0 CDN -->
-  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-
-  <!-- Clean Overlay UI Styling -->
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      user-select: none;
-      background-color: #0f172a;
-    }
-
-    #ui-overlay {
-      position: absolute;
-      top: 16px;
-      left: 16px;
-      z-index: 1000;
-      background: rgba(15, 23, 42, 0.92);
-      color: #f8fafc;
-      padding: 18px 22px;
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      width: 280px;
-      box-sizing: border-box;
-      backdrop-filter: blur(10px);
-    }
-
-    #ui-overlay h1 {
-      margin: 0 0 12px 0;
-      font-size: 19px;
-      font-weight: 700;
-      color: #38bdf8;
-      letter-spacing: -0.3px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .ui-group {
-      margin-bottom: 12px;
-    }
-
-    .ui-group label {
-      display: block;
-      font-size: 12px;
-      color: #94a3b8;
-      margin-bottom: 4px;
-      font-weight: 600;
-    }
-
-    select, button {
-      width: 100%;
-      background: #1e293b;
-      color: #f8fafc;
-      border: 1px solid #475569;
-      padding: 9px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      cursor: pointer;
-      box-sizing: border-box;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-
-    select:focus, button:focus {
-      border-color: #38bdf8;
-    }
-
-    button {
-      background: #0284c7;
-      border: none;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-
-    button:hover {
-      background: #0369a1;
-    }
-
-    #counter {
-      font-size: 14px;
-      font-weight: 600;
-      color: #e2e8f0;
-      margin-top: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .instructions {
-      font-size: 11px;
-      color: #94a3b8;
-      margin-top: 12px;
-      line-height: 1.45;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      padding-top: 10px;
-    }
-
-    #win-banner {
-      display: none;
-      margin-top: 12px;
-      padding: 10px;
-      background: #166534;
-      color: #f0fdf4;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: 700;
-      font-size: 13px;
-      border: 1px solid #22c55e;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.85; }
-    }
-  </style>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>Jigsaw Puzzle</title>
+ <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 </head>
+
 <body>
+ <a-scene>
+  <a-sky color="#0f172a"></a-sky>
+  <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#1e293b" roughness="0.8"></a-plane>
+  <a-entity id="table" position="0 0 -1.2">
+   <a-box width="1.8" height="0.08" depth="1.2" position="0 0.76 0" color="#5c3a21" roughness="0.5"></a-box>
+   <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 -0.5" color="#3b2312"></a-cylinder>
+   <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 -0.5" color="#3b2312"></a-cylinder>
+   <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 0.5" color="#3b2312"></a-cylinder>
+   <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 0.5" color="#3b2312"></a-cylinder>
+   <a-entity id="puzzle-board" position="0 0.801 0" rotation="-90 0 0"></a-entity>
+  </a-entity>
+  <a-entity id="pieces-container"></a-entity>
+  <a-entity id="vr-hud" position="0 1.6 -1.8">
+   <a-text id="vr-hud-text" value="VR Jigsaw Puzzle\n\n0 / 0" align="center" color="#38bdf8" width="2.8"></a-text>
+  </a-entity>
+  <a-entity id="rig" position="0 0 0">
+   <a-camera id="camera" position="0 1.55 0" look-controls="pointerLockEnabled: false; touchEnabled: false">
+    <a-entity id="mouse-cursor" cursor="rayOrigin: mouse" raycaster="objects: .pickable; far: 10"></a-entity>
+   </a-camera>
+   <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .pickable; far: 5"></a-entity>
+   <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .pickable; far: 5"></a-entity>
+  </a-entity>
+ </a-scene>
+ <script>
+  window.state = {
+   gridSize: 5,
+   totalPieces: 25,
+   lockedCount: 0,
+   heldPieceId: null,
+   activeVRHand: null,
+   pieces: [],
+   isCompleted: false
+  };
 
-  <!-- ==================== GREEK UI OVERLAY ==================== -->
-  <div id="ui-overlay">
-    <h1>🧩 VR & Desktop Παζλ</h1>
+  function generateCanvasImage(width, height) {
+   const canvas = document.createElement('canvas');
+   canvas.width = width;
+   canvas.height = height;
+   const ctx = canvas.getContext('2d');
 
-    <div class="ui-group">
-      <label for="grid-select">Δυσκολία (Πλέγμα):</label>
-      <select id="grid-select">
-        <option value="2">2 x 2 (4 Κομμάτια)</option>
-        <option value="3" selected>3 x 3 (9 Κομμάτια)</option>
-        <option value="4">4 x 4 (16 Κομμάτια)</option>
-      </select>
-    </div>
+   const img = document.createElement('img');
+   img.src = 'chrome.png';
+   img.onload = function () { ctx.drawImage(img, 0, 0); }
 
-    <button id="btn-restart">🔄 Νέο Παιχνίδι</button>
+   return canvas;
+  }
 
-    <div id="counter">
-      <span>Πρόοδος:</span>
-      <strong id="counter-val" style="color: #38bdf8;">0 / 0</strong>
-    </div>
+  // ==================== PROCEDURAL CANVAS JIGSAW SLICER ==================== //
+  function drawJigsawEdge(ctx, x1, y1, x2, y2, tabDir) {
+   if (tabDir === 0) {
+    ctx.lineTo(x2, y2);
+    return;
+   }
+   const dx = x2 - x1;
+   const dy = y2 - y1;
+   const dist = Math.hypot(dx, dy);
+   const nx = -dy / dist * tabDir;
+   const ny = dx / dist * tabDir;
 
-    <div class="instructions">
-      💡 <strong>Ποντίκι / Αφή:</strong> Πατήστε & σύρετε κομμάτια πάνω στο τραπέζι.<br>
-      🥽 <strong>VR:</strong> Χρησιμοποιήστε τη σκανδάλη (Trigger) του χειριστηρίου.
-    </div>
+   const p1x = x1 + dx * 0.35;
+   const p1y = y1 + dy * 0.35;
+   const p2x = x1 + dx * 0.65;
+   const p2y = y1 + dy * 0.65;
 
-    <div id="win-banner">
-      🎉 Συγχαρητήρια!<br>Το παζλ ολοκληρώθηκε!
-    </div>
-  </div>
+   ctx.lineTo(p1x, p1y);
 
-  <!-- ==================== A-FRAME 3D SCENE ==================== -->
-  <a-scene embedded style="width: 100vw; height: 100vh;">
-    
-    <!-- Environment Sky & Floor -->
-    <a-sky color="#0f172a"></a-sky>
-    <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#1e293b" roughness="0.8"></a-plane>
+   const tabSize = dist * 0.22;
+   const mx = x1 + dx * 0.5;
+   const my = y1 + dy * 0.5;
 
-    <!-- Room Lighting -->
-    <a-light type="ambient" intensity="0.75" color="#ffffff"></a-light>
-    <a-light type="directional" intensity="0.85" position="2 4 1" color="#fef08a"></a-light>
+   const tipX = mx + nx * tabSize;
+   const tipY = my + ny * tabSize;
 
-    <!-- Wooden Table Surface & Puzzle Board Receiver -->
-    <a-entity id="table" position="0 0 -1.2">
-      <!-- Table Top (Y = 0.76 to Y = 0.80) -->
-      <a-box width="1.8" height="0.08" depth="1.2" position="0 0.76 0" color="#5c3a21" roughness="0.5"></a-box>
+   const c1x = p1x + nx * (tabSize * 0.2);
+   const c1y = p1y + ny * (tabSize * 0.2);
+   const c2x = tipX - (dx / dist) * (tabSize * 0.6);
+   const c2y = tipY - (dy / dist) * (tabSize * 0.6);
 
-      <!-- Table Legs -->
-      <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 -0.5" color="#3b2312"></a-cylinder>
-      <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 -0.5" color="#3b2312"></a-cylinder>
-      <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 0.5" color="#3b2312"></a-cylinder>
-      <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 0.5" color="#3b2312"></a-cylinder>
+   ctx.bezierCurveTo(c1x, c1y, c2x, c2y, tipX, tipY);
 
-      <!-- Target Puzzle Frame Surface Entity (Direct Three.js Mesh at Y = 0.801) -->
-      <a-entity id="puzzle-board" position="0 0.801 0" rotation="-90 0 0"></a-entity>
-    </a-entity>
+   const c3x = tipX + (dx / dist) * (tabSize * 0.6);
+   const c3y = tipY + (dy / dist) * (tabSize * 0.6);
+   const c4x = p2x + nx * (tabSize * 0.2);
+   const c4y = p2y + ny * (tabSize * 0.2);
 
-    <!-- Dynamic Container for Jigsaw Piece Entities -->
-    <a-entity id="pieces-container"></a-entity>
+   ctx.bezierCurveTo(c3x, c3y, c4x, c4y, p2x, p2y);
 
-    <!-- Floating VR 3D Text Panel -->
-    <a-entity id="vr-hud" position="0 1.6 -1.8">
-      <a-text id="vr-hud-text" value="VR Jigsaw Puzzle\n\nΚομμάτια: 0 / 0" align="center" color="#38bdf8" width="2.8"></a-text>
-    </a-entity>
+   ctx.lineTo(x2, y2);
+  }
 
-    <!-- Camera Rig & WebXR Laser Controllers -->
-    <a-entity id="rig" position="0 0 0">
-      <a-camera id="camera" position="0 1.55 0" look-controls="pointerLockEnabled: false; touchEnabled: false">
-        <a-entity id="mouse-cursor" cursor="rayOrigin: mouse" raycaster="objects: .pickable; far: 10"></a-entity>
-      </a-camera>
+  function sliceCanvasToJigsaw(sourceCanvas, N) {
+   const W = sourceCanvas.width;
+   const H = sourceCanvas.height;
+   const cellW = W / N;
+   const cellH = H / N;
 
-      <!-- WebXR Laser Controls -->
-      <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .pickable; far: 5"></a-entity>
-      <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .pickable; far: 5"></a-entity>
-    </a-entity>
-  </a-scene>
+   const vEdges = Array.from({length: N}, () => Array(N - 1).fill(0));
+   const hEdges = Array.from({length: N - 1}, () => Array(N).fill(0));
 
-  <!-- ==================== JAVASCRIPT APPLICATION ENGINE ==================== -->
-  <script>
-    // ==================== GLOBAL GAME STATE ==================== //
-    window.state = {
-      gridSize: 3,
-      totalPieces: 9,
-      lockedCount: 0,
-      heldPieceId: null,
-      activeVRHand: null,
-      pieces: [],
-      isCompleted: false
+   for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N - 1; c++) {
+     vEdges[r][c] = Math.random() < 0.5 ? 1 : -1;
+    }
+   }
+   for (let r = 0; r < N - 1; r++) {
+    for (let c = 0; c < N; c++) {
+     hEdges[r][c] = Math.random() < 0.5 ? 1 : -1;
+    }
+   }
+
+   const slices = [];
+   const margin = cellW * 0.28;
+
+   for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+     const pieceCanvas = document.createElement('canvas');
+     pieceCanvas.width = cellW + margin * 2;
+     pieceCanvas.height = cellH + margin * 2;
+     const ctx = pieceCanvas.getContext('2d');
+
+     ctx.translate(margin, margin);
+
+     ctx.beginPath();
+     ctx.moveTo(0, 0);
+
+     // Top
+     const topTab = r === 0 ? 0 : -hEdges[r - 1][c];
+     drawJigsawEdge(ctx, 0, 0, cellW, 0, topTab);
+
+     // Right
+     const rightTab = c === N - 1 ? 0 : vEdges[r][c];
+     drawJigsawEdge(ctx, cellW, 0, cellW, cellH, rightTab);
+
+     // Bottom
+     const bottomTab = r === N - 1 ? 0 : hEdges[r][c];
+     drawJigsawEdge(ctx, cellW, cellH, 0, cellH, bottomTab);
+
+     // Left
+     const leftTab = c === 0 ? 0 : -vEdges[r][c - 1];
+     drawJigsawEdge(ctx, 0, cellH, 0, 0, leftTab);
+
+     ctx.closePath();
+     ctx.clip();
+
+     // Draw slice
+     const sx = c * cellW - margin;
+     const sy = r * cellH - margin;
+     const sw = cellW + margin * 2;
+     const sh = cellH + margin * 2;
+
+     ctx.drawImage(sourceCanvas, sx, sy, sw, sh, -margin, -margin, sw, sh);
+
+     // Edge stroke outline
+     ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+     ctx.lineWidth = 4;
+     ctx.stroke();
+
+     slices.push({
+      row: r,
+      col: c,
+      canvas: pieceCanvas
+     });
+    }
+   }
+
+   // Board canvas with grid outline
+   const boardCanvas = document.createElement('canvas');
+   boardCanvas.width = W;
+   boardCanvas.height = H;
+   const bctx = boardCanvas.getContext('2d');
+   bctx.globalAlpha = 0.25;
+   bctx.drawImage(sourceCanvas, 0, 0, W, H);
+   bctx.globalAlpha = 1.0;
+   bctx.strokeStyle = 'rgba(255,255,255,0.7)';
+   bctx.lineWidth = 3;
+   for (let i = 1; i < N; i++) {
+    bctx.beginPath();
+    bctx.moveTo(i * cellW, 0);
+    bctx.lineTo(i * cellW, H);
+    bctx.stroke();
+    bctx.beginPath();
+    bctx.moveTo(0, i * cellH);
+    bctx.lineTo(W, i * cellH);
+    bctx.stroke();
+   }
+
+   return {slices, boardCanvas};
+  }
+
+  // ==================== UNIVERSAL THREE.JS RAYCASTING DRAG SYSTEM ==================== //
+  function pickPiece(pieceId, handEl = null) {
+   const piece = window.state.pieces[pieceId];
+   if (!piece || piece.locked) return;
+
+   window.state.heldPieceId = pieceId;
+   window.state.activeVRHand = handEl;
+
+   // Temporarily disable camera rotation so dragging moves piece smoothly on screen
+   const camera = document.getElementById('camera');
+   if (camera && !handEl) {
+    camera.setAttribute('look-controls', 'enabled: false');
+   }
+
+   // Elevate piece during drag (Y = 0.88)
+   piece.currentPos.y = 0.88;
+   const el = document.getElementById(`piece-${pieceId}`);
+   if (el) {
+    el.setAttribute('position', `${piece.currentPos.x} 0.88 ${piece.currentPos.z}`);
+   }
+  }
+
+  function releasePiece(pieceId) {
+   const piece = window.state.pieces[pieceId];
+   if (!piece || piece.locked) return;
+
+   window.state.heldPieceId = null;
+   window.state.activeVRHand = null;
+
+   // Re-enable camera rotation
+   const camera = document.getElementById('camera');
+   if (camera) {
+    camera.setAttribute('look-controls', 'enabled: true; pointerLockEnabled: false; touchEnabled: false');
+   }
+
+   // Snap Distance Check (0.15m threshold)
+   const dist = Math.hypot(
+    piece.currentPos.x - piece.targetPos.x,
+    piece.currentPos.z - piece.targetPos.z
+   );
+
+   const pieceEl = document.getElementById(`piece-${pieceId}`);
+
+   if (dist < 0.15) {
+    // --- SNAP TO BOARD ---
+    piece.currentPos.x = piece.targetPos.x;
+    piece.currentPos.y = piece.targetPos.y;
+    piece.currentPos.z = piece.targetPos.z;
+    piece.locked = true;
+
+    if (pieceEl) {
+     pieceEl.setAttribute('position', `${piece.targetPos.x} ${piece.targetPos.y} ${piece.targetPos.z}`);
+     pieceEl.classList.remove('pickable');
+    }
+
+    window.state.lockedCount++;
+    updateUI();
+
+    if (window.state.lockedCount === window.state.totalPieces) {
+     triggerVictory();
+    }
+   } else {
+    // --- DROP ON TABLE ---
+    piece.currentPos.y = 0.802;
+    if (pieceEl) {
+     pieceEl.setAttribute('position', `${piece.currentPos.x} 0.802 ${piece.currentPos.z}`);
+    }
+   }
+  }
+
+  // Move held piece across table surface using Three.js Plane Intersection
+  function updateDragPosition(clientX, clientY) {
+   if (window.state.heldPieceId === null || window.state.activeVRHand) return;
+
+   const cameraEl = document.getElementById('camera');
+   if (!cameraEl) return;
+   const threeCamera = cameraEl.getObject3D('camera');
+   if (!threeCamera) return;
+
+   // Screen Normalized Device Coordinates (-1 to +1)
+   const mouse = new THREE.Vector2(
+    (clientX / window.innerWidth) * 2 - 1,
+    -(clientY / window.innerHeight) * 2 + 1
+   );
+
+   const raycaster = new THREE.Raycaster();
+   raycaster.setFromCamera(mouse, threeCamera);
+
+   // Horizontal Plane at Table Elevation (Y = 0.88)
+   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.88);
+   const targetPoint = new THREE.Vector3();
+
+   if (raycaster.ray.intersectPlane(plane, targetPoint)) {
+    // Clamp bounds to table area
+    targetPoint.x = Math.max(-1.1, Math.min(1.1, targetPoint.x));
+    targetPoint.z = Math.max(-2.2, Math.min(-0.2, targetPoint.z));
+
+    const piece = window.state.pieces[window.state.heldPieceId];
+    piece.currentPos.x = targetPoint.x;
+    piece.currentPos.z = targetPoint.z;
+
+    const el = document.getElementById(`piece-${piece.id}`);
+    if (el) {
+     el.setAttribute('position', `${targetPoint.x} 0.88 ${targetPoint.z}`);
+    }
+   }
+  }
+
+  // Listeners for Mouse, Touch, & VR Dragging
+  window.addEventListener('mousemove', (e) => {
+   updateDragPosition(e.clientX, e.clientY);
+  });
+
+  window.addEventListener('touchmove', (e) => {
+   if (e.touches && e.touches[0]) {
+    updateDragPosition(e.touches[0].clientX, e.touches[0].clientY);
+   }
+  });
+
+  window.addEventListener('mouseup', () => {
+   if (window.state.heldPieceId !== null && !window.state.activeVRHand) {
+    releasePiece(window.state.heldPieceId);
+   }
+  });
+
+  window.addEventListener('touchend', () => {
+   if (window.state.heldPieceId !== null && !window.state.activeVRHand) {
+    releasePiece(window.state.heldPieceId);
+   }
+  });
+
+  // ==================== GAME SETUP & THREE.MESH BUILDING ==================== //
+  function initPuzzle() {
+   window.state.totalPieces = window.state.gridSize * window.state.gridSize;
+   window.state.lockedCount = 0;
+   window.state.heldPieceId = null;
+   window.state.activeVRHand = null;
+   window.state.isCompleted = false;
+
+   updateUI();
+
+   // 1. Generate artwork canvas
+   const artCanvas = generateCanvasImage(800, 800);
+
+   // 2. Slice image into pieces & get board canvas
+   const {slices, boardCanvas} = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
+
+   // 3. Build Reference Board Mesh directly with THREE.Mesh (Bypasses A-Frame Material Bug)
+   const boardEntity = document.getElementById('puzzle-board');
+   const boardGeom = new THREE.PlaneGeometry(0.8, 0.8);
+   const boardTexture = new THREE.CanvasTexture(boardCanvas);
+   if (THREE.SRGBColorSpace) boardTexture.colorSpace = THREE.SRGBColorSpace;
+   const boardMat = new THREE.MeshBasicMaterial({
+    map: boardTexture,
+    transparent: true,
+    opacity: 0.65,
+    side: THREE.DoubleSide
+   });
+   const boardMesh = new THREE.Mesh(boardGeom, boardMat);
+   boardEntity.setObject3D('mesh', boardMesh);
+
+   // 4. Spawn Jigsaw Piece Entities using Pure THREE.Mesh
+   const container = document.getElementById('pieces-container');
+   container.innerHTML = '';
+   window.state.pieces = [];
+
+   const boardSize = 0.8;
+   const pieceSize = boardSize / window.state.gridSize;
+   const pieceMeshDim = pieceSize * 1.56;
+
+   slices.forEach((slice, idx) => {
+    // Target position on board
+    const targetX = -boardSize / 2 + (slice.col + 0.5) * pieceSize;
+    const targetZ = -1.2 - boardSize / 2 + (slice.row + 0.5) * pieceSize;
+    const targetY = 0.802;
+
+    // Scattered start position on table
+    let randomX = (Math.random() - 0.5) * 1.4;
+    let randomZ = -1.2 + (Math.random() - 0.5) * 0.85;
+
+    // Ensure pieces don't spawn right on top of target board
+    if (Math.abs(randomX) < 0.45 && Math.abs(randomZ + 1.2) < 0.45) {
+     randomX += (randomX >= 0 ? 0.48 : -0.48);
+    }
+
+    const pieceData = {
+     id: idx,
+     targetPos: {x: targetX, y: targetY, z: targetZ},
+     currentPos: {x: randomX, y: 0.802, z: randomZ},
+     locked: false
     };
 
-    // Native Multi-Tab Sync BroadcastChannel
-    const broadcastChannel = new BroadcastChannel('aframe-jigsaw-sync');
-
-    // ==================== WEB AUDIO SYNTHESIZER ==================== //
-    let audioCtx = null;
-
-    function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-    }
-
-    function playSnapSound() {
-      initAudio();
-      if (!audioCtx) return;
-
-      const now = audioCtx.currentTime;
-      const osc1 = audioCtx.createOscillator();
-      const osc2 = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc1.type = 'sine';
-      osc2.type = 'triangle';
-
-      osc1.frequency.setValueAtTime(523.25, now); // C5
-      osc1.frequency.exponentialRampToValueAtTime(783.99, now + 0.14); // G5
-
-      osc2.frequency.setValueAtTime(1046.50, now); // C6
-      osc2.frequency.exponentialRampToValueAtTime(1318.51, now + 0.14); // E6
-
-      gain.gain.setValueAtTime(0.25, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-
-      osc1.connect(gain);
-      osc2.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc1.start(now);
-      osc2.start(now);
-      osc1.stop(now + 0.22);
-      osc2.stop(now + 0.22);
-    }
-
-    function playWinSound() {
-      initAudio();
-      if (!audioCtx) return;
-
-      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51];
-      notes.forEach((freq, idx) => {
-        const now = audioCtx.currentTime + idx * 0.10;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now);
-
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.start(now);
-        osc.stop(now + 0.35);
-      });
-    }
-
-    // ==================== PROCEDURAL ARTWORK GENERATOR ==================== //
-    function generateProceduralArt(width, height) {
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-
-      // 1. Sky Gradient
-      const skyGrad = ctx.createLinearGradient(0, 0, 0, height * 0.65);
-      skyGrad.addColorStop(0, '#0f172a');
-      skyGrad.addColorStop(0.35, '#581c87');
-      skyGrad.addColorStop(0.7, '#c026d3');
-      skyGrad.addColorStop(1, '#f97316');
-      ctx.fillStyle = skyGrad;
-      ctx.fillRect(0, 0, width, height);
-
-      // 2. Glowing Sun
-      const sunX = width * 0.5;
-      const sunY = height * 0.42;
-      const sunGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 130);
-      sunGrad.addColorStop(0, '#fef08a');
-      sunGrad.addColorStop(0.4, '#facc15');
-      sunGrad.addColorStop(1, 'rgba(250, 204, 21, 0)');
-      ctx.fillStyle = sunGrad;
-      ctx.beginPath();
-      ctx.arc(sunX, sunY, 130, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Sun Core
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(sunX, sunY, 35, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 3. Distant Mountains
-      ctx.fillStyle = '#3b0764';
-      ctx.beginPath();
-      ctx.moveTo(0, height * 0.62);
-      ctx.lineTo(width * 0.25, height * 0.38);
-      ctx.lineTo(width * 0.52, height * 0.58);
-      ctx.lineTo(width * 0.78, height * 0.4);
-      ctx.lineTo(width, height * 0.56);
-      ctx.lineTo(width, height);
-      ctx.lineTo(0, height);
-      ctx.closePath();
-      ctx.fill();
-
-      // 4. Foreground Silhouette
-      ctx.fillStyle = '#1e1b4b';
-      ctx.beginPath();
-      ctx.moveTo(0, height * 0.66);
-      ctx.lineTo(width * 0.35, height * 0.48);
-      ctx.lineTo(width * 0.65, height * 0.62);
-      ctx.lineTo(width, height * 0.48);
-      ctx.lineTo(width, height);
-      ctx.lineTo(0, height);
-      ctx.closePath();
-      ctx.fill();
-
-      // 5. Water Reflection Surface
-      const waterGrad = ctx.createLinearGradient(0, height * 0.65, 0, height);
-      waterGrad.addColorStop(0, '#1e1b4b');
-      waterGrad.addColorStop(0.5, '#0f172a');
-      waterGrad.addColorStop(1, '#0284c7');
-      ctx.fillStyle = waterGrad;
-      ctx.fillRect(0, height * 0.65, width, height * 0.35);
-
-      // Water Ripple Light Rays
-      ctx.strokeStyle = 'rgba(253, 224, 71, 0.45)';
-      ctx.lineWidth = 3;
-      for (let y = height * 0.67; y < height; y += 12) {
-        const w = (y - height * 0.65) * 0.9 + 24;
-        ctx.beginPath();
-        ctx.moveTo(sunX - w / 2 + Math.random() * 8, y);
-        ctx.lineTo(sunX + w / 2 - Math.random() * 8, y);
-        ctx.stroke();
-      }
-
-      // Outer Border Line
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 12;
-      ctx.strokeRect(6, 6, width - 12, height - 12);
-
-      return canvas;
-    }
-
-    // ==================== PROCEDURAL CANVAS JIGSAW SLICER ==================== //
-    function drawJigsawEdge(ctx, x1, y1, x2, y2, tabDir) {
-      if (tabDir === 0) {
-        ctx.lineTo(x2, y2);
-        return;
-      }
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      const dist = Math.hypot(dx, dy);
-      const nx = -dy / dist * tabDir;
-      const ny = dx / dist * tabDir;
-
-      const p1x = x1 + dx * 0.35;
-      const p1y = y1 + dy * 0.35;
-      const p2x = x1 + dx * 0.65;
-      const p2y = y1 + dy * 0.65;
-
-      ctx.lineTo(p1x, p1y);
-
-      const tabSize = dist * 0.22;
-      const mx = x1 + dx * 0.5;
-      const my = y1 + dy * 0.5;
-
-      const tipX = mx + nx * tabSize;
-      const tipY = my + ny * tabSize;
-
-      const c1x = p1x + nx * (tabSize * 0.2);
-      const c1y = p1y + ny * (tabSize * 0.2);
-      const c2x = tipX - (dx / dist) * (tabSize * 0.6);
-      const c2y = tipY - (dy / dist) * (tabSize * 0.6);
-
-      ctx.bezierCurveTo(c1x, c1y, c2x, c2y, tipX, tipY);
-
-      const c3x = tipX + (dx / dist) * (tabSize * 0.6);
-      const c3y = tipY + (dy / dist) * (tabSize * 0.6);
-      const c4x = p2x + nx * (tabSize * 0.2);
-      const c4y = p2y + ny * (tabSize * 0.2);
-
-      ctx.bezierCurveTo(c3x, c3y, c4x, c4y, p2x, p2y);
-
-      ctx.lineTo(x2, y2);
-    }
-
-    function sliceCanvasToJigsaw(sourceCanvas, N) {
-      const W = sourceCanvas.width;
-      const H = sourceCanvas.height;
-      const cellW = W / N;
-      const cellH = H / N;
-
-      const vEdges = Array.from({ length: N }, () => Array(N - 1).fill(0));
-      const hEdges = Array.from({ length: N - 1 }, () => Array(N).fill(0));
-
-      for (let r = 0; r < N; r++) {
-        for (let c = 0; c < N - 1; c++) {
-          vEdges[r][c] = Math.random() < 0.5 ? 1 : -1;
-        }
-      }
-      for (let r = 0; r < N - 1; r++) {
-        for (let c = 0; c < N; c++) {
-          hEdges[r][c] = Math.random() < 0.5 ? 1 : -1;
-        }
-      }
-
-      const slices = [];
-      const margin = cellW * 0.28;
-
-      for (let r = 0; r < N; r++) {
-        for (let c = 0; c < N; c++) {
-          const pieceCanvas = document.createElement('canvas');
-          pieceCanvas.width = cellW + margin * 2;
-          pieceCanvas.height = cellH + margin * 2;
-          const ctx = pieceCanvas.getContext('2d');
-
-          ctx.translate(margin, margin);
-
-          ctx.beginPath();
-          ctx.moveTo(0, 0);
-
-          // Top
-          const topTab = r === 0 ? 0 : -hEdges[r - 1][c];
-          drawJigsawEdge(ctx, 0, 0, cellW, 0, topTab);
-
-          // Right
-          const rightTab = c === N - 1 ? 0 : vEdges[r][c];
-          drawJigsawEdge(ctx, cellW, 0, cellW, cellH, rightTab);
-
-          // Bottom
-          const bottomTab = r === N - 1 ? 0 : hEdges[r][c];
-          drawJigsawEdge(ctx, cellW, cellH, 0, cellH, bottomTab);
-
-          // Left
-          const leftTab = c === 0 ? 0 : -vEdges[r][c - 1];
-          drawJigsawEdge(ctx, 0, cellH, 0, 0, leftTab);
-
-          ctx.closePath();
-          ctx.clip();
-
-          // Draw slice
-          const sx = c * cellW - margin;
-          const sy = r * cellH - margin;
-          const sw = cellW + margin * 2;
-          const sh = cellH + margin * 2;
-
-          ctx.drawImage(sourceCanvas, sx, sy, sw, sh, -margin, -margin, sw, sh);
-
-          // Edge stroke outline
-          ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-          ctx.lineWidth = 4;
-          ctx.stroke();
-
-          slices.push({
-            row: r,
-            col: c,
-            canvas: pieceCanvas
-          });
-        }
-      }
-
-      // Board canvas with grid outline
-      const boardCanvas = document.createElement('canvas');
-      boardCanvas.width = W;
-      boardCanvas.height = H;
-      const bctx = boardCanvas.getContext('2d');
-      bctx.globalAlpha = 0.25;
-      bctx.drawImage(sourceCanvas, 0, 0, W, H);
-      bctx.globalAlpha = 1.0;
-      bctx.strokeStyle = 'rgba(255,255,255,0.7)';
-      bctx.lineWidth = 3;
-      for (let i = 1; i < N; i++) {
-        bctx.beginPath();
-        bctx.moveTo(i * cellW, 0);
-        bctx.lineTo(i * cellW, H);
-        bctx.stroke();
-        bctx.beginPath();
-        bctx.moveTo(0, i * cellH);
-        bctx.lineTo(W, i * cellH);
-        bctx.stroke();
-      }
-
-      return { slices, boardCanvas };
-    }
-
-    // ==================== UNIVERSAL THREE.JS RAYCASTING DRAG SYSTEM ==================== //
-    function pickPiece(pieceId, handEl = null) {
-      const piece = window.state.pieces[pieceId];
-      if (!piece || piece.locked) return;
-
-      initAudio();
-      window.state.heldPieceId = pieceId;
-      window.state.activeVRHand = handEl;
-
-      // Temporarily disable camera rotation so dragging moves piece smoothly on screen
-      const camera = document.getElementById('camera');
-      if (camera && !handEl) {
-        camera.setAttribute('look-controls', 'enabled: false');
-      }
-
-      // Elevate piece during drag (Y = 0.88)
-      piece.currentPos.y = 0.88;
-      const el = document.getElementById(`piece-${pieceId}`);
-      if (el) {
-        el.setAttribute('position', `${piece.currentPos.x} 0.88 ${piece.currentPos.z}`);
-      }
-    }
-
-    function releasePiece(pieceId) {
-      const piece = window.state.pieces[pieceId];
-      if (!piece || piece.locked) return;
-
-      window.state.heldPieceId = null;
-      window.state.activeVRHand = null;
-
-      // Re-enable camera rotation
-      const camera = document.getElementById('camera');
-      if (camera) {
-        camera.setAttribute('look-controls', 'enabled: true; pointerLockEnabled: false; touchEnabled: false');
-      }
-
-      // Snap Distance Check (0.15m threshold)
-      const dist = Math.hypot(
-        piece.currentPos.x - piece.targetPos.x,
-        piece.currentPos.z - piece.targetPos.z
-      );
-
-      const pieceEl = document.getElementById(`piece-${pieceId}`);
-
-      if (dist < 0.15) {
-        // --- SNAP TO BOARD ---
-        piece.currentPos.x = piece.targetPos.x;
-        piece.currentPos.y = piece.targetPos.y;
-        piece.currentPos.z = piece.targetPos.z;
-        piece.locked = true;
-
-        if (pieceEl) {
-          pieceEl.setAttribute('position', `${piece.targetPos.x} ${piece.targetPos.y} ${piece.targetPos.z}`);
-          pieceEl.classList.remove('pickable');
-        }
-
-        playSnapSound();
-        window.state.lockedCount++;
-        updateUI();
-
-        broadcastLock(pieceId, piece.currentPos);
-
-        if (window.state.lockedCount === window.state.totalPieces) {
-          triggerVictory();
-        }
-      } else {
-        // --- DROP ON TABLE ---
-        piece.currentPos.y = 0.802;
-        if (pieceEl) {
-          pieceEl.setAttribute('position', `${piece.currentPos.x} 0.802 ${piece.currentPos.z}`);
-        }
-        broadcastMove(pieceId, piece.currentPos);
-      }
-    }
-
-    // Move held piece across table surface using Three.js Plane Intersection
-    function updateDragPosition(clientX, clientY) {
-      if (window.state.heldPieceId === null || window.state.activeVRHand) return;
-
-      const cameraEl = document.getElementById('camera');
-      if (!cameraEl) return;
-      const threeCamera = cameraEl.getObject3D('camera');
-      if (!threeCamera) return;
-
-      // Screen Normalized Device Coordinates (-1 to +1)
-      const mouse = new THREE.Vector2(
-        (clientX / window.innerWidth) * 2 - 1,
-        -(clientY / window.innerHeight) * 2 + 1
-      );
-
-      const raycaster = new THREE.Raycaster();
-      raycaster.setFromCamera(mouse, threeCamera);
-
-      // Horizontal Plane at Table Elevation (Y = 0.88)
-      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.88);
-      const targetPoint = new THREE.Vector3();
-
-      if (raycaster.ray.intersectPlane(plane, targetPoint)) {
-        // Clamp bounds to table area
-        targetPoint.x = Math.max(-1.1, Math.min(1.1, targetPoint.x));
-        targetPoint.z = Math.max(-2.2, Math.min(-0.2, targetPoint.z));
-
-        const piece = window.state.pieces[window.state.heldPieceId];
-        piece.currentPos.x = targetPoint.x;
-        piece.currentPos.z = targetPoint.z;
-
-        const el = document.getElementById(`piece-${piece.id}`);
-        if (el) {
-          el.setAttribute('position', `${targetPoint.x} 0.88 ${targetPoint.z}`);
-        }
-        broadcastMove(piece.id, piece.currentPos);
-      }
-    }
-
-    // Listeners for Mouse, Touch, & VR Dragging
-    window.addEventListener('mousemove', (e) => {
-      updateDragPosition(e.clientX, e.clientY);
+    window.state.pieces.push(pieceData);
+
+    // A-Frame Entity Container
+    const pieceEntity = document.createElement('a-entity');
+    pieceEntity.setAttribute('id', `piece-${idx}`);
+    pieceEntity.setAttribute('class', 'pickable');
+    pieceEntity.setAttribute('position', `${pieceData.currentPos.x} ${pieceData.currentPos.y} ${pieceData.currentPos.z}`);
+    pieceEntity.setAttribute('rotation', '-90 0 0');
+
+    // Pure Three.js Mesh Attachment
+    const pieceGeom = new THREE.PlaneGeometry(pieceMeshDim, pieceMeshDim);
+    const pieceTexture = new THREE.CanvasTexture(slice.canvas);
+    if (THREE.SRGBColorSpace) pieceTexture.colorSpace = THREE.SRGBColorSpace;
+    const pieceMat = new THREE.MeshBasicMaterial({
+     map: pieceTexture,
+     transparent: true,
+     side: THREE.DoubleSide
+    });
+    const pieceMesh = new THREE.Mesh(pieceGeom, pieceMat);
+    pieceEntity.setObject3D('mesh', pieceMesh);
+
+    // Drag Listener on Mouse Down
+    pieceEntity.addEventListener('mousedown', (e) => {
+     if (e.target.closest && e.target.closest('#ui-overlay')) return;
+     pickPiece(idx);
     });
 
-    window.addEventListener('touchmove', (e) => {
-      if (e.touches && e.touches[0]) {
-        updateDragPosition(e.touches[0].clientX, e.touches[0].clientY);
-      }
+    // Click Fallback (Toggle Pick/Place)
+    pieceEntity.addEventListener('click', (e) => {
+     if (pieceData.locked) return;
+     if (window.state.heldPieceId === null) {
+      pickPiece(idx);
+     } else if (window.state.heldPieceId === idx) {
+      releasePiece(idx);
+     }
     });
 
-    window.addEventListener('mouseup', () => {
-      if (window.state.heldPieceId !== null && !window.state.activeVRHand) {
-        releasePiece(window.state.heldPieceId);
+    container.appendChild(pieceEntity);
+   });
+  }
+
+  function updateUI() {
+   const valStr = `${window.state.lockedCount} / ${window.state.totalPieces}`;
+   const vrHud = document.getElementById('vr-hud-text');
+   if (vrHud) {
+    if (window.state.isCompleted) {
+     vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\n🎉 ΟΛΟΚΛΗΡΩΘΗΚΕ!`);
+     vrHud.setAttribute('color', '#4ade80');
+    } else {
+     vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\nΚομμάτια: ${valStr}`);
+     vrHud.setAttribute('color', '#38bdf8');
+    }
+   }
+  }
+
+  function triggerVictory() {
+   window.state.isCompleted = true;
+   updateUI();
+  }
+
+  // ==================== INITIALIZATION & BINDINGS ==================== //
+  window.addEventListener('load', () => {
+   // Setup WebXR Controller Event Listeners
+   ['left-hand', 'right-hand'].forEach(handId => {
+    const handEl = document.getElementById(handId);
+    if (handEl) {
+     handEl.addEventListener('selectstart', () => {
+      const rc = handEl.components.raycaster;
+      if (rc && rc.intersections && rc.intersections.length > 0) {
+       const hit = rc.intersections[0].object.el;
+       if (hit && hit.classList.contains('pickable')) {
+        const id = parseInt(hit.id.replace('piece-', ''), 10);
+        if (!isNaN(id)) pickPiece(id, handEl);
+       }
       }
-    });
+     });
 
-    window.addEventListener('touchend', () => {
-      if (window.state.heldPieceId !== null && !window.state.activeVRHand) {
-        releasePiece(window.state.heldPieceId);
+     handEl.addEventListener('selectend', () => {
+      if (window.state.heldPieceId !== null && window.state.activeVRHand === handEl) {
+       releasePiece(window.state.heldPieceId);
       }
-    });
-
-    // ==================== GAME SETUP & THREE.MESH BUILDING ==================== //
-    function initPuzzle(shouldBroadcastReset = true) {
-      window.state.totalPieces = window.state.gridSize * window.state.gridSize;
-      window.state.lockedCount = 0;
-      window.state.heldPieceId = null;
-      window.state.activeVRHand = null;
-      window.state.isCompleted = false;
-
-      document.getElementById('win-banner').style.display = 'none';
-      updateUI();
-
-      // 1. Generate artwork canvas
-      const artCanvas = generateProceduralArt(800, 800);
-
-      // 2. Slice image into pieces & get board canvas
-      const { slices, boardCanvas } = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
-
-      // 3. Build Reference Board Mesh directly with THREE.Mesh (Bypasses A-Frame Material Bug)
-      const boardEntity = document.getElementById('puzzle-board');
-      const boardGeom = new THREE.PlaneGeometry(0.8, 0.8);
-      const boardTexture = new THREE.CanvasTexture(boardCanvas);
-      if (THREE.SRGBColorSpace) boardTexture.colorSpace = THREE.SRGBColorSpace;
-      const boardMat = new THREE.MeshBasicMaterial({
-        map: boardTexture,
-        transparent: true,
-        opacity: 0.65,
-        side: THREE.DoubleSide
-      });
-      const boardMesh = new THREE.Mesh(boardGeom, boardMat);
-      boardEntity.setObject3D('mesh', boardMesh);
-
-      // 4. Spawn Jigsaw Piece Entities using Pure THREE.Mesh
-      const container = document.getElementById('pieces-container');
-      container.innerHTML = '';
-      window.state.pieces = [];
-
-      const boardSize = 0.8;
-      const pieceSize = boardSize / window.state.gridSize;
-      const pieceMeshDim = pieceSize * 1.56;
-
-      slices.forEach((slice, idx) => {
-        // Target position on board
-        const targetX = -boardSize / 2 + (slice.col + 0.5) * pieceSize;
-        const targetZ = -1.2 - boardSize / 2 + (slice.row + 0.5) * pieceSize;
-        const targetY = 0.802;
-
-        // Scattered start position on table
-        let randomX = (Math.random() - 0.5) * 1.4;
-        let randomZ = -1.2 + (Math.random() - 0.5) * 0.85;
-
-        // Ensure pieces don't spawn right on top of target board
-        if (Math.abs(randomX) < 0.45 && Math.abs(randomZ + 1.2) < 0.45) {
-          randomX += (randomX >= 0 ? 0.48 : -0.48);
-        }
-
-        const pieceData = {
-          id: idx,
-          targetPos: { x: targetX, y: targetY, z: targetZ },
-          currentPos: { x: randomX, y: 0.802, z: randomZ },
-          locked: false
-        };
-
-        window.state.pieces.push(pieceData);
-
-        // A-Frame Entity Container
-        const pieceEntity = document.createElement('a-entity');
-        pieceEntity.setAttribute('id', `piece-${idx}`);
-        pieceEntity.setAttribute('class', 'pickable');
-        pieceEntity.setAttribute('position', `${pieceData.currentPos.x} ${pieceData.currentPos.y} ${pieceData.currentPos.z}`);
-        pieceEntity.setAttribute('rotation', '-90 0 0');
-
-        // Pure Three.js Mesh Attachment
-        const pieceGeom = new THREE.PlaneGeometry(pieceMeshDim, pieceMeshDim);
-        const pieceTexture = new THREE.CanvasTexture(slice.canvas);
-        if (THREE.SRGBColorSpace) pieceTexture.colorSpace = THREE.SRGBColorSpace;
-        const pieceMat = new THREE.MeshBasicMaterial({
-          map: pieceTexture,
-          transparent: true,
-          side: THREE.DoubleSide
-        });
-        const pieceMesh = new THREE.Mesh(pieceGeom, pieceMat);
-        pieceEntity.setObject3D('mesh', pieceMesh);
-
-        // Drag Listener on Mouse Down
-        pieceEntity.addEventListener('mousedown', (e) => {
-          if (e.target.closest && e.target.closest('#ui-overlay')) return;
-          pickPiece(idx);
-        });
-
-        // Click Fallback (Toggle Pick/Place)
-        pieceEntity.addEventListener('click', (e) => {
-          if (pieceData.locked) return;
-          if (window.state.heldPieceId === null) {
-            pickPiece(idx);
-          } else if (window.state.heldPieceId === idx) {
-            releasePiece(idx);
-          }
-        });
-
-        container.appendChild(pieceEntity);
-      });
-
-      if (shouldBroadcastReset) {
-        broadcastReset(window.state.gridSize);
-      }
+     });
     }
+   });
 
-    function updateUI() {
-      const valStr = `${window.state.lockedCount} / ${window.state.totalPieces}`;
-      document.getElementById('counter-val').innerText = valStr;
-
-      const vrHud = document.getElementById('vr-hud-text');
-      if (vrHud) {
-        if (window.state.isCompleted) {
-          vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\n🎉 ΟΛΟΚΛΗΡΩΘΗΚΕ!`);
-          vrHud.setAttribute('color', '#4ade80');
-        } else {
-          vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\nΚομμάτια: ${valStr}`);
-          vrHud.setAttribute('color', '#38bdf8');
-        }
-      }
-    }
-
-    function triggerVictory() {
-      window.state.isCompleted = true;
-      playWinSound();
-      updateUI();
-      document.getElementById('win-banner').style.display = 'block';
-    }
-
-    // ==================== MULTI-TAB BROADCAST CHANNEL SYNC ==================== //
-    function broadcastMove(pieceId, pos) {
-      broadcastChannel.postMessage({
-        type: 'MOVE',
-        id: pieceId,
-        pos: { x: pos.x, y: pos.y, z: pos.z }
-      });
-    }
-
-    function broadcastLock(pieceId, pos) {
-      broadcastChannel.postMessage({
-        type: 'LOCK',
-        id: pieceId,
-        pos: { x: pos.x, y: pos.y, z: pos.z }
-      });
-    }
-
-    function broadcastReset(gridSize) {
-      broadcastChannel.postMessage({
-        type: 'RESET',
-        gridSize: gridSize
-      });
-    }
-
-    broadcastChannel.onmessage = (event) => {
-      const data = event.data;
-      if (!data) return;
-
-      if (data.type === 'MOVE') {
-        const piece = window.state.pieces[data.id];
-        if (piece && !piece.locked && window.state.heldPieceId !== data.id) {
-          piece.currentPos = data.pos;
-          const el = document.getElementById(`piece-${data.id}`);
-          if (el) el.setAttribute('position', `${data.pos.x} ${data.pos.y} ${data.pos.z}`);
-        }
-      } else if (data.type === 'LOCK') {
-        const piece = window.state.pieces[data.id];
-        if (piece && !piece.locked) {
-          piece.currentPos = data.pos;
-          piece.locked = true;
-          const el = document.getElementById(`piece-${data.id}`);
-          if (el) {
-            el.setAttribute('position', `${data.pos.x} ${data.pos.y} ${data.pos.z}`);
-            el.classList.remove('pickable');
-          }
-          playSnapSound();
-          window.state.lockedCount++;
-          updateUI();
-          if (window.state.lockedCount === window.state.totalPieces) {
-            triggerVictory();
-          }
-        }
-      } else if (data.type === 'RESET') {
-        window.state.gridSize = data.gridSize;
-        document.getElementById('grid-select').value = data.gridSize;
-        initPuzzle(false);
-      }
-    };
-
-    // ==================== INITIALIZATION & BINDINGS ==================== //
-    window.addEventListener('load', () => {
-      // Setup WebXR Controller Event Listeners
-      ['left-hand', 'right-hand'].forEach(handId => {
-        const handEl = document.getElementById(handId);
-        if (handEl) {
-          handEl.addEventListener('selectstart', () => {
-            const rc = handEl.components.raycaster;
-            if (rc && rc.intersections && rc.intersections.length > 0) {
-              const hit = rc.intersections[0].object.el;
-              if (hit && hit.classList.contains('pickable')) {
-                const id = parseInt(hit.id.replace('piece-', ''), 10);
-                if (!isNaN(id)) pickPiece(id, handEl);
-              }
-            }
-          });
-
-          handEl.addEventListener('selectend', () => {
-            if (window.state.heldPieceId !== null && window.state.activeVRHand === handEl) {
-              releasePiece(window.state.heldPieceId);
-            }
-          });
-        }
-      });
-
-      // UI Control Bindings
-      document.getElementById('grid-select').addEventListener('change', (e) => {
-        window.state.gridSize = parseInt(e.target.value, 10);
-        initPuzzle(true);
-      });
-
-      document.getElementById('btn-restart').addEventListener('click', () => {
-        initPuzzle(true);
-      });
-
-      // Launch application
-      initPuzzle(false);
-    });
-  </script>
+   // Launch application
+   initPuzzle();
+  });
+ </script>
 </body>
+
 </html>
