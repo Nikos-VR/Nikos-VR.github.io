@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VR & Desktop Real-time Jigsaw Puzzle</title>
 
-  <!-- Standard A-Frame 1.4.2 (ONLY External Library) -->
+  <!-- Standard A-Frame 1.4.2 (Only External Library) -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-  <!-- Minimal Standard CSS Overlay -->
+  <!-- Minimal Standard CSS UI Styling -->
   <style>
     body {
       margin: 0;
@@ -19,7 +19,7 @@
       background-color: #0f172a;
     }
 
-    /* Minimal UI Overlay in the top-left corner */
+    /* Minimal Overlay Panel in Top-Left Corner */
     #ui-overlay {
       position: absolute;
       top: 16px;
@@ -27,24 +27,24 @@
       z-index: 1000;
       background: rgba(15, 23, 42, 0.92);
       color: #f8fafc;
-      padding: 16px 20px;
+      padding: 18px 22px;
       border-radius: 12px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      width: 270px;
+      width: 280px;
       box-sizing: border-box;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
     }
 
     #ui-overlay h1 {
-      margin: 0 0 10px 0;
-      font-size: 18px;
+      margin: 0 0 12px 0;
+      font-size: 19px;
       font-weight: 700;
       color: #38bdf8;
       letter-spacing: -0.3px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
     .ui-group {
@@ -64,7 +64,7 @@
       background: #1e293b;
       color: #f8fafc;
       border: 1px solid #475569;
-      padding: 8px 10px;
+      padding: 9px 12px;
       border-radius: 8px;
       font-size: 13px;
       cursor: pointer;
@@ -92,7 +92,7 @@
       font-size: 14px;
       font-weight: 600;
       color: #e2e8f0;
-      margin-top: 8px;
+      margin-top: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -101,10 +101,10 @@
     .instructions {
       font-size: 11px;
       color: #94a3b8;
-      margin-top: 10px;
-      line-height: 1.4;
+      margin-top: 12px;
+      line-height: 1.45;
       border-top: 1px solid rgba(255,255,255,0.1);
-      padding-top: 8px;
+      padding-top: 10px;
     }
 
     #win-banner {
@@ -129,12 +129,12 @@
 </head>
 <body>
 
-  <!-- ==================== MINIMAL UI OVERLAY ==================== -->
+  <!-- ==================== MINIMAL GREEK UI OVERLAY ==================== -->
   <div id="ui-overlay">
-    <h1>🧩 VR & Desktop Jigsaw</h1>
+    <h1>🧩 VR & Desktop Παζλ</h1>
 
     <div class="ui-group">
-      <label for="grid-select">Δυσκολία (Grid):</label>
+      <label for="grid-select">Δυσκολία (Πλέγμα):</label>
       <select id="grid-select">
         <option value="2">2 x 2 (4 Κομμάτια)</option>
         <option value="3" selected>3 x 3 (9 Κομμάτια)</option>
@@ -150,7 +150,7 @@
     </div>
 
     <div class="instructions">
-      💡 <strong>Ποντίκι:</strong> Πατήστε παρατεταμένα & σύρετε (Drag & Drop) ή κάντε κλικ για παραλαβή/απόθεση.<br>
+      💡 <strong>Ποντίκι:</strong> Πατήστε παρατεταμένα & σύρετε (Drag & Drop) για μετακίνηση κομματιών.<br>
       🥽 <strong>VR:</strong> Χρησιμοποιήστε το Laser Pointer του χειριστηρίου.
     </div>
 
@@ -162,19 +162,17 @@
   <!-- ==================== A-FRAME 3D SCENE ==================== -->
   <a-scene drag-system embedded style="width: 100vw; height: 100vh;">
     
-    <a-assets id="assets-container"></a-assets>
-
-    <!-- Sky and Ground Floor -->
+    <!-- Environment Sky & Floor -->
     <a-sky color="#0f172a"></a-sky>
     <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#1e293b" roughness="0.8"></a-plane>
 
     <!-- Room Lighting -->
-    <a-light type="ambient" intensity="0.6" color="#ffffff"></a-light>
-    <a-light type="directional" intensity="0.8" position="2 4 1" color="#fef08a" cast-shadow="true"></a-light>
+    <a-light type="ambient" intensity="0.65" color="#ffffff"></a-light>
+    <a-light type="directional" intensity="0.8" position="2 4 1" color="#fef08a"></a-light>
 
-    <!-- Wooden Assembly Table Surface -->
+    <!-- Wooden Table Surface & Target Puzzle Board -->
     <a-entity id="table" position="0 0 -1.2">
-      <!-- Table Top Wooden Slab -->
+      <!-- Wooden Table Top -->
       <a-box width="1.8" height="0.08" depth="1.2" position="0 0.76 0" color="#5c3a21" roughness="0.5"></a-box>
 
       <!-- Table Legs -->
@@ -183,29 +181,29 @@
       <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 0.5" color="#3b2312"></a-cylinder>
       <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 0.5" color="#3b2312"></a-cylinder>
 
-      <!-- Target Puzzle Board Reference Guide Frame -->
-      <a-plane id="puzzle-board" position="0 0.801 0" rotation="-90 0 0" width="0.8" height="0.8" material="shader: flat; transparent: true; opacity: 0.5; color: #ffffff"></a-plane>
+      <!-- Target Puzzle Reference Board -->
+      <a-plane id="puzzle-board" position="0 0.801 0" rotation="-90 0 0" width="0.8" height="0.8" material="shader: flat; transparent: true; side: double"></a-plane>
 
-      <!-- Invisible Table Surface Raycast Drag Receiver Plane -->
+      <!-- Invisible Horizontal Drag Surface Receiver Plane -->
       <a-plane id="table-plane" class="drag-surface" position="0 0.81 0" rotation="-90 0 0" width="3.0" height="2.5" visible="false"></a-plane>
     </a-entity>
 
-    <!-- Dynamic Container for Sliced Jigsaw 3D Piece Entities -->
+    <!-- Dynamic Container for Jigsaw Piece Entities -->
     <a-entity id="pieces-container"></a-entity>
 
-    <!-- Floating VR 3D HUD Progress Panel above Table -->
+    <!-- Floating VR 3D Text Panel -->
     <a-entity id="vr-hud" position="0 1.6 -1.8">
       <a-text id="vr-hud-text" value="VR Jigsaw Puzzle\n\nΚομμάτια: 0 / 0" align="center" color="#38bdf8" width="2.8"></a-text>
     </a-entity>
 
-    <!-- Camera Rig with Mouse Raycaster Controls & VR Laser support -->
+    <!-- Camera Rig with Mouse Raycaster & VR Hand Support -->
     <a-entity id="rig" position="0 0 0">
       <a-camera id="camera" position="0 1.55 0" look-controls="pointerLockEnabled: false; touchEnabled: false">
-        <!-- Desktop Raycaster attached to mouse pointer -->
+        <!-- Desktop Mouse Raycaster -->
         <a-entity id="mouse-cursor" cursor="rayOrigin: mouse" raycaster="objects: .pickable, .drag-surface; far: 10"></a-entity>
       </a-camera>
 
-      <!-- WebXR Motion Controller Support -->
+      <!-- WebXR Laser Controls -->
       <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .pickable, .drag-surface; far: 5"></a-entity>
       <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .pickable, .drag-surface; far: 5"></a-entity>
     </a-entity>
@@ -213,7 +211,7 @@
 
   <!-- ==================== JAVASCRIPT APPLICATION ENGINE ==================== -->
   <script>
-    // ==================== GLOBAL APP STATE ==================== //
+    // ==================== GLOBAL GAME STATE ==================== //
     window.state = {
       gridSize: 3,
       totalPieces: 9,
@@ -224,8 +222,8 @@
       isCompleted: false
     };
 
-    // Native Multi-Tab Realtime Synchronization Channel
-    const broadcastChannel = new BroadcastChannel('vr_jigsaw_channel');
+    // Native Multi-Tab Sync BroadcastChannel
+    const broadcastChannel = new BroadcastChannel('aframe_jigsaw_vr_channel');
 
     // ==================== WEB AUDIO SYNTHESIZER ==================== //
     let audioCtx = null;
@@ -239,7 +237,7 @@
       }
     }
 
-    // Snapping sound effect (dual-frequency soft chime)
+    // Play soft dual-harmonic snap chime
     function playSnapSound() {
       initAudio();
       if (!audioCtx) return;
@@ -271,7 +269,7 @@
       osc2.stop(now + 0.22);
     }
 
-    // Victory fanfare arpeggio sound effect
+    // Play victory fanfare arpeggio sound
     function playWinSound() {
       initAudio();
       if (!audioCtx) return;
@@ -355,7 +353,7 @@
       ctx.closePath();
       ctx.fill();
 
-      // 5. Water Surface & Sun Reflection
+      // 5. Water Reflection Surface
       const waterGrad = ctx.createLinearGradient(0, height * 0.65, 0, height);
       waterGrad.addColorStop(0, '#1e1b4b');
       waterGrad.addColorStop(0.5, '#0f172a');
@@ -374,7 +372,7 @@
         ctx.stroke();
       }
 
-      // Elegant Outer Frame Border
+      // Outer Canvas Frame Line
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 12;
       ctx.strokeRect(6, 6, width - 12, height - 12);
@@ -382,7 +380,7 @@
       return canvas;
     }
 
-    // ==================== PROCEDURAL JIGSAW CANVAS SLICER ==================== //
+    // ==================== PROCEDURAL CANVAS JIGSAW SLICER ==================== //
     function drawJigsawEdge(ctx, x1, y1, x2, y2, tabDir) {
       if (tabDir === 0) {
         ctx.lineTo(x2, y2);
@@ -487,7 +485,7 @@
 
           ctx.drawImage(sourceCanvas, sx, sy, sw, sh, -margin, -margin, sw, sh);
 
-          // Contour Stroke Outline
+          // Contour Edge Outline
           ctx.strokeStyle = 'rgba(0,0,0,0.5)';
           ctx.lineWidth = 4;
           ctx.stroke();
@@ -495,12 +493,12 @@
           slices.push({
             row: r,
             col: c,
-            dataUrl: pieceCanvas.toDataURL()
+            canvas: pieceCanvas
           });
         }
       }
 
-      // Board background guide canvas (Faint translucent image + grid overlay)
+      // Board reference canvas (Faint image + guide lines)
       const boardCanvas = document.createElement('canvas');
       boardCanvas.width = W;
       boardCanvas.height = H;
@@ -523,19 +521,15 @@
 
       return {
         slices,
-        boardDataUrl: boardCanvas.toDataURL()
+        boardCanvas
       };
     }
 
-    // ==================== MOUSE & VR DRAG DRAG CONTROLLER COMPONENT ==================== //
+    // ==================== MOUSE & VR DRAG CONTROLLER COMPONENT ==================== //
     AFRAME.registerComponent('drag-system', {
       init: function () {
-        this.raycasters = [];
-        this.cameraEl = document.getElementById('camera');
-
-        // Track Mouse Down & Up on window level for universal Mouse Drag support
+        // Universal Mouse Drag support on window
         window.addEventListener('mousedown', (e) => {
-          // Ignore clicks on UI panel overlay
           if (e.target.closest('#ui-overlay')) return;
           window.state.isMouseDown = true;
         });
@@ -547,7 +541,6 @@
           }
         });
 
-        // Touch support for Mobile/Tablet screens
         window.addEventListener('touchend', () => {
           window.state.isMouseDown = false;
           if (window.state.heldPieceId !== null) {
@@ -564,7 +557,7 @@
 
           let activeIntersection = null;
 
-          // Check raycaster intersections from Mouse or VR Hand Controllers
+          // Raycaster check for Mouse or VR Controllers
           [mouseCursor, rightHand, leftHand].forEach(el => {
             if (!activeIntersection && el && el.components && el.components.raycaster) {
               const rc = el.components.raycaster;
@@ -579,14 +572,14 @@
             }
           });
 
-          // Update position of currently held piece to follow mouse/VR pointer on table
+          // Move active piece across table surface
           if (activeIntersection && activeIntersection.point) {
             const p = activeIntersection.point;
             const piece = window.state.pieces[window.state.heldPieceId];
             if (piece && !piece.locked) {
               piece.currentPos.x = p.x;
               piece.currentPos.z = p.z;
-              piece.currentPos.y = 0.84; // Elevate piece slightly while dragging
+              piece.currentPos.y = 0.84; // Slightly elevated during dragging
 
               const el = document.getElementById(`piece-${piece.id}`);
               if (el) {
@@ -612,32 +605,45 @@
       // 1. Generate artwork canvas
       const artCanvas = generateProceduralArt(800, 800);
 
-      // 2. Slice image into pieces
-      const { slices, boardDataUrl } = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
+      // 2. Slice image into pieces & get board canvas
+      const { slices, boardCanvas } = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
 
-      // Update target board reference plane
+      // Apply board texture directly via THREE.CanvasTexture (Fixes src-loader.js HEAD error!)
       const boardPlane = document.getElementById('puzzle-board');
-      boardPlane.setAttribute('material', `src: ${boardDataUrl}; transparent: true; opacity: 0.65; shader: flat`);
+      const applyBoardTexture = () => {
+        const mesh = boardPlane.getObject3D('mesh');
+        if (mesh && mesh.material) {
+          mesh.material.map = new THREE.CanvasTexture(boardCanvas);
+          mesh.material.transparent = true;
+          mesh.material.opacity = 0.65;
+          mesh.material.needsUpdate = true;
+        }
+      };
+      if (boardPlane.getObject3D('mesh')) {
+        applyBoardTexture();
+      } else {
+        boardPlane.addEventListener('loaded', applyBoardTexture);
+      }
 
       // 3. Spawn 3D Jigsaw Piece Entities
       const container = document.getElementById('pieces-container');
       container.innerHTML = '';
       window.state.pieces = [];
 
-      const boardSize = 0.8; // 80cm board width
+      const boardSize = 0.8;
       const pieceSize = boardSize / window.state.gridSize;
 
       slices.forEach((slice, idx) => {
-        // Target snap slot on table board
+        // Correct target slot position on board
         const targetX = -boardSize / 2 + (slice.col + 0.5) * pieceSize;
         const targetZ = -1.2 - boardSize / 2 + (slice.row + 0.5) * pieceSize;
         const targetY = 0.802;
 
-        // Scatter piece randomly around the table
+        // Scatter pieces around table top
         let randomX = (Math.random() - 0.5) * 1.5;
         let randomZ = -1.2 + (Math.random() - 0.5) * 0.9;
         
-        // Ensure pieces don't spawn directly inside the assembly board
+        // Prevent pieces from spawning directly over the target board
         if (Math.abs(randomX) < 0.45 && Math.abs(randomZ + 1.2) < 0.45) {
           randomX += (randomX >= 0 ? 0.48 : -0.48);
         }
@@ -651,31 +657,48 @@
 
         window.state.pieces.push(pieceData);
 
-        // Create A-Frame Plane Entity for the Piece
+        // Create Entity Plane for Piece
         const pieceEntity = document.createElement('a-plane');
         pieceEntity.setAttribute('id', `piece-${idx}`);
         pieceEntity.setAttribute('class', 'pickable');
-        pieceEntity.setAttribute('width', pieceSize * 1.5); // Scaled for tab margin
+        pieceEntity.setAttribute('width', pieceSize * 1.5);
         pieceEntity.setAttribute('height', pieceSize * 1.5);
         pieceEntity.setAttribute('rotation', '-90 0 0');
         pieceEntity.setAttribute('position', `${pieceData.currentPos.x} ${pieceData.currentPos.y} ${pieceData.currentPos.z}`);
-        pieceEntity.setAttribute('material', `src: ${slice.dataUrl}; transparent: true; side: double; shader: flat`);
+        
+        // Set basic material (no data URL in material src attribute!)
+        pieceEntity.setAttribute('material', 'shader: flat; transparent: true; side: double');
 
-        // MOUSE & VR INTERACTION LISTENERS:
-        // 1. Mousedown / Pick up event
+        // Apply texture directly to Three.js Mesh using THREE.CanvasTexture
+        // THIS COMPLETELY FIXES THE 'src-loader.js:154 HEAD data:image/png net::ERR_INVALID_URL' ERROR!
+        const applyPieceTexture = () => {
+          const mesh = pieceEntity.getObject3D('mesh');
+          if (mesh && mesh.material) {
+            const texture = new THREE.CanvasTexture(slice.canvas);
+            mesh.material.map = texture;
+            mesh.material.needsUpdate = true;
+          }
+        };
+
+        if (pieceEntity.getObject3D('mesh')) {
+          applyPieceTexture();
+        } else {
+          pieceEntity.addEventListener('loaded', applyPieceTexture);
+        }
+
+        // Mouse Pickup Listener
         pieceEntity.addEventListener('mousedown', (e) => {
           initAudio();
           if (pieceData.locked) return;
 
-          // Pick up piece
           window.state.heldPieceId = idx;
           
-          // Disable look-controls while dragging piece so screen doesn't pan
+          // Temporarily disable camera rotation so drag is smooth
           const camera = document.getElementById('camera');
           if (camera) camera.setAttribute('look-controls', 'enabled: false');
         });
 
-        // 2. Click fallback (for single-click pickup/drop mode)
+        // Click Fallback Listener (Single Click Pickup / Drop)
         pieceEntity.addEventListener('click', (e) => {
           initAudio();
           if (pieceData.locked) return;
@@ -690,7 +713,7 @@
         container.appendChild(pieceEntity);
       });
 
-      // Table Drag Surface Listener to drop piece on click
+      // Table surface fallback click to drop
       const tablePlane = document.getElementById('table-plane');
       tablePlane.onclick = () => {
         if (window.state.heldPieceId !== null && !window.state.isMouseDown) {
@@ -703,7 +726,7 @@
       }
     }
 
-    // Release held piece and evaluate distance to target slot
+    // Release held piece & check snapping distance
     function releasePiece(pieceId) {
       const piece = window.state.pieces[pieceId];
       if (!piece || piece.locked) return;
@@ -714,7 +737,7 @@
       const camera = document.getElementById('camera');
       if (camera) camera.setAttribute('look-controls', 'enabled: true; pointerLockEnabled: false; touchEnabled: false');
 
-      // Calculate distance to correct grid slot (Snap Threshold = 0.18m)
+      // Distance check to correct slot (Snap threshold = 0.18 meters)
       const dist = Math.hypot(
         piece.currentPos.x - piece.targetPos.x,
         piece.currentPos.z - piece.targetPos.z
@@ -723,7 +746,7 @@
       const pieceEl = document.getElementById(`piece-${pieceId}`);
 
       if (dist < 0.18) {
-        // --- SNAP TO BOARD SLOT ---
+        // --- SNAP TO BOARD ---
         piece.currentPos.x = piece.targetPos.x;
         piece.currentPos.y = piece.targetPos.y;
         piece.currentPos.z = piece.targetPos.z;
@@ -744,7 +767,7 @@
           triggerVictory();
         }
       } else {
-        // --- DROP ON TABLE SURFACE ---
+        // --- DROP ON TABLE ---
         piece.currentPos.y = 0.802;
         if (pieceEl) {
           pieceEl.setAttribute('position', `${piece.currentPos.x} 0.802 ${piece.currentPos.z}`);
@@ -846,7 +869,7 @@
         initPuzzle(true);
       });
 
-      // Launch puzzle
+      // Launch application
       initPuzzle(false);
     });
   </script>
