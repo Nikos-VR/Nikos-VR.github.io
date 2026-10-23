@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VR & Desktop Real-time Jigsaw Puzzle</title>
+  <title>VR & Desktop Real-time Jigsaw Puzzle (A-Frame 1.6.0)</title>
 
-  <!-- Standard A-Frame 1.4.2 (Only External Library) -->
+  <!-- Official A-Frame 1.6.0 CDN -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-  <!-- Minimal Standard CSS UI Styling -->
+  <!-- Minimal Standard CSS Overlay UI Styling -->
   <style>
     body {
       margin: 0;
@@ -181,10 +181,10 @@
       <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 0.5" color="#3b2312"></a-cylinder>
       <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 0.5" color="#3b2312"></a-cylinder>
 
-      <!-- Target Puzzle Reference Board -->
-      <a-plane id="puzzle-board" position="0 0.801 0" rotation="-90 0 0" width="0.8" height="0.8" material="shader: flat; transparent: true; side: double"></a-plane>
+      <!-- Target Puzzle Reference Board Entity (Direct Three.js Mesh) -->
+      <a-entity id="puzzle-board" position="0 0.801 0" rotation="-90 0 0"></a-entity>
 
-      <!-- Invisible Horizontal Drag Surface Receiver Plane -->
+      <!-- Invisible Horizontal Drag Surface Receiver Entity -->
       <a-plane id="table-plane" class="drag-surface" position="0 0.81 0" rotation="-90 0 0" width="3.0" height="2.5" visible="false"></a-plane>
     </a-entity>
 
@@ -223,7 +223,7 @@
     };
 
     // Native Multi-Tab Sync BroadcastChannel
-    const broadcastChannel = new BroadcastChannel('aframe_jigsaw_vr_channel');
+    const broadcastChannel = new BroadcastChannel('aframe-jigsaw-sync');
 
     // ==================== WEB AUDIO SYNTHESIZER ==================== //
     let audioCtx = null;
@@ -608,30 +608,29 @@
       // 2. Slice image into pieces & get board canvas
       const { slices, boardCanvas } = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
 
-      // Apply board texture directly via THREE.CanvasTexture (Fixes src-loader.js HEAD error!)
-      const boardPlane = document.getElementById('puzzle-board');
-      const applyBoardTexture = () => {
-        const mesh = boardPlane.getObject3D('mesh');
-        if (mesh && mesh.material) {
-          mesh.material.map = new THREE.CanvasTexture(boardCanvas);
-          mesh.material.transparent = true;
-          mesh.material.opacity = 0.65;
-          mesh.material.needsUpdate = true;
-        }
-      };
-      if (boardPlane.getObject3D('mesh')) {
-        applyBoardTexture();
-      } else {
-        boardPlane.addEventListener('loaded', applyBoardTexture);
-      }
+      // 3. Build Board Reference using Pure Three.js Mesh (Fixes A-Frame 1.6.0 Material Registration Error)
+      const boardEntity = document.getElementById('puzzle-board');
+      const boardGeom = new THREE.PlaneGeometry(0.8, 0.8);
+      const boardTexture = new THREE.CanvasTexture(boardCanvas);
+      if (THREE.SRGBColorSpace) boardTexture.colorSpace = THREE.SRGBColorSpace;
+      const boardMat = new THREE.MeshBasicMaterial({
+        map: boardTexture,
+        transparent: true,
+        opacity: 0.65,
+        side: THREE.DoubleSide
+      });
+      const boardMesh = new THREE.Mesh(boardGeom, boardMat);
+      boardEntity.setObject3D('mesh', boardMesh);
 
-      // 3. Spawn 3D Jigsaw Piece Entities
+      // 4. Spawn 3D Jigsaw Piece Entities using Pure Three.js Mesh
       const container = document.getElementById('pieces-container');
       container.innerHTML = '';
       window.state.pieces = [];
 
       const boardSize = 0.8;
       const pieceSize = boardSize / window.state.gridSize;
+      // Dimensions including jigsaw tab margin allowance (1 + 2 * 0.28)
+      const pieceMeshDim = pieceSize * 1.56;
 
       slices.forEach((slice, idx) => {
         // Correct target slot position on board
@@ -657,34 +656,24 @@
 
         window.state.pieces.push(pieceData);
 
-        // Create Entity Plane for Piece
-        const pieceEntity = document.createElement('a-plane');
+        // Create Entity for Piece
+        const pieceEntity = document.createElement('a-entity');
         pieceEntity.setAttribute('id', `piece-${idx}`);
         pieceEntity.setAttribute('class', 'pickable');
-        pieceEntity.setAttribute('width', pieceSize * 1.5);
-        pieceEntity.setAttribute('height', pieceSize * 1.5);
-        pieceEntity.setAttribute('rotation', '-90 0 0');
         pieceEntity.setAttribute('position', `${pieceData.currentPos.x} ${pieceData.currentPos.y} ${pieceData.currentPos.z}`);
-        
-        // Set basic material (no data URL in material src attribute!)
-        pieceEntity.setAttribute('material', 'shader: flat; transparent: true; side: double');
+        pieceEntity.setAttribute('rotation', '-90 0 0');
 
-        // Apply texture directly to Three.js Mesh using THREE.CanvasTexture
-        // THIS COMPLETELY FIXES THE 'src-loader.js:154 HEAD data:image/png net::ERR_INVALID_URL' ERROR!
-        const applyPieceTexture = () => {
-          const mesh = pieceEntity.getObject3D('mesh');
-          if (mesh && mesh.material) {
-            const texture = new THREE.CanvasTexture(slice.canvas);
-            mesh.material.map = texture;
-            mesh.material.needsUpdate = true;
-          }
-        };
-
-        if (pieceEntity.getObject3D('mesh')) {
-          applyPieceTexture();
-        } else {
-          pieceEntity.addEventListener('loaded', applyPieceTexture);
-        }
+        // Create Pure THREE.Mesh to completely bypass A-Frame 1.6.0 material component issue
+        const pieceGeom = new THREE.PlaneGeometry(pieceMeshDim, pieceMeshDim);
+        const pieceTexture = new THREE.CanvasTexture(slice.canvas);
+        if (THREE.SRGBColorSpace) pieceTexture.colorSpace = THREE.SRGBColorSpace;
+        const pieceMat = new THREE.MeshBasicMaterial({
+          map: pieceTexture,
+          transparent: true,
+          side: THREE.DoubleSide
+        });
+        const pieceMesh = new THREE.Mesh(pieceGeom, pieceMat);
+        pieceEntity.setObject3D('mesh', pieceMesh);
 
         // Mouse Pickup Listener
         pieceEntity.addEventListener('mousedown', (e) => {
@@ -737,7 +726,7 @@
       const camera = document.getElementById('camera');
       if (camera) camera.setAttribute('look-controls', 'enabled: true; pointerLockEnabled: false; touchEnabled: false');
 
-      // Distance check to correct slot (Snap threshold = 0.18 meters)
+      // Distance check to correct slot (Snap threshold = 0.15 meters)
       const dist = Math.hypot(
         piece.currentPos.x - piece.targetPos.x,
         piece.currentPos.z - piece.targetPos.z
@@ -745,7 +734,7 @@
 
       const pieceEl = document.getElementById(`piece-${pieceId}`);
 
-      if (dist < 0.18) {
+      if (dist < 0.15) {
         // --- SNAP TO BOARD ---
         piece.currentPos.x = piece.targetPos.x;
         piece.currentPos.y = piece.targetPos.y;
