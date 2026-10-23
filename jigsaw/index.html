@@ -8,7 +8,6 @@
 </head>
 
 <body>
- <img id="puzzle-image" src="chrome.png" style="display: none;" />
  <a-scene>
   <a-sky color="#0f172a"></a-sky>
   <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#1e293b" roughness="0.8"></a-plane>
@@ -44,15 +43,9 @@
   };
 
   function generateCanvasImage(width, height) {
-   const canvas = document.createElement('canvas');
-   canvas.width = width;
-   canvas.height = height;
-   const ctx = canvas.getContext('2d');
-
-   const img = document.getElementById('puzzle-image');
-   img.onload = function () { ctx.drawImage(img, 0, 0); }
-
-   return canvas;
+   const img = new Image(width, height);
+   img.src = 'chrome.png';
+   return img;
   }
 
   // ==================== PROCEDURAL CANVAS JIGSAW SLICER ==================== //
