@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VR & Desktop Real-time Jigsaw Puzzle (A-Frame 1.6.0)</title>
+  <title>VR & Desktop Jigsaw Puzzle (A-Frame 1.6.0)</title>
 
   <!-- Official A-Frame 1.6.0 CDN -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-  <!-- Minimal Standard CSS Overlay UI Styling -->
+  <!-- Clean Overlay UI Styling -->
   <style>
     body {
       margin: 0;
@@ -19,7 +19,6 @@
       background-color: #0f172a;
     }
 
-    /* Minimal Overlay Panel in Top-Left Corner */
     #ui-overlay {
       position: absolute;
       top: 16px;
@@ -129,7 +128,7 @@
 </head>
 <body>
 
-  <!-- ==================== MINIMAL GREEK UI OVERLAY ==================== -->
+  <!-- ==================== GREEK UI OVERLAY ==================== -->
   <div id="ui-overlay">
     <h1>🧩 VR & Desktop Παζλ</h1>
 
@@ -150,8 +149,8 @@
     </div>
 
     <div class="instructions">
-      💡 <strong>Ποντίκι:</strong> Πατήστε παρατεταμένα & σύρετε (Drag & Drop) για μετακίνηση κομματιών.<br>
-      🥽 <strong>VR:</strong> Χρησιμοποιήστε το Laser Pointer του χειριστηρίου.
+      💡 <strong>Ποντίκι / Αφή:</strong> Πατήστε & σύρετε κομμάτια πάνω στο τραπέζι.<br>
+      🥽 <strong>VR:</strong> Χρησιμοποιήστε τη σκανδάλη (Trigger) του χειριστηρίου.
     </div>
 
     <div id="win-banner">
@@ -160,19 +159,19 @@
   </div>
 
   <!-- ==================== A-FRAME 3D SCENE ==================== -->
-  <a-scene drag-system embedded style="width: 100vw; height: 100vh;">
+  <a-scene embedded style="width: 100vw; height: 100vh;">
     
     <!-- Environment Sky & Floor -->
     <a-sky color="#0f172a"></a-sky>
     <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#1e293b" roughness="0.8"></a-plane>
 
     <!-- Room Lighting -->
-    <a-light type="ambient" intensity="0.65" color="#ffffff"></a-light>
-    <a-light type="directional" intensity="0.8" position="2 4 1" color="#fef08a"></a-light>
+    <a-light type="ambient" intensity="0.75" color="#ffffff"></a-light>
+    <a-light type="directional" intensity="0.85" position="2 4 1" color="#fef08a"></a-light>
 
-    <!-- Wooden Table Surface & Target Puzzle Board -->
+    <!-- Wooden Table Surface & Puzzle Board Receiver -->
     <a-entity id="table" position="0 0 -1.2">
-      <!-- Wooden Table Top -->
+      <!-- Table Top (Y = 0.76 to Y = 0.80) -->
       <a-box width="1.8" height="0.08" depth="1.2" position="0 0.76 0" color="#5c3a21" roughness="0.5"></a-box>
 
       <!-- Table Legs -->
@@ -181,11 +180,8 @@
       <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 0.5" color="#3b2312"></a-cylinder>
       <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 0.5" color="#3b2312"></a-cylinder>
 
-      <!-- Target Puzzle Reference Board Entity (Direct Three.js Mesh) -->
+      <!-- Target Puzzle Frame Surface Entity (Direct Three.js Mesh at Y = 0.801) -->
       <a-entity id="puzzle-board" position="0 0.801 0" rotation="-90 0 0"></a-entity>
-
-      <!-- Invisible Horizontal Drag Surface Receiver Entity -->
-      <a-plane id="table-plane" class="drag-surface" position="0 0.81 0" rotation="-90 0 0" width="3.0" height="2.5" visible="false"></a-plane>
     </a-entity>
 
     <!-- Dynamic Container for Jigsaw Piece Entities -->
@@ -196,16 +192,15 @@
       <a-text id="vr-hud-text" value="VR Jigsaw Puzzle\n\nΚομμάτια: 0 / 0" align="center" color="#38bdf8" width="2.8"></a-text>
     </a-entity>
 
-    <!-- Camera Rig with Mouse Raycaster & VR Hand Support -->
+    <!-- Camera Rig & WebXR Laser Controllers -->
     <a-entity id="rig" position="0 0 0">
       <a-camera id="camera" position="0 1.55 0" look-controls="pointerLockEnabled: false; touchEnabled: false">
-        <!-- Desktop Mouse Raycaster -->
-        <a-entity id="mouse-cursor" cursor="rayOrigin: mouse" raycaster="objects: .pickable, .drag-surface; far: 10"></a-entity>
+        <a-entity id="mouse-cursor" cursor="rayOrigin: mouse" raycaster="objects: .pickable; far: 10"></a-entity>
       </a-camera>
 
       <!-- WebXR Laser Controls -->
-      <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .pickable, .drag-surface; far: 5"></a-entity>
-      <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .pickable, .drag-surface; far: 5"></a-entity>
+      <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .pickable; far: 5"></a-entity>
+      <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .pickable; far: 5"></a-entity>
     </a-entity>
   </a-scene>
 
@@ -217,7 +212,7 @@
       totalPieces: 9,
       lockedCount: 0,
       heldPieceId: null,
-      isMouseDown: false,
+      activeVRHand: null,
       pieces: [],
       isCompleted: false
     };
@@ -237,7 +232,6 @@
       }
     }
 
-    // Play soft dual-harmonic snap chime
     function playSnapSound() {
       initAudio();
       if (!audioCtx) return;
@@ -269,12 +263,11 @@
       osc2.stop(now + 0.22);
     }
 
-    // Play victory fanfare arpeggio sound
     function playWinSound() {
       initAudio();
       if (!audioCtx) return;
 
-      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51]; // C Major Fanfare
+      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51];
       notes.forEach((freq, idx) => {
         const now = audioCtx.currentTime + idx * 0.10;
         const osc = audioCtx.createOscillator();
@@ -341,7 +334,7 @@
       ctx.closePath();
       ctx.fill();
 
-      // 4. Foreground Dark Mountain Silhouette
+      // 4. Foreground Silhouette
       ctx.fillStyle = '#1e1b4b';
       ctx.beginPath();
       ctx.moveTo(0, height * 0.66);
@@ -372,7 +365,7 @@
         ctx.stroke();
       }
 
-      // Outer Canvas Frame Line
+      // Outer Border Line
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 12;
       ctx.strokeRect(6, 6, width - 12, height - 12);
@@ -458,26 +451,26 @@
           ctx.beginPath();
           ctx.moveTo(0, 0);
 
-          // Top Edge
+          // Top
           const topTab = r === 0 ? 0 : -hEdges[r - 1][c];
           drawJigsawEdge(ctx, 0, 0, cellW, 0, topTab);
 
-          // Right Edge
+          // Right
           const rightTab = c === N - 1 ? 0 : vEdges[r][c];
           drawJigsawEdge(ctx, cellW, 0, cellW, cellH, rightTab);
 
-          // Bottom Edge
+          // Bottom
           const bottomTab = r === N - 1 ? 0 : hEdges[r][c];
           drawJigsawEdge(ctx, cellW, cellH, 0, cellH, bottomTab);
 
-          // Left Edge
+          // Left
           const leftTab = c === 0 ? 0 : -vEdges[r][c - 1];
           drawJigsawEdge(ctx, 0, cellH, 0, 0, leftTab);
 
           ctx.closePath();
           ctx.clip();
 
-          // Draw artwork image slice
+          // Draw slice
           const sx = c * cellW - margin;
           const sy = r * cellH - margin;
           const sw = cellW + margin * 2;
@@ -485,8 +478,8 @@
 
           ctx.drawImage(sourceCanvas, sx, sy, sw, sh, -margin, -margin, sw, sh);
 
-          // Contour Edge Outline
-          ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+          // Edge stroke outline
+          ctx.strokeStyle = 'rgba(0,0,0,0.6)';
           ctx.lineWidth = 4;
           ctx.stroke();
 
@@ -498,7 +491,7 @@
         }
       }
 
-      // Board reference canvas (Faint image + guide lines)
+      // Board canvas with grid outline
       const boardCanvas = document.createElement('canvas');
       boardCanvas.width = W;
       boardCanvas.height = H;
@@ -519,214 +512,46 @@
         bctx.stroke();
       }
 
-      return {
-        slices,
-        boardCanvas
-      };
+      return { slices, boardCanvas };
     }
 
-    // ==================== MOUSE & VR DRAG CONTROLLER COMPONENT ==================== //
-    AFRAME.registerComponent('drag-system', {
-      init: function () {
-        // Universal Mouse Drag support on window
-        window.addEventListener('mousedown', (e) => {
-          if (e.target.closest('#ui-overlay')) return;
-          window.state.isMouseDown = true;
-        });
+    // ==================== UNIVERSAL THREE.JS RAYCASTING DRAG SYSTEM ==================== //
+    function pickPiece(pieceId, handEl = null) {
+      const piece = window.state.pieces[pieceId];
+      if (!piece || piece.locked) return;
 
-        window.addEventListener('mouseup', () => {
-          window.state.isMouseDown = false;
-          if (window.state.heldPieceId !== null) {
-            releasePiece(window.state.heldPieceId);
-          }
-        });
+      initAudio();
+      window.state.heldPieceId = pieceId;
+      window.state.activeVRHand = handEl;
 
-        window.addEventListener('touchend', () => {
-          window.state.isMouseDown = false;
-          if (window.state.heldPieceId !== null) {
-            releasePiece(window.state.heldPieceId);
-          }
-        });
-      },
-
-      tick: function () {
-        if (window.state && window.state.heldPieceId !== null) {
-          const mouseCursor = document.getElementById('mouse-cursor');
-          const leftHand = document.getElementById('left-hand');
-          const rightHand = document.getElementById('right-hand');
-
-          let activeIntersection = null;
-
-          // Raycaster check for Mouse or VR Controllers
-          [mouseCursor, rightHand, leftHand].forEach(el => {
-            if (!activeIntersection && el && el.components && el.components.raycaster) {
-              const rc = el.components.raycaster;
-              if (rc.intersections && rc.intersections.length > 0) {
-                for (let inter of rc.intersections) {
-                  if (inter.object.el && inter.object.el.classList.contains('drag-surface')) {
-                    activeIntersection = inter;
-                    break;
-                  }
-                }
-              }
-            }
-          });
-
-          // Move active piece across table surface
-          if (activeIntersection && activeIntersection.point) {
-            const p = activeIntersection.point;
-            const piece = window.state.pieces[window.state.heldPieceId];
-            if (piece && !piece.locked) {
-              piece.currentPos.x = p.x;
-              piece.currentPos.z = p.z;
-              piece.currentPos.y = 0.84; // Slightly elevated during dragging
-
-              const el = document.getElementById(`piece-${piece.id}`);
-              if (el) {
-                el.setAttribute('position', `${p.x} 0.84 ${p.z}`);
-              }
-              broadcastMove(piece.id, piece.currentPos);
-            }
-          }
-        }
+      // Temporarily disable camera rotation so dragging moves piece smoothly on screen
+      const camera = document.getElementById('camera');
+      if (camera && !handEl) {
+        camera.setAttribute('look-controls', 'enabled: false');
       }
-    });
 
-    // ==================== GAME CONTROLLER LOGIC ==================== //
-    function initPuzzle(shouldBroadcastReset = true) {
-      window.state.totalPieces = window.state.gridSize * window.state.gridSize;
-      window.state.lockedCount = 0;
-      window.state.heldPieceId = null;
-      window.state.isCompleted = false;
-
-      document.getElementById('win-banner').style.display = 'none';
-      updateUI();
-
-      // 1. Generate artwork canvas
-      const artCanvas = generateProceduralArt(800, 800);
-
-      // 2. Slice image into pieces & get board canvas
-      const { slices, boardCanvas } = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
-
-      // 3. Build Board Reference using Pure Three.js Mesh (Fixes A-Frame 1.6.0 Material Registration Error)
-      const boardEntity = document.getElementById('puzzle-board');
-      const boardGeom = new THREE.PlaneGeometry(0.8, 0.8);
-      const boardTexture = new THREE.CanvasTexture(boardCanvas);
-      if (THREE.SRGBColorSpace) boardTexture.colorSpace = THREE.SRGBColorSpace;
-      const boardMat = new THREE.MeshBasicMaterial({
-        map: boardTexture,
-        transparent: true,
-        opacity: 0.65,
-        side: THREE.DoubleSide
-      });
-      const boardMesh = new THREE.Mesh(boardGeom, boardMat);
-      boardEntity.setObject3D('mesh', boardMesh);
-
-      // 4. Spawn 3D Jigsaw Piece Entities using Pure Three.js Mesh
-      const container = document.getElementById('pieces-container');
-      container.innerHTML = '';
-      window.state.pieces = [];
-
-      const boardSize = 0.8;
-      const pieceSize = boardSize / window.state.gridSize;
-      // Dimensions including jigsaw tab margin allowance (1 + 2 * 0.28)
-      const pieceMeshDim = pieceSize * 1.56;
-
-      slices.forEach((slice, idx) => {
-        // Correct target slot position on board
-        const targetX = -boardSize / 2 + (slice.col + 0.5) * pieceSize;
-        const targetZ = -1.2 - boardSize / 2 + (slice.row + 0.5) * pieceSize;
-        const targetY = 0.802;
-
-        // Scatter pieces around table top
-        let randomX = (Math.random() - 0.5) * 1.5;
-        let randomZ = -1.2 + (Math.random() - 0.5) * 0.9;
-        
-        // Prevent pieces from spawning directly over the target board
-        if (Math.abs(randomX) < 0.45 && Math.abs(randomZ + 1.2) < 0.45) {
-          randomX += (randomX >= 0 ? 0.48 : -0.48);
-        }
-
-        const pieceData = {
-          id: idx,
-          targetPos: { x: targetX, y: targetY, z: targetZ },
-          currentPos: { x: randomX, y: 0.802, z: randomZ },
-          locked: false
-        };
-
-        window.state.pieces.push(pieceData);
-
-        // Create Entity for Piece
-        const pieceEntity = document.createElement('a-entity');
-        pieceEntity.setAttribute('id', `piece-${idx}`);
-        pieceEntity.setAttribute('class', 'pickable');
-        pieceEntity.setAttribute('position', `${pieceData.currentPos.x} ${pieceData.currentPos.y} ${pieceData.currentPos.z}`);
-        pieceEntity.setAttribute('rotation', '-90 0 0');
-
-        // Create Pure THREE.Mesh to completely bypass A-Frame 1.6.0 material component issue
-        const pieceGeom = new THREE.PlaneGeometry(pieceMeshDim, pieceMeshDim);
-        const pieceTexture = new THREE.CanvasTexture(slice.canvas);
-        if (THREE.SRGBColorSpace) pieceTexture.colorSpace = THREE.SRGBColorSpace;
-        const pieceMat = new THREE.MeshBasicMaterial({
-          map: pieceTexture,
-          transparent: true,
-          side: THREE.DoubleSide
-        });
-        const pieceMesh = new THREE.Mesh(pieceGeom, pieceMat);
-        pieceEntity.setObject3D('mesh', pieceMesh);
-
-        // Mouse Pickup Listener
-        pieceEntity.addEventListener('mousedown', (e) => {
-          initAudio();
-          if (pieceData.locked) return;
-
-          window.state.heldPieceId = idx;
-          
-          // Temporarily disable camera rotation so drag is smooth
-          const camera = document.getElementById('camera');
-          if (camera) camera.setAttribute('look-controls', 'enabled: false');
-        });
-
-        // Click Fallback Listener (Single Click Pickup / Drop)
-        pieceEntity.addEventListener('click', (e) => {
-          initAudio();
-          if (pieceData.locked) return;
-
-          if (window.state.heldPieceId === null) {
-            window.state.heldPieceId = idx;
-          } else if (window.state.heldPieceId === idx && !window.state.isMouseDown) {
-            releasePiece(idx);
-          }
-        });
-
-        container.appendChild(pieceEntity);
-      });
-
-      // Table surface fallback click to drop
-      const tablePlane = document.getElementById('table-plane');
-      tablePlane.onclick = () => {
-        if (window.state.heldPieceId !== null && !window.state.isMouseDown) {
-          releasePiece(window.state.heldPieceId);
-        }
-      };
-
-      if (shouldBroadcastReset) {
-        broadcastReset(window.state.gridSize);
+      // Elevate piece during drag (Y = 0.88)
+      piece.currentPos.y = 0.88;
+      const el = document.getElementById(`piece-${pieceId}`);
+      if (el) {
+        el.setAttribute('position', `${piece.currentPos.x} 0.88 ${piece.currentPos.z}`);
       }
     }
 
-    // Release held piece & check snapping distance
     function releasePiece(pieceId) {
       const piece = window.state.pieces[pieceId];
       if (!piece || piece.locked) return;
 
       window.state.heldPieceId = null;
+      window.state.activeVRHand = null;
 
-      // Re-enable camera look-controls
+      // Re-enable camera rotation
       const camera = document.getElementById('camera');
-      if (camera) camera.setAttribute('look-controls', 'enabled: true; pointerLockEnabled: false; touchEnabled: false');
+      if (camera) {
+        camera.setAttribute('look-controls', 'enabled: true; pointerLockEnabled: false; touchEnabled: false');
+      }
 
-      // Distance check to correct slot (Snap threshold = 0.15 meters)
+      // Snap Distance Check (0.15m threshold)
       const dist = Math.hypot(
         piece.currentPos.x - piece.targetPos.x,
         piece.currentPos.z - piece.targetPos.z
@@ -762,6 +587,175 @@
           pieceEl.setAttribute('position', `${piece.currentPos.x} 0.802 ${piece.currentPos.z}`);
         }
         broadcastMove(pieceId, piece.currentPos);
+      }
+    }
+
+    // Move held piece across table surface using Three.js Plane Intersection
+    function updateDragPosition(clientX, clientY) {
+      if (window.state.heldPieceId === null || window.state.activeVRHand) return;
+
+      const cameraEl = document.getElementById('camera');
+      if (!cameraEl) return;
+      const threeCamera = cameraEl.getObject3D('camera');
+      if (!threeCamera) return;
+
+      // Screen Normalized Device Coordinates (-1 to +1)
+      const mouse = new THREE.Vector2(
+        (clientX / window.innerWidth) * 2 - 1,
+        -(clientY / window.innerHeight) * 2 + 1
+      );
+
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, threeCamera);
+
+      // Horizontal Plane at Table Elevation (Y = 0.88)
+      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.88);
+      const targetPoint = new THREE.Vector3();
+
+      if (raycaster.ray.intersectPlane(plane, targetPoint)) {
+        // Clamp bounds to table area
+        targetPoint.x = Math.max(-1.1, Math.min(1.1, targetPoint.x));
+        targetPoint.z = Math.max(-2.2, Math.min(-0.2, targetPoint.z));
+
+        const piece = window.state.pieces[window.state.heldPieceId];
+        piece.currentPos.x = targetPoint.x;
+        piece.currentPos.z = targetPoint.z;
+
+        const el = document.getElementById(`piece-${piece.id}`);
+        if (el) {
+          el.setAttribute('position', `${targetPoint.x} 0.88 ${targetPoint.z}`);
+        }
+        broadcastMove(piece.id, piece.currentPos);
+      }
+    }
+
+    // Listeners for Mouse, Touch, & VR Dragging
+    window.addEventListener('mousemove', (e) => {
+      updateDragPosition(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches[0]) {
+        updateDragPosition(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (window.state.heldPieceId !== null && !window.state.activeVRHand) {
+        releasePiece(window.state.heldPieceId);
+      }
+    });
+
+    window.addEventListener('touchend', () => {
+      if (window.state.heldPieceId !== null && !window.state.activeVRHand) {
+        releasePiece(window.state.heldPieceId);
+      }
+    });
+
+    // ==================== GAME SETUP & THREE.MESH BUILDING ==================== //
+    function initPuzzle(shouldBroadcastReset = true) {
+      window.state.totalPieces = window.state.gridSize * window.state.gridSize;
+      window.state.lockedCount = 0;
+      window.state.heldPieceId = null;
+      window.state.activeVRHand = null;
+      window.state.isCompleted = false;
+
+      document.getElementById('win-banner').style.display = 'none';
+      updateUI();
+
+      // 1. Generate artwork canvas
+      const artCanvas = generateProceduralArt(800, 800);
+
+      // 2. Slice image into pieces & get board canvas
+      const { slices, boardCanvas } = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
+
+      // 3. Build Reference Board Mesh directly with THREE.Mesh (Bypasses A-Frame Material Bug)
+      const boardEntity = document.getElementById('puzzle-board');
+      const boardGeom = new THREE.PlaneGeometry(0.8, 0.8);
+      const boardTexture = new THREE.CanvasTexture(boardCanvas);
+      if (THREE.SRGBColorSpace) boardTexture.colorSpace = THREE.SRGBColorSpace;
+      const boardMat = new THREE.MeshBasicMaterial({
+        map: boardTexture,
+        transparent: true,
+        opacity: 0.65,
+        side: THREE.DoubleSide
+      });
+      const boardMesh = new THREE.Mesh(boardGeom, boardMat);
+      boardEntity.setObject3D('mesh', boardMesh);
+
+      // 4. Spawn Jigsaw Piece Entities using Pure THREE.Mesh
+      const container = document.getElementById('pieces-container');
+      container.innerHTML = '';
+      window.state.pieces = [];
+
+      const boardSize = 0.8;
+      const pieceSize = boardSize / window.state.gridSize;
+      const pieceMeshDim = pieceSize * 1.56;
+
+      slices.forEach((slice, idx) => {
+        // Target position on board
+        const targetX = -boardSize / 2 + (slice.col + 0.5) * pieceSize;
+        const targetZ = -1.2 - boardSize / 2 + (slice.row + 0.5) * pieceSize;
+        const targetY = 0.802;
+
+        // Scattered start position on table
+        let randomX = (Math.random() - 0.5) * 1.4;
+        let randomZ = -1.2 + (Math.random() - 0.5) * 0.85;
+
+        // Ensure pieces don't spawn right on top of target board
+        if (Math.abs(randomX) < 0.45 && Math.abs(randomZ + 1.2) < 0.45) {
+          randomX += (randomX >= 0 ? 0.48 : -0.48);
+        }
+
+        const pieceData = {
+          id: idx,
+          targetPos: { x: targetX, y: targetY, z: targetZ },
+          currentPos: { x: randomX, y: 0.802, z: randomZ },
+          locked: false
+        };
+
+        window.state.pieces.push(pieceData);
+
+        // A-Frame Entity Container
+        const pieceEntity = document.createElement('a-entity');
+        pieceEntity.setAttribute('id', `piece-${idx}`);
+        pieceEntity.setAttribute('class', 'pickable');
+        pieceEntity.setAttribute('position', `${pieceData.currentPos.x} ${pieceData.currentPos.y} ${pieceData.currentPos.z}`);
+        pieceEntity.setAttribute('rotation', '-90 0 0');
+
+        // Pure Three.js Mesh Attachment
+        const pieceGeom = new THREE.PlaneGeometry(pieceMeshDim, pieceMeshDim);
+        const pieceTexture = new THREE.CanvasTexture(slice.canvas);
+        if (THREE.SRGBColorSpace) pieceTexture.colorSpace = THREE.SRGBColorSpace;
+        const pieceMat = new THREE.MeshBasicMaterial({
+          map: pieceTexture,
+          transparent: true,
+          side: THREE.DoubleSide
+        });
+        const pieceMesh = new THREE.Mesh(pieceGeom, pieceMat);
+        pieceEntity.setObject3D('mesh', pieceMesh);
+
+        // Drag Listener on Mouse Down
+        pieceEntity.addEventListener('mousedown', (e) => {
+          if (e.target.closest && e.target.closest('#ui-overlay')) return;
+          pickPiece(idx);
+        });
+
+        // Click Fallback (Toggle Pick/Place)
+        pieceEntity.addEventListener('click', (e) => {
+          if (pieceData.locked) return;
+          if (window.state.heldPieceId === null) {
+            pickPiece(idx);
+          } else if (window.state.heldPieceId === idx) {
+            releasePiece(idx);
+          }
+        });
+
+        container.appendChild(pieceEntity);
+      });
+
+      if (shouldBroadcastReset) {
+        broadcastReset(window.state.gridSize);
       }
     }
 
@@ -849,6 +843,30 @@
 
     // ==================== INITIALIZATION & BINDINGS ==================== //
     window.addEventListener('load', () => {
+      // Setup WebXR Controller Event Listeners
+      ['left-hand', 'right-hand'].forEach(handId => {
+        const handEl = document.getElementById(handId);
+        if (handEl) {
+          handEl.addEventListener('selectstart', () => {
+            const rc = handEl.components.raycaster;
+            if (rc && rc.intersections && rc.intersections.length > 0) {
+              const hit = rc.intersections[0].object.el;
+              if (hit && hit.classList.contains('pickable')) {
+                const id = parseInt(hit.id.replace('piece-', ''), 10);
+                if (!isNaN(id)) pickPiece(id, handEl);
+              }
+            }
+          });
+
+          handEl.addEventListener('selectend', () => {
+            if (window.state.heldPieceId !== null && window.state.activeVRHand === handEl) {
+              releasePiece(window.state.heldPieceId);
+            }
+          });
+        }
+      });
+
+      // UI Control Bindings
       document.getElementById('grid-select').addEventListener('change', (e) => {
         window.state.gridSize = parseInt(e.target.value, 10);
         initPuzzle(true);
