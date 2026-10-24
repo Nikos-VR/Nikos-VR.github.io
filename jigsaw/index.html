@@ -31,13 +31,18 @@
    <a-text id="vr-hud-text" value="" align="center" color="#4ade80" width="3" position="0 0.38 0"></a-text>
   </a-entity>
 
-  <!-- Camera Rig & VR Controllers -->
+  <!-- Camera Rig, VR Controllers & Hand Tracking -->
   <a-entity id="rig" position="0 0 0">
    <a-camera id="camera" position="0 1.55 0" look-controls="pointerLockEnabled: false; touchEnabled: false">
     <a-entity id="mouse-cursor" cursor="rayOrigin: mouse" raycaster="objects: .pickable; far: 10"></a-entity>
    </a-camera>
-   <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .pickable; far: 5"></a-entity>
-   <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .pickable; far: 5"></a-entity>
+
+   <a-entity id="left-hand" laser-controls="hand: left" hand-tracking-controls="hand: left"
+    raycaster="objects: .pickable; far: 5">
+   </a-entity>
+   <a-entity id="right-hand" laser-controls="hand: right" hand-tracking-controls="hand: right"
+    raycaster="objects: .pickable; far: 5">
+   </a-entity>
   </a-entity>
  </a-scene>
 
@@ -47,11 +52,15 @@
    totalPieces: 25,
    heldPieceId: null,
    activeVRHand: null,
+   leftPinching: false,
+   rightPinching: false,
    pieces: [],
    isCompleted: false
   };
 
   let dragStartPoint = null;
+  let initialHandAngleZ = 0;
+  let lastTwoHandAngle = null;
 
   // Όρια Επιφάνειας Τραπεζιού & Ύψη
   const TABLE_MIN_X = -0.82;
@@ -110,11 +119,13 @@
    ctx.fillRect(0, 0, 800, 800);
 
    ctx.fillStyle = '#ffffff';
-   ctx.font = 'bold 70px sans-serif';
+   ctx.font = 'bold 150px sans-serif';
    ctx.textAlign = 'center';
-   ctx.fillText('VR JIGSAW', 400, 380);
-   ctx.font = '35px sans-serif';
-   ctx.fillText('A-Frame 1.6.0', 400, 450);
+   ctx.fillText('A B C D E', 400, 150);
+   ctx.fillText('F G H J K', 400, 300);
+   ctx.fillText('L M N O P', 400, 450);
+   ctx.fillText('Q R S T U', 400, 600);
+   ctx.fillText('V W X Y Z', 400, 750);
 
    initPuzzle(fallbackCanvas);
   }
@@ -234,7 +245,7 @@
    return slices;
   }
 
-  // ==================== UNIVERSAL THREE.JS RAYCASTING DRAG & ROTATION SYSTEM ==================== //
+  // ==================== UNIVERSAL DRAG & ROTATION SYSTEM ==================== //
   function pickPiece(pieceId, handEl = null) {
    const piece = window.state.pieces[pieceId];
    if (!piece) return;
@@ -242,6 +253,10 @@
    window.state.heldPieceId = pieceId;
    window.state.activeVRHand = handEl;
    dragStartPoint = null;
+
+   if (handEl && handEl.object3D) {
+    initialHandAngleZ = handEl.object3D.rotation.z;
+   }
 
    const camera = document.getElementById('camera');
    if (camera && !handEl) {
@@ -269,6 +284,7 @@
    window.state.heldPieceId = null;
    window.state.activeVRHand = null;
    dragStartPoint = null;
+   lastTwoHandAngle = null;
 
    const camera = document.getElementById('camera');
    if (camera) {
@@ -287,7 +303,6 @@
    const pivotZ = pivotPiece.currentPos.z;
    const rad = (stepDegrees * Math.PI) / 180;
 
-   // 1. Περιστροφή θέσεων & γωνιών γύρω από το pivot
    pivotPiece.group.forEach(p => {
     const relX = p.currentPos.x - pivotX;
     const relZ = p.currentPos.z - pivotZ;
@@ -300,7 +315,6 @@
     p.rotation = (p.rotation + stepDegrees + 360) % 360;
    });
 
-   // 2. Έλεγχος & διόρθωση ορίων τραπεζιού μετά την περιστροφή
    let clampShiftX = 0;
    let clampShiftZ = 0;
    pivotPiece.group.forEach(p => {
@@ -310,7 +324,6 @@
     if (p.currentPos.z > TABLE_MAX_Z) clampShiftZ = Math.min(clampShiftZ, TABLE_MAX_Z - p.currentPos.z);
    });
 
-   // 3. Εφαρμογή τελικών συντεταγμένων & μηδενισμός dragStartPoint (ΔΙΟΡΘΩΝΕΙ ΤΟ ΠΕΤΑΓΜΑ)
    pivotPiece.group.forEach(p => {
     p.currentPos.x += clampShiftX;
     p.currentPos.z += clampShiftZ;
@@ -323,8 +336,64 @@
     }
    });
 
-   dragStartPoint = null; // Επαναφορά σημείου αναφοράς σύρσης
+   dragStartPoint = null;
   }
+
+  // --- ΕΛΕΓΧΟΣ ΠΕΡΙΣΤΡΟΦΗΣ: ΜΕ ΤΑ ΔΥΟ ΧΕΡΙΑ (2-HAND PINCH) Η ΜΕ ΤΟΝ ΚΑΡΠΟ (WRIST ROLL) ---
+  function checkHandGestures() {
+   if (window.state.heldPieceId !== null) {
+    const leftHand = document.getElementById('left-hand');
+    const rightHand = document.getElementById('right-hand');
+
+    // 1. Περιστροφή με τα ΔΥΟ ΧΕΡΙΑ (Όταν και τα δύο χέρια κάνουν Pinch)
+    if (window.state.leftPinching && window.state.rightPinching) {
+     if (leftHand && rightHand && leftHand.object3D && rightHand.object3D) {
+      const pL = new THREE.Vector3();
+      const pR = new THREE.Vector3();
+      leftHand.object3D.getWorldPosition(pL);
+      rightHand.object3D.getWorldPosition(pR);
+
+      const dx = pR.x - pL.x;
+      const dz = pR.z - pL.z;
+      const currentAngle = Math.atan2(dz, dx) * (180 / Math.PI);
+
+      if (lastTwoHandAngle === null) {
+       lastTwoHandAngle = currentAngle;
+      } else {
+       const delta = currentAngle - lastTwoHandAngle;
+       if (delta > 10) {
+        rotateHeldGroup(10);
+        lastTwoHandAngle = currentAngle;
+       } else if (delta < -10) {
+        rotateHeldGroup(-10);
+        lastTwoHandAngle = currentAngle;
+       }
+      }
+     }
+    } else {
+     lastTwoHandAngle = null;
+
+     // 2. Περιστροφή με το ΕΝΑ ΧΕΡΙ (Wrist Roll)
+     const handEl = window.state.activeVRHand;
+     if (handEl && handEl.object3D) {
+      const currentAngleZ = handEl.object3D.rotation.z;
+      const deltaAngle = (currentAngleZ - initialHandAngleZ) * (180 / Math.PI);
+
+      if (deltaAngle > 10) {
+       rotateHeldGroup(10);
+       initialHandAngleZ = currentAngleZ;
+      } else if (deltaAngle < -10) {
+       rotateHeldGroup(-10);
+       initialHandAngleZ = currentAngleZ;
+      }
+     }
+    }
+   } else {
+    lastTwoHandAngle = null;
+   }
+   requestAnimationFrame(checkHandGestures);
+  }
+  requestAnimationFrame(checkHandGestures);
 
   function checkSnap(pieceId) {
    const piece = window.state.pieces[pieceId];
@@ -449,15 +518,10 @@
    }
   }
 
-  // Listeners
-  window.addEventListener('mousemove', (e) => {
-   updateDragPosition(e.clientX, e.clientY);
-  });
-
+  // Mouse & Touch Listeners
+  window.addEventListener('mousemove', (e) => updateDragPosition(e.clientX, e.clientY));
   window.addEventListener('touchmove', (e) => {
-   if (e.touches && e.touches[0]) {
-    updateDragPosition(e.touches[0].clientX, e.touches[0].clientY);
-   }
+   if (e.touches && e.touches[0]) updateDragPosition(e.touches[0].clientX, e.touches[0].clientY);
   });
 
   window.addEventListener('wheel', (e) => {
@@ -468,9 +532,7 @@
   }, {passive: false});
 
   window.addEventListener('keydown', (e) => {
-   if ((e.key === 'r' || e.key === 'R') && window.state.heldPieceId !== null) {
-    rotateHeldGroup(10);
-   }
+   if ((e.key === 'r' || e.key === 'R') && window.state.heldPieceId !== null) rotateHeldGroup(10);
   });
 
   window.addEventListener('contextmenu', (e) => {
@@ -481,18 +543,13 @@
   });
 
   window.addEventListener('mouseup', () => {
-   if (window.state.heldPieceId !== null && !window.state.activeVRHand) {
-    releasePiece(window.state.heldPieceId);
-   }
+   if (window.state.heldPieceId !== null && !window.state.activeVRHand) releasePiece(window.state.heldPieceId);
   });
-
   window.addEventListener('touchend', () => {
-   if (window.state.heldPieceId !== null && !window.state.activeVRHand) {
-    releasePiece(window.state.heldPieceId);
-   }
+   if (window.state.heldPieceId !== null && !window.state.activeVRHand) releasePiece(window.state.heldPieceId);
   });
 
-  // ==================== GAME SETUP & THREE.MESH BUILDING ==================== //
+  // ==================== GAME SETUP ==================== //
   function initPuzzle(loadedSource) {
    window.state.totalPieces = window.state.gridSize * window.state.gridSize;
    window.state.heldPieceId = null;
@@ -509,10 +566,7 @@
    const previewGeom = new THREE.PlaneGeometry(0.5, 0.5);
    const previewTexture = new THREE.CanvasTexture(artCanvas);
    if (THREE.SRGBColorSpace) previewTexture.colorSpace = THREE.SRGBColorSpace;
-   const previewMat = new THREE.MeshBasicMaterial({
-    map: previewTexture,
-    side: THREE.DoubleSide
-   });
+   const previewMat = new THREE.MeshBasicMaterial({map: previewTexture, side: THREE.DoubleSide});
    const previewMesh = new THREE.Mesh(previewGeom, previewMat);
    previewEntity.setObject3D('mesh', previewMesh);
 
@@ -530,7 +584,6 @@
     let randomX = TABLE_MIN_X + 0.1 + Math.random() * (TABLE_MAX_X - TABLE_MIN_X - 0.2);
     let randomZ = TABLE_MIN_Z + 0.1 + Math.random() * (TABLE_MAX_Z - TABLE_MIN_Z - 0.2);
     const restingY = RESTING_Y_BASE + (idx * 0.0001);
-
     const initialRot = Math.floor(Math.random() * 36) * 10;
 
     const pieceData = {
@@ -587,21 +640,14 @@
    if (!window.state.pieces || window.state.pieces.length === 0) return 0;
    let max = 0;
    window.state.pieces.forEach(p => {
-    if (p.group && p.group.length > max) {
-     max = p.group.length;
-    }
+    if (p.group && p.group.length > max) max = p.group.length;
    });
    return max;
   }
 
   function updateUI() {
    const largestGroup = getLargestGroupSize();
-
-   if (largestGroup >= window.state.totalPieces && window.state.totalPieces > 0) {
-    window.state.isCompleted = true;
-   } else {
-    window.state.isCompleted = false;
-   }
+   window.state.isCompleted = (largestGroup >= window.state.totalPieces && window.state.totalPieces > 0);
 
    const vrHud = document.getElementById('vr-hud-text');
    if (vrHud) {
@@ -616,42 +662,52 @@
 
   function setupApp() {
    const scene = document.querySelector('a-scene');
-   if (scene && scene.hasLoaded) {
-    loadPuzzleImage();
-   } else if (scene) {
-    scene.addEventListener('loaded', loadPuzzleImage);
-   } else {
-    window.addEventListener('DOMContentLoaded', loadPuzzleImage);
-   }
+   if (scene && scene.hasLoaded) loadPuzzleImage();
+   else if (scene) scene.addEventListener('loaded', loadPuzzleImage);
+   else window.addEventListener('DOMContentLoaded', loadPuzzleImage);
 
    ['left-hand', 'right-hand'].forEach(handId => {
     const handEl = document.getElementById(handId);
-    if (handEl) {
-     handEl.addEventListener('selectstart', () => {
-      const rc = handEl.components.raycaster;
-      if (rc && rc.intersections && rc.intersections.length > 0) {
-       const hit = rc.intersections[0].object.el;
-       if (hit && hit.classList.contains('pickable')) {
-        const id = parseInt(hit.id.replace('piece-', ''), 10);
-        if (!isNaN(id)) pickPiece(id, handEl);
+    if (!handEl) return;
+
+    const isLeft = handId === 'left-hand';
+
+    const handlePick = () => {
+     if (isLeft) window.state.leftPinching = true;
+     else window.state.rightPinching = true;
+
+     const rc = handEl.components.raycaster;
+     if (rc && rc.intersections && rc.intersections.length > 0) {
+      const hit = rc.intersections[0].object.el;
+      if (hit && hit.classList.contains('pickable')) {
+       const id = parseInt(hit.id.replace('piece-', ''), 10);
+       if (!isNaN(id) && window.state.heldPieceId === null) {
+        pickPiece(id, handEl);
        }
       }
-     });
+     }
+    };
 
-     handEl.addEventListener('selectend', () => {
-      if (window.state.heldPieceId !== null && window.state.activeVRHand === handEl) {
-       releasePiece(window.state.heldPieceId);
-      }
-     });
+    const handleRelease = () => {
+     if (isLeft) window.state.leftPinching = false;
+     else window.state.rightPinching = false;
 
-     ['abuttondown', 'bbuttondown', 'xbuttondown', 'ybuttondown', 'thumbstickdown'].forEach(btnEvent => {
-      handEl.addEventListener(btnEvent, () => {
-       if (window.state.heldPieceId !== null) {
-        rotateHeldGroup(90);
-       }
-      });
+     if (window.state.heldPieceId !== null && window.state.activeVRHand === handEl) {
+      releasePiece(window.state.heldPieceId);
+     }
+    };
+
+    handEl.addEventListener('selectstart', handlePick);
+    handEl.addEventListener('pinchstarted', handlePick);
+
+    handEl.addEventListener('selectend', handleRelease);
+    handEl.addEventListener('pinchend', handleRelease);
+
+    ['abuttondown', 'bbuttondown', 'xbuttondown', 'ybuttondown', 'thumbstickdown'].forEach(btnEvent => {
+     handEl.addEventListener(btnEvent, () => {
+      if (window.state.heldPieceId !== null) rotateHeldGroup(10);
      });
-    }
+    });
    });
   }
 
