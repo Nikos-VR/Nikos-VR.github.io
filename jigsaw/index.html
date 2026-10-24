@@ -52,13 +52,13 @@
 
   let dragStartPoint = null;
 
-  // Όρια Επιφάνειας Τραπεζιού
+  // Όρια Επιφάνειας Τραπεζιού & Ύψη
   const TABLE_MIN_X = -0.85;
   const TABLE_MAX_X = 0.85;
   const TABLE_MIN_Z = -1.75;
   const TABLE_MAX_Z = -0.65;
-  const RESTING_Y = 0.808; // Ύψος ηρεμίας πάνω στο τραπέζι
-  const DRAGGING_Y = 0.88;  // Ύψος ανύψωσης κατά τη μετακίνηση
+  const RESTING_Y = 0.806;  // Ύψος ηρεμίας (διορθώνει το Z-fighting)
+  const DRAGGING_Y = 0.88;  // Ύψος κατά τη μετακίνηση
 
   function loadPuzzleImage() {
    const img = new Image();
@@ -294,7 +294,7 @@
     if (merged) break;
    }
 
-   // Επαναφορά στο ύψος ηρεμίας (RESTING_Y)
+   // Επαναφορά στο καθαρό ύψος ηρεμίας (RESTING_Y)
    group.forEach(p => {
     p.currentPos.y = RESTING_Y;
     const el = document.getElementById(`piece-${p.id}`);
@@ -408,7 +408,7 @@
    const previewMesh = new THREE.Mesh(previewGeom, previewMat);
    previewEntity.setObject3D('mesh', previewMesh);
 
-   // 2. Slicing εικόνας
+   // 2. Slicing εικόνας σε καμπύλα κομμάτια παζλ
    const slices = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
 
    const container = document.getElementById('pieces-container');
@@ -440,34 +440,17 @@
     pieceEntity.setAttribute('position', `${pieceData.currentPos.x} ${pieceData.currentPos.y} ${pieceData.currentPos.z}`);
     pieceEntity.setAttribute('rotation', '-90 0 0');
 
-    // --- ΔΗΜΙΟΥΡΓΙΑ 3D ΚΟΜΜΑΤΙΟΥ ΜΕ ΠΑΧΟΣ 8mm ---
-    const pieceGroup = new THREE.Group();
-    const thickness = 0.008; // 8mm πάχος
-
-    // 1. Βάση & Πλευρές (Σκούρο Χαρτόνι)
-    const baseGeom = new THREE.BoxGeometry(pieceMeshDim * 0.98, pieceMeshDim * 0.98, thickness);
-    const baseMat = new THREE.MeshStandardMaterial({
-     color: 0x3d2817,
-     roughness: 0.8
-    });
-    const baseMesh = new THREE.Mesh(baseGeom, baseMat);
-    baseMesh.position.z = 0;
-    pieceGroup.add(baseMesh);
-
-    // 2. Εκτυπωμένη Επιφάνεια Παζλ (Πάνω Όψη)
+    // 2D Plane Geometry με διαφάνεια για τις καμπύλες του παζλ
     const pieceGeom = new THREE.PlaneGeometry(pieceMeshDim, pieceMeshDim);
     const pieceTexture = new THREE.CanvasTexture(slice.canvas);
     if (THREE.SRGBColorSpace) pieceTexture.colorSpace = THREE.SRGBColorSpace;
     const pieceMat = new THREE.MeshBasicMaterial({
      map: pieceTexture,
      transparent: true,
-     side: THREE.FrontSide
+     side: THREE.DoubleSide
     });
     const pieceMesh = new THREE.Mesh(pieceGeom, pieceMat);
-    pieceMesh.position.z = thickness / 2 + 0.0005; // Ελαφρώς πιο πάνω από τη βάση
-    pieceGroup.add(pieceMesh);
-
-    pieceEntity.setObject3D('mesh', pieceGroup);
+    pieceEntity.setObject3D('mesh', pieceMesh);
 
     pieceEntity.addEventListener('mousedown', (e) => {
      if (e.target.closest && e.target.closest('#ui-overlay')) return;
@@ -475,76 +458,4 @@
     });
 
     pieceEntity.addEventListener('click', (e) => {
-     if (window.state.heldPieceId === null) {
-      pickPiece(idx);
-     } else if (window.state.heldPieceId === idx) {
-      releasePiece(idx);
-     }
-    });
-
-    container.appendChild(pieceEntity);
-   });
-
-   updateUI();
-  }
-
-  function getLargestGroupSize() {
-   if (!window.state.pieces || window.state.pieces.length === 0) return 0;
-   let max = 0;
-   window.state.pieces.forEach(p => {
-    if (p.group && p.group.length > max) {
-     max = p.group.length;
-    }
-   });
-   return max;
-  }
-
-  function updateUI() {
-   const largestGroup = getLargestGroupSize();
-   
-   if (largestGroup >= window.state.totalPieces && window.state.totalPieces > 0) {
-    window.state.isCompleted = true;
-   } else {
-    window.state.isCompleted = false;
-   }
-
-   const vrHud = document.getElementById('vr-hud-text');
-   if (vrHud) {
-    if (window.state.isCompleted) {
-     vrHud.setAttribute('value', 'Completed!');
-     vrHud.setAttribute('color', '#4ade80');
-    } else {
-     vrHud.setAttribute('value', '');
-    }
-   }
-  }
-
-  window.addEventListener('load', () => {
-   loadPuzzleImage();
-
-   ['left-hand', 'right-hand'].forEach(handId => {
-    const handEl = document.getElementById(handId);
-    if (handEl) {
-     handEl.addEventListener('selectstart', () => {
-      const rc = handEl.components.raycaster;
-      if (rc && rc.intersections && rc.intersections.length > 0) {
-       const hit = rc.intersections[0].object.el;
-       if (hit && hit.classList.contains('pickable')) {
-        const id = parseInt(hit.id.replace('piece-', ''), 10);
-        if (!isNaN(id)) pickPiece(id, handEl);
-       }
-      }
-     });
-
-     handEl.addEventListener('selectend', () => {
-      if (window.state.heldPieceId !== null && window.state.activeVRHand === handEl) {
-       releasePiece(window.state.heldPieceId);
-      }
-     });
-    }
-   });
-  });
- </script>
-</body>
-
-</html>
+     if
