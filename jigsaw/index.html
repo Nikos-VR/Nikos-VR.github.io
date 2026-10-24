@@ -42,6 +42,8 @@
    isCompleted: false
   };
 
+  let dragStartPoint = null;
+
   const img = new Image();
   img.crossOrigin = 'anonymous';
   img.src = 'puzzle.jpg';
@@ -176,19 +178,6 @@
    bctx.drawImage(sourceCanvas, 0, 0, W, H);
    bctx.globalAlpha = 1.0;
    bctx.strokeStyle = 'rgba(255,255,255,0.7)';
-   /* GRID
-   bctx.lineWidth = 3;
-   for (let i = 1; i < N; i++) {
-    bctx.beginPath();
-    bctx.moveTo(i * cellW, 0);
-    bctx.lineTo(i * cellW, H);
-    bctx.stroke();
-    bctx.beginPath();
-    bctx.moveTo(0, i * cellH);
-    bctx.lineTo(W, i * cellH);
-    bctx.stroke();
-   }
-   */
    return {slices, boardCanvas};
   }
 
@@ -199,6 +188,7 @@
 
    window.state.heldPieceId = pieceId;
    window.state.activeVRHand = handEl;
+   dragStartPoint = null;
 
    // Temporarily disable camera rotation so dragging moves piece smoothly on screen
    const camera = document.getElementById('camera');
@@ -206,12 +196,15 @@
     camera.setAttribute('look-controls', 'enabled: false');
    }
 
-   // Elevate piece during drag (Y = 0.88)
-   piece.currentPos.y = 0.88;
-   const el = document.getElementById(`piece-${pieceId}`);
-   if (el) {
-    el.setAttribute('position', `${piece.currentPos.x} 0.88 ${piece.currentPos.z}`);
-   }
+   // Elevate all pieces in the group during drag (Y = 0.88)
+   piece.group.forEach(p => {
+    p.dragStartPos = { x: p.currentPos.x, z: p.currentPos.z };
+    p.currentPos.y = 0.88;
+    const el = document.getElementById(`piece-${p.id}`);
+    if (el) {
+     el.setAttribute('position', `${p.currentPos.x} 0.88 ${p.currentPos.z}`);
+    }
+   });
   }
 
   function releasePiece(pieceId) {
@@ -220,6 +213,7 @@
 
    window.state.heldPieceId = null;
    window.state.activeVRHand = null;
+   dragStartPoint = null;
 
    // Re-enable camera rotation
    const camera = document.getElementById('camera');
@@ -227,42 +221,116 @@
     camera.setAttribute('look-controls', 'enabled: true; pointerLockEnabled: false; touchEnabled: false');
    }
 
-   // Snap Distance Check (0.15m threshold)
-   const dist = Math.hypot(
-    piece.currentPos.x - piece.targetPos.x,
-    piece.currentPos.z - piece.targetPos.z
-   );
+   // Check snapping for board & neighbors
+   checkSnap(pieceId);
+  }
 
-   const pieceEl = document.getElementById(`piece-${pieceId}`);
+  function checkSnap(pieceId) {
+   const piece = window.state.pieces[pieceId];
+   if (!piece || piece.locked) return;
 
-   if (dist < 0.15) {
-    // --- SNAP TO BOARD ---
-    piece.currentPos.x = piece.targetPos.x;
-    piece.currentPos.y = piece.targetPos.y;
-    piece.currentPos.z = piece.targetPos.z;
-    piece.locked = true;
+   let group = piece.group;
 
-    if (pieceEl) {
-     pieceEl.setAttribute('position', `${piece.targetPos.x} ${piece.targetPos.y} ${piece.targetPos.z}`);
-     pieceEl.classList.remove('pickable');
+   // 1. Check if group snaps to BOARD target positions
+   let snapToBoard = false;
+   for (const p of group) {
+    const dist = Math.hypot(p.currentPos.x - p.targetPos.x, p.currentPos.z - p.targetPos.z);
+    if (dist < 0.15) {
+     snapToBoard = true;
+     break;
     }
+   }
 
+   if (snapToBoard) {
+    lockGroup(group);
+    return;
+   }
+
+   // 2. Check NEIGHBOR snapping on table surface
+   const SNAP_THRESHOLD = 0.08;
+   let merged = false;
+
+   for (const p1 of [...group]) {
+    for (const p2 of window.state.pieces) {
+     if (p2.locked || group.includes(p2)) continue;
+
+     const isNeighbor = (Math.abs(p1.row - p2.row) + Math.abs(p1.col - p2.col)) === 1;
+     if (isNeighbor) {
+      const expectedX = p2.currentPos.x + (p1.targetPos.x - p2.targetPos.x);
+      const expectedZ = p2.currentPos.z + (p1.targetPos.z - p2.targetPos.z);
+      const dist = Math.hypot(p1.currentPos.x - expectedX, p1.currentPos.z - expectedZ);
+
+      if (dist < SNAP_THRESHOLD) {
+       const shiftX = expectedX - p1.currentPos.x;
+       const shiftZ = expectedZ - p1.currentPos.z;
+
+       group.forEach(gp => {
+        gp.currentPos.x += shiftX;
+        gp.currentPos.z += shiftZ;
+        const el = document.getElementById(`piece-${gp.id}`);
+        if (el) {
+         el.setAttribute('position', `${gp.currentPos.x} ${gp.currentPos.y} ${gp.currentPos.z}`);
+        }
+       });
+
+       const mergedGroup = [...group, ...p2.group];
+       mergedGroup.forEach(gp => gp.group = mergedGroup);
+       group = mergedGroup;
+       merged = true;
+       break;
+      }
+     }
+    }
+    if (merged) break;
+   }
+
+   // 3. If merged with neighbor, re-check if board snap is triggered
+   if (merged) {
+    for (const p of group) {
+     const dist = Math.hypot(p.currentPos.x - p.targetPos.x, p.currentPos.z - p.targetPos.z);
+     if (dist < 0.15) {
+      lockGroup(group);
+      return;
+     }
+    }
+   }
+
+   // 4. Set un-locked group pieces back to table Y (0.802)
+   group.forEach(p => {
+    if (!p.locked) {
+     p.currentPos.y = 0.802;
+     const el = document.getElementById(`piece-${p.id}`);
+     if (el) {
+      el.setAttribute('position', `${p.currentPos.x} 0.802 ${p.currentPos.z}`);
+     }
+    }
+   });
+  }
+
+  function lockGroup(group) {
+   group.forEach(p => {
+    if (p.locked) return;
+    p.currentPos.x = p.targetPos.x;
+    p.currentPos.y = p.targetPos.y;
+    p.currentPos.z = p.targetPos.z;
+    p.locked = true;
+
+    const el = document.getElementById(`piece-${p.id}`);
+    if (el) {
+     el.setAttribute('position', `${p.targetPos.x} ${p.targetPos.y} ${p.targetPos.z}`);
+     el.classList.remove('pickable');
+    }
     window.state.lockedCount++;
-    updateUI();
+   });
 
-    if (window.state.lockedCount === window.state.totalPieces) {
-     triggerVictory();
-    }
-   } else {
-    // --- DROP ON TABLE ---
-    piece.currentPos.y = 0.802;
-    if (pieceEl) {
-     pieceEl.setAttribute('position', `${piece.currentPos.x} 0.802 ${piece.currentPos.z}`);
-    }
+   updateUI();
+
+   if (window.state.lockedCount === window.state.totalPieces) {
+    triggerVictory();
    }
   }
 
-  // Move held piece across table surface using Three.js Plane Intersection
+  // Move held piece group across table surface using Three.js Plane Intersection
   function updateDragPosition(clientX, clientY) {
    if (window.state.heldPieceId === null || window.state.activeVRHand) return;
 
@@ -289,14 +357,24 @@
     targetPoint.x = Math.max(-1.1, Math.min(1.1, targetPoint.x));
     targetPoint.z = Math.max(-2.2, Math.min(-0.2, targetPoint.z));
 
-    const piece = window.state.pieces[window.state.heldPieceId];
-    piece.currentPos.x = targetPoint.x;
-    piece.currentPos.z = targetPoint.z;
-
-    const el = document.getElementById(`piece-${piece.id}`);
-    if (el) {
-     el.setAttribute('position', `${targetPoint.x} 0.88 ${targetPoint.z}`);
+    if (!dragStartPoint) {
+     dragStartPoint = { x: targetPoint.x, z: targetPoint.z };
     }
+
+    const deltaX = targetPoint.x - dragStartPoint.x;
+    const deltaZ = targetPoint.z - dragStartPoint.z;
+
+    const heldPiece = window.state.pieces[window.state.heldPieceId];
+    heldPiece.group.forEach(p => {
+     p.currentPos.x = p.dragStartPos.x + deltaX;
+     p.currentPos.z = p.dragStartPos.z + deltaZ;
+     p.currentPos.y = 0.88;
+
+     const el = document.getElementById(`piece-${p.id}`);
+     if (el) {
+      el.setAttribute('position', `${p.currentPos.x} 0.88 ${p.currentPos.z}`);
+     }
+    });
    }
   }
 
@@ -343,7 +421,7 @@
    // 2. Slice image into pieces & get board canvas
    const {slices, boardCanvas} = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
 
-   // 3. Build Reference Board Mesh directly with THREE.Mesh (Bypasses A-Frame Material Bug)
+   // 3. Build Reference Board Mesh directly with THREE.Mesh
    const boardEntity = document.getElementById('puzzle-board');
    const boardGeom = new THREE.PlaneGeometry(0.8, 0.8);
    const boardTexture = new THREE.CanvasTexture(boardCanvas);
@@ -383,10 +461,14 @@
 
     const pieceData = {
      id: idx,
+     row: slice.row,
+     col: slice.col,
      targetPos: {x: targetX, y: targetY, z: targetZ},
      currentPos: {x: randomX, y: 0.802, z: randomZ},
-     locked: false
+     locked: false,
+     group: []
     };
+    pieceData.group = [pieceData];
 
     window.state.pieces.push(pieceData);
 
