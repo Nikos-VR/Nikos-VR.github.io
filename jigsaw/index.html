@@ -11,18 +11,28 @@
  <a-scene>
   <a-sky color="#0f172a"></a-sky>
   <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#1e293b" roughness="0.8"></a-plane>
+  
+  <!-- Τραπέζι -->
   <a-entity id="table" position="0 0 -1.2">
    <a-box width="1.8" height="0.08" depth="1.2" position="0 0.76 0" color="#5c3a21" roughness="0.5"></a-box>
    <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 -0.5" color="#3b2312"></a-cylinder>
    <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 -0.5" color="#3b2312"></a-cylinder>
    <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 0.5" color="#3b2312"></a-cylinder>
    <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 0.5" color="#3b2312"></a-cylinder>
-   <a-entity id="puzzle-board" position="0 0.801 0" rotation="-90 0 0"></a-entity>
   </a-entity>
+
+  <!-- Κομμάτια Παζλ -->
   <a-entity id="pieces-container"></a-entity>
-  <a-entity id="vr-hud" position="0 1.6 -1.8">
-   <a-text id="vr-hud-text" value="" align="center" color="#4ade80" width="2.8"></a-text>
+
+  <!-- HUD: Εικόνα Αναφοράς & Μήνυμα Ολοκλήρωσης -->
+  <a-entity id="vr-hud" position="0 1.65 -1.8">
+   <!-- Πίνακας Προεπισκόπησης Εικόνας -->
+   <a-entity id="reference-preview" position="0 0 0"></a-entity>
+   <!-- Κείμενο Ολοκλήρωσης -->
+   <a-text id="vr-hud-text" value="" align="center" color="#4ade80" width="3" position="0 0.38 0"></a-text>
   </a-entity>
+
+  <!-- Camera Rig -->
   <a-entity id="rig" position="0 0 0">
    <a-camera id="camera" position="0 1.55 0" look-controls="pointerLockEnabled: false; touchEnabled: false">
     <a-entity id="mouse-cursor" cursor="rayOrigin: mouse" raycaster="objects: .pickable; far: 10"></a-entity>
@@ -31,6 +41,7 @@
    <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .pickable; far: 5"></a-entity>
   </a-entity>
  </a-scene>
+
  <script>
   window.state = {
    gridSize: 5,
@@ -58,7 +69,7 @@
    };
 
    img.onerror = () => {
-    // Δημιουργία αναπληρωματικής εικόνας αν δεν βρεθεί το puzzle.jpg
+    // Fallback Canvas αν λείπει το puzzle.jpg
     const fallbackCanvas = document.createElement('canvas');
     fallbackCanvas.width = 800;
     fallbackCanvas.height = 800;
@@ -181,7 +192,6 @@
      ctx.closePath();
      ctx.clip();
 
-     // Draw slice
      const sx = c * cellW - margin;
      const sy = r * cellH - margin;
      const sw = cellW + margin * 2;
@@ -189,7 +199,6 @@
 
      ctx.drawImage(sourceCanvas, sx, sy, sw, sh, -margin, -margin, sw, sh);
 
-     // Edge stroke outline
      ctx.strokeStyle = 'rgba(0,0,0,0.6)';
      ctx.lineWidth = 4;
      ctx.stroke();
@@ -202,16 +211,7 @@
     }
    }
 
-   // Board canvas with grid outline
-   const boardCanvas = document.createElement('canvas');
-   boardCanvas.width = W;
-   boardCanvas.height = H;
-   const bctx = boardCanvas.getContext('2d');
-   bctx.globalAlpha = 0.25;
-   bctx.drawImage(sourceCanvas, 0, 0, W, H);
-   bctx.globalAlpha = 1.0;
-   bctx.strokeStyle = 'rgba(255,255,255,0.7)';
-   return {slices, boardCanvas};
+   return slices;
   }
 
   // ==================== UNIVERSAL THREE.JS RAYCASTING DRAG SYSTEM ==================== //
@@ -229,9 +229,6 @@
    }
 
    piece.group.forEach(p => {
-    if (p.locked) {
-     p.locked = false;
-    }
     p.dragStartPos = { x: p.currentPos.x, z: p.currentPos.z };
     p.currentPos.y = 0.88;
     const el = document.getElementById(`piece-${p.id}`);
@@ -264,34 +261,19 @@
    if (!piece) return;
 
    let group = piece.group;
-
-   // 1. Check if group snaps to BOARD target positions
-   let snapToBoard = false;
-   for (const p of group) {
-    const dist = Math.hypot(p.currentPos.x - p.targetPos.x, p.currentPos.z - p.targetPos.z);
-    if (dist < 0.15) {
-     snapToBoard = true;
-     break;
-    }
-   }
-
-   if (snapToBoard) {
-    lockGroup(group);
-    return;
-   }
-
-   // 2. Check NEIGHBOR snapping on table surface
    const SNAP_THRESHOLD = 0.08;
+   const pieceUnitSize = 0.8 / window.state.gridSize; // 0.16m ανά κομμάτι
    let merged = false;
 
+   // Έλεγχος Κουμπώματος Γειτονικών Κομματιών (Neighbor Snap)
    for (const p1 of [...group]) {
     for (const p2 of window.state.pieces) {
      if (group.includes(p2)) continue;
 
      const isNeighbor = (Math.abs(p1.row - p2.row) + Math.abs(p1.col - p2.col)) === 1;
      if (isNeighbor) {
-      const expectedX = p2.currentPos.x + (p1.targetPos.x - p2.targetPos.x);
-      const expectedZ = p2.currentPos.z + (p1.targetPos.z - p2.targetPos.z);
+      const expectedX = p2.currentPos.x + (p1.col - p2.col) * pieceUnitSize;
+      const expectedZ = p2.currentPos.z + (p1.row - p2.row) * pieceUnitSize;
       const dist = Math.hypot(p1.currentPos.x - expectedX, p1.currentPos.z - expectedZ);
 
       if (dist < SNAP_THRESHOLD) {
@@ -318,48 +300,19 @@
     if (merged) break;
    }
 
-   // 3. If merged with neighbor, re-check if board snap is triggered
-   if (merged) {
-    for (const p of group) {
-     const dist = Math.hypot(p.currentPos.x - p.targetPos.x, p.currentPos.z - p.targetPos.z);
-     if (dist < 0.15) {
-      lockGroup(group);
-      return;
-     }
-    }
-   }
-
-   // 4. Set un-locked group pieces back to table Y (0.802)
+   // Επαναφορά Y ύψους στο τραπέζι (0.802)
    group.forEach(p => {
-    if (!p.locked) {
-     p.currentPos.y = 0.802;
-     const el = document.getElementById(`piece-${p.id}`);
-     if (el) {
-      el.setAttribute('position', `${p.currentPos.x} 0.802 ${p.currentPos.z}`);
-     }
-    }
-   });
-
-   updateUI();
-  }
-
-  function lockGroup(group) {
-   group.forEach(p => {
-    p.locked = true;
-    p.currentPos.x = p.targetPos.x;
-    p.currentPos.y = p.targetPos.y;
-    p.currentPos.z = p.targetPos.z;
-
+    p.currentPos.y = 0.802;
     const el = document.getElementById(`piece-${p.id}`);
     if (el) {
-     el.setAttribute('position', `${p.targetPos.x} ${p.targetPos.y} ${p.targetPos.z}`);
+     el.setAttribute('position', `${p.currentPos.x} 0.802 ${p.currentPos.z}`);
     }
    });
 
    updateUI();
   }
 
-  // Move held piece group across table surface with BORDER CLAMPING
+  // Dragging με περιορισμό στα όρια του τραπεζιού
   function updateDragPosition(clientX, clientY) {
    if (window.state.heldPieceId === null || window.state.activeVRHand) return;
 
@@ -450,20 +403,20 @@
    const ctx = artCanvas.getContext('2d');
    ctx.drawImage(loadedSource, 0, 0, 800, 800);
 
-   const {slices, boardCanvas} = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
-
-   const boardEntity = document.getElementById('puzzle-board');
-   const boardGeom = new THREE.PlaneGeometry(0.8, 0.8);
-   const boardTexture = new THREE.CanvasTexture(boardCanvas);
-   if (THREE.SRGBColorSpace) boardTexture.colorSpace = THREE.SRGBColorSpace;
-   const boardMat = new THREE.MeshBasicMaterial({
-    map: boardTexture,
-    transparent: true,
-    opacity: 0.65,
+   // 1. Δημιουργία Εικόνας Προεπισκόπησης στο HUD
+   const previewEntity = document.getElementById('reference-preview');
+   const previewGeom = new THREE.PlaneGeometry(0.5, 0.5);
+   const previewTexture = new THREE.CanvasTexture(artCanvas);
+   if (THREE.SRGBColorSpace) previewTexture.colorSpace = THREE.SRGBColorSpace;
+   const previewMat = new THREE.MeshBasicMaterial({
+    map: previewTexture,
     side: THREE.DoubleSide
    });
-   const boardMesh = new THREE.Mesh(boardGeom, boardMat);
-   boardEntity.setObject3D('mesh', boardMesh);
+   const previewMesh = new THREE.Mesh(previewGeom, previewMat);
+   previewEntity.setObject3D('mesh', previewMesh);
+
+   // 2. Κοπή εικόνας σε κομμάτια
+   const slices = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
 
    const container = document.getElementById('pieces-container');
    container.innerHTML = '';
@@ -474,24 +427,14 @@
    const pieceMeshDim = pieceSize * 1.56;
 
    slices.forEach((slice, idx) => {
-    const targetX = -boardSize / 2 + (slice.col + 0.5) * pieceSize;
-    const targetZ = -1.2 - boardSize / 2 + (slice.row + 0.5) * pieceSize;
-    const targetY = 0.802;
-
     let randomX = TABLE_MIN_X + 0.1 + Math.random() * (TABLE_MAX_X - TABLE_MIN_X - 0.2);
     let randomZ = TABLE_MIN_Z + 0.1 + Math.random() * (TABLE_MAX_Z - TABLE_MIN_Z - 0.2);
-
-    if (Math.abs(randomX) < 0.45 && Math.abs(randomZ + 1.2) < 0.45) {
-     randomX += (randomX >= 0 ? 0.4 : -0.4);
-    }
 
     const pieceData = {
      id: idx,
      row: slice.row,
      col: slice.col,
-     targetPos: {x: targetX, y: targetY, z: targetZ},
      currentPos: {x: randomX, y: 0.802, z: randomZ},
-     locked: false,
      group: []
     };
     pieceData.group = [pieceData];
@@ -565,7 +508,6 @@
    }
   }
 
-  // Εκκίνηση αμέσως
   window.addEventListener('load', () => {
    loadPuzzleImage();
 
