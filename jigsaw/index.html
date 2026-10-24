@@ -44,95 +44,10 @@
 
   const img = new Image();
   img.crossOrigin = 'anonymous';
-  img.src = 'chrome.png';
+  img.src = 'puzzle.jpg';
   img.onload = () => {
    initPuzzle(img);
   };
-
-  function generateProceduralArt(width, height) {
-   const canvas = document.createElement('canvas');
-   canvas.width = width;
-   canvas.height = height;
-   const ctx = canvas.getContext('2d');
-
-   // 1. Sky Gradient
-   const skyGrad = ctx.createLinearGradient(0, 0, 0, height * 0.65);
-   skyGrad.addColorStop(0, '#0f172a');
-   skyGrad.addColorStop(0.35, '#581c87');
-   skyGrad.addColorStop(0.7, '#c026d3');
-   skyGrad.addColorStop(1, '#f97316');
-   ctx.fillStyle = skyGrad;
-   ctx.fillRect(0, 0, width, height);
-
-   // 2. Glowing Sun
-   const sunX = width * 0.5;
-   const sunY = height * 0.42;
-   const sunGrad = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 130);
-   sunGrad.addColorStop(0, '#fef08a');
-   sunGrad.addColorStop(0.4, '#facc15');
-   sunGrad.addColorStop(1, 'rgba(250, 204, 21, 0)');
-   ctx.fillStyle = sunGrad;
-   ctx.beginPath();
-   ctx.arc(sunX, sunY, 130, 0, Math.PI * 2);
-   ctx.fill();
-
-   // Sun Core
-   ctx.fillStyle = '#ffffff';
-   ctx.beginPath();
-   ctx.arc(sunX, sunY, 35, 0, Math.PI * 2);
-   ctx.fill();
-
-   // 3. Distant Mountains
-   ctx.fillStyle = '#3b0764';
-   ctx.beginPath();
-   ctx.moveTo(0, height * 0.62);
-   ctx.lineTo(width * 0.25, height * 0.38);
-   ctx.lineTo(width * 0.52, height * 0.58);
-   ctx.lineTo(width * 0.78, height * 0.4);
-   ctx.lineTo(width, height * 0.56);
-   ctx.lineTo(width, height);
-   ctx.lineTo(0, height);
-   ctx.closePath();
-   ctx.fill();
-
-   // 4. Foreground Silhouette
-   ctx.fillStyle = '#1e1b4b';
-   ctx.beginPath();
-   ctx.moveTo(0, height * 0.66);
-   ctx.lineTo(width * 0.35, height * 0.48);
-   ctx.lineTo(width * 0.65, height * 0.62);
-   ctx.lineTo(width, height * 0.48);
-   ctx.lineTo(width, height);
-   ctx.lineTo(0, height);
-   ctx.closePath();
-   ctx.fill();
-
-   // 5. Water Reflection Surface
-   const waterGrad = ctx.createLinearGradient(0, height * 0.65, 0, height);
-   waterGrad.addColorStop(0, '#1e1b4b');
-   waterGrad.addColorStop(0.5, '#0f172a');
-   waterGrad.addColorStop(1, '#0284c7');
-   ctx.fillStyle = waterGrad;
-   ctx.fillRect(0, height * 0.65, width, height * 0.35);
-
-   // Water Ripple Light Rays
-   ctx.strokeStyle = 'rgba(253, 224, 71, 0.45)';
-   ctx.lineWidth = 3;
-   for (let y = height * 0.67; y < height; y += 12) {
-    const w = (y - height * 0.65) * 0.9 + 24;
-    ctx.beginPath();
-    ctx.moveTo(sunX - w / 2 + Math.random() * 8, y);
-    ctx.lineTo(sunX + w / 2 - Math.random() * 8, y);
-    ctx.stroke();
-   }
-
-   // Outer Border Line
-   ctx.strokeStyle = '#ffffff';
-   ctx.lineWidth = 12;
-   ctx.strokeRect(6, 6, width - 12, height - 12);
-
-   return canvas;
-  }
 
   // ==================== PROCEDURAL CANVAS JIGSAW SLICER ==================== //
   function drawJigsawEdge(ctx, x1, y1, x2, y2, tabDir) {
