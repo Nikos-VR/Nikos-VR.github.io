@@ -1,9 +1,10 @@
-<html>
+<!DOCTYPE html>
+<html lang="el">
 
 <head>
  <meta charset="UTF-8" />
  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Jigsaw Puzzle</title>
+ <title>VR Jigsaw Puzzle</title>
  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 </head>
 
@@ -30,7 +31,7 @@
    <a-text id="vr-hud-text" value="" align="center" color="#4ade80" width="3" position="0 0.38 0"></a-text>
   </a-entity>
 
-  <!-- Camera Rig -->
+  <!-- Camera Rig & VR Controllers -->
   <a-entity id="rig" position="0 0 0">
    <a-camera id="camera" position="0 1.55 0" look-controls="pointerLockEnabled: false; touchEnabled: false">
     <a-entity id="mouse-cursor" cursor="rayOrigin: mouse" raycaster="objects: .pickable; far: 10"></a-entity>
@@ -53,45 +54,70 @@
   let dragStartPoint = null;
 
   // Όρια Επιφάνειας Τραπεζιού & Ύψη
-  const TABLE_MIN_X = -0.85;
-  const TABLE_MAX_X = 0.85;
-  const TABLE_MIN_Z = -1.75;
-  const TABLE_MAX_Z = -0.65;
-  const RESTING_Y = 0.806;  // Ύψος ηρεμίας (διορθώνει το Z-fighting)
+  const TABLE_MIN_X = -0.82;
+  const TABLE_MAX_X = 0.82;
+  const TABLE_MIN_Z = -1.72;
+  const TABLE_MAX_Z = -0.68;
+  const RESTING_Y = 0.805; // Ύψος ηρεμίας πάνω στο τραπέζι (αποφυγή Z-fighting)
   const DRAGGING_Y = 0.88;  // Ύψος κατά τη μετακίνηση
 
+  // Ασφαλής φόρτωση εικόνας που αποτρέπει Tainted Canvas σφάλματα στο WebGL
   function loadPuzzleImage() {
-   const img = new Image();
-   img.crossOrigin = 'anonymous';
+   fetch('puzzle.jpg')
+    .then(res => {
+     if (!res.ok) throw new Error('HTTP ' + res.status);
+     return res.blob();
+    })
+    .then(blob => {
+     const reader = new FileReader();
+     reader.onload = () => {
+      const img = new Image();
+      img.onload = () => initPuzzle(img);
+      img.src = reader.result;
+     };
+     reader.readAsDataURL(blob);
+    })
+    .catch(() => {
+     const img = new Image();
+     img.crossOrigin = 'anonymous';
+     img.onload = () => {
+      const testCanvas = document.createElement('canvas');
+      testCanvas.width = 10; testCanvas.height = 10;
+      const tCtx = testCanvas.getContext('2d');
+      tCtx.drawImage(img, 0, 0);
+      try {
+       tCtx.getImageData(0, 0, 1, 1);
+       initPuzzle(img);
+      } catch(e) {
+       createProceduralFallback();
+      }
+     };
+     img.onerror = () => createProceduralFallback();
+     img.src = 'puzzle.jpg';
+    });
+  }
 
-   img.onload = () => {
-    initPuzzle(img);
-   };
+  function createProceduralFallback() {
+   const fallbackCanvas = document.createElement('canvas');
+   fallbackCanvas.width = 800;
+   fallbackCanvas.height = 800;
+   const ctx = fallbackCanvas.getContext('2d');
 
-   img.onerror = () => {
-    const fallbackCanvas = document.createElement('canvas');
-    fallbackCanvas.width = 800;
-    fallbackCanvas.height = 800;
-    const ctx = fallbackCanvas.getContext('2d');
+   const grad = ctx.createLinearGradient(0, 0, 800, 800);
+   grad.addColorStop(0, '#0284c7');
+   grad.addColorStop(0.5, '#6366f1');
+   grad.addColorStop(1, '#ec4899');
+   ctx.fillStyle = grad;
+   ctx.fillRect(0, 0, 800, 800);
 
-    const grad = ctx.createLinearGradient(0, 0, 800, 800);
-    grad.addColorStop(0, '#0284c7');
-    grad.addColorStop(0.5, '#6366f1');
-    grad.addColorStop(1, '#ec4899');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 800, 800);
+   ctx.fillStyle = '#ffffff';
+   ctx.font = 'bold 70px sans-serif';
+   ctx.textAlign = 'center';
+   ctx.fillText('VR JIGSAW', 400, 380);
+   ctx.font = '35px sans-serif';
+   ctx.fillText('A-Frame 1.6.0', 400, 450);
 
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 70px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('VR JIGSAW', 400, 380);
-    ctx.font = '35px sans-serif';
-    ctx.fillText('A-Frame 1.6.0', 400, 450);
-
-    initPuzzle(fallbackCanvas);
-   };
-
-   img.src = 'puzzle.jpg';
+   initPuzzle(fallbackCanvas);
   }
 
   // ==================== PROCEDURAL CANVAS JIGSAW SLICER ==================== //
@@ -294,7 +320,7 @@
     if (merged) break;
    }
 
-   // Επαναφορά στο καθαρό ύψος ηρεμίας (RESTING_Y)
+   // Επαναφορά στο ύψος ηρεμίας (RESTING_Y)
    group.forEach(p => {
     p.currentPos.y = RESTING_Y;
     const el = document.getElementById(`piece-${p.id}`);
@@ -458,4 +484,89 @@
     });
 
     pieceEntity.addEventListener('click', (e) => {
-     if
+     if (window.state.heldPieceId === null) {
+      pickPiece(idx);
+     } else if (window.state.heldPieceId === idx) {
+      releasePiece(idx);
+     }
+    });
+
+    container.appendChild(pieceEntity);
+   });
+
+   updateUI();
+  }
+
+  function getLargestGroupSize() {
+   if (!window.state.pieces || window.state.pieces.length === 0) return 0;
+   let max = 0;
+   window.state.pieces.forEach(p => {
+    if (p.group && p.group.length > max) {
+     max = p.group.length;
+    }
+   });
+   return max;
+  }
+
+  function updateUI() {
+   const largestGroup = getLargestGroupSize();
+   
+   if (largestGroup >= window.state.totalPieces && window.state.totalPieces > 0) {
+    window.state.isCompleted = true;
+   } else {
+    window.state.isCompleted = false;
+   }
+
+   const vrHud = document.getElementById('vr-hud-text');
+   if (vrHud) {
+    if (window.state.isCompleted) {
+     vrHud.setAttribute('value', 'Completed!');
+     vrHud.setAttribute('color', '#4ade80');
+    } else {
+     vrHud.setAttribute('value', '');
+    }
+   }
+  }
+
+  function setupApp() {
+   const scene = document.querySelector('a-scene');
+   if (scene && scene.hasLoaded) {
+    loadPuzzleImage();
+   } else if (scene) {
+    scene.addEventListener('loaded', loadPuzzleImage);
+   } else {
+    window.addEventListener('DOMContentLoaded', loadPuzzleImage);
+   }
+
+   ['left-hand', 'right-hand'].forEach(handId => {
+    const handEl = document.getElementById(handId);
+    if (handEl) {
+     handEl.addEventListener('selectstart', () => {
+      const rc = handEl.components.raycaster;
+      if (rc && rc.intersections && rc.intersections.length > 0) {
+       const hit = rc.intersections[0].object.el;
+       if (hit && hit.classList.contains('pickable')) {
+        const id = parseInt(hit.id.replace('piece-', ''), 10);
+        if (!isNaN(id)) pickPiece(id, handEl);
+       }
+      }
+     });
+
+     handEl.addEventListener('selectend', () => {
+      if (window.state.heldPieceId !== null && window.state.activeVRHand === handEl) {
+       releasePiece(window.state.heldPieceId);
+      }
+     });
+    }
+   });
+  }
+
+  if (document.readyState === 'loading') {
+   window.addEventListener('DOMContentLoaded', setupApp);
+  } else {
+   setupApp();
+  }
+ </script>
+</body>
+
+</html>
