@@ -42,13 +42,37 @@
   };
 
   let dragStartPoint = null;
+  let isInitialized = false;
 
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.src = 'puzzle.jpg';
-  img.onload = () => {
-   initPuzzle(img);
-  };
+  function loadPuzzleImage() {
+   if (isInitialized) return;
+
+   const img = new Image();
+   img.crossOrigin = 'anonymous';
+
+   img.onload = () => {
+    if (isInitialized) return;
+    isInitialized = true;
+    initPuzzle(img);
+   };
+
+   img.onerror = () => {
+    if (img.crossOrigin) {
+     img.crossOrigin = null;
+     img.src = 'puzzle.jpg';
+    } else {
+     console.error('⚠️ Αποτυχία φόρτωσης της εικόνας puzzle.jpg');
+    }
+   };
+
+   img.src = 'puzzle.jpg';
+
+   if (img.complete && img.naturalWidth !== 0) {
+    if (isInitialized) return;
+    isInitialized = true;
+    initPuzzle(img);
+   }
+  }
 
   // ==================== PROCEDURAL CANVAS JIGSAW SLICER ==================== //
   function drawJigsawEdge(ctx, x1, y1, x2, y2, tabDir) {
@@ -518,3 +542,70 @@
    });
    return max;
   }
+
+  function updateUI() {
+   const largestGroup = getLargestGroupSize();
+   
+   if (largestGroup >= window.state.totalPieces && window.state.totalPieces > 0) {
+    window.state.isCompleted = true;
+   } else {
+    window.state.isCompleted = false;
+   }
+
+   const valStr = `${largestGroup} / ${window.state.totalPieces}`;
+   const vrHud = document.getElementById('vr-hud-text');
+   if (vrHud) {
+    if (window.state.isCompleted) {
+     vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\nCompleted!`);
+     vrHud.setAttribute('color', '#4ade80');
+    } else {
+     vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\n${valStr}`);
+     vrHud.setAttribute('color', '#38bdf8');
+    }
+   }
+  }
+
+  // ==================== INITIALIZATION & BINDINGS ==================== //
+  function setupApp() {
+   const scene = document.querySelector('a-scene');
+   if (scene && scene.hasLoaded) {
+    loadPuzzleImage();
+   } else if (scene) {
+    scene.addEventListener('loaded', loadPuzzleImage);
+   } else {
+    window.addEventListener('DOMContentLoaded', loadPuzzleImage);
+   }
+
+   // Setup WebXR Controller Event Listeners
+   ['left-hand', 'right-hand'].forEach(handId => {
+    const handEl = document.getElementById(handId);
+    if (handEl) {
+     handEl.addEventListener('selectstart', () => {
+      const rc = handEl.components.raycaster;
+      if (rc && rc.intersections && rc.intersections.length > 0) {
+       const hit = rc.intersections[0].object.el;
+       if (hit && hit.classList.contains('pickable')) {
+        const id = parseInt(hit.id.replace('piece-', ''), 10);
+        if (!isNaN(id)) pickPiece(id, handEl);
+       }
+      }
+     });
+
+     handEl.addEventListener('selectend', () => {
+      if (window.state.heldPieceId !== null && window.state.activeVRHand === handEl) {
+       releasePiece(window.state.heldPieceId);
+      }
+     });
+    }
+   });
+  }
+
+  if (document.readyState === 'loading') {
+   window.addEventListener('DOMContentLoaded', setupApp);
+  } else {
+   setupApp();
+  }
+ </script>
+</body>
+
+</html>
