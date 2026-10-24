@@ -43,8 +43,8 @@
 
  <script>
   window.state = {
-   gridSize: 2,
-   totalPieces: 4,
+   gridSize: 5,
+   totalPieces: 25,
    heldPieceId: null,
    activeVRHand: null,
    pieces: [],
@@ -58,8 +58,8 @@
   const TABLE_MAX_X = 0.82;
   const TABLE_MIN_Z = -1.72;
   const TABLE_MAX_Z = -0.68;
-  const RESTING_Y = 0.805; // Ύψος ηρεμίας πάνω στο τραπέζι (αποφυγή Z-fighting)
-  const DRAGGING_Y = 0.88;  // Ύψος κατά τη μετακίνηση
+  const RESTING_Y_BASE = 0.806; // Βασικό ύψος ηρεμίας
+  const DRAGGING_Y = 0.88;      // Ύψος κατά τη μετακίνηση
 
   // Ασφαλής φόρτωση εικόνας που αποτρέπει Tainted Canvas σφάλματα στο WebGL
   function loadPuzzleImage() {
@@ -154,8 +154,8 @@
    ctx.bezierCurveTo(c1x, c1y, c2x, c2y, tipX, tipY);
 
    const c3x = tipX + (dx / dist) * (tabSize * 0.6);
-   const c3y = tipY + (dy / dist) * (tabSize * 0.6);
    const c4x = p2x + nx * (tabSize * 0.2);
+   const c3y = tipY + (dy / dist) * (tabSize * 0.6);
    const c4y = p2y + ny * (tabSize * 0.2);
 
    ctx.bezierCurveTo(c3x, c3y, c4x, c4y, p2x, p2y);
@@ -255,6 +255,8 @@
     const el = document.getElementById(`piece-${p.id}`);
     if (el) {
      el.setAttribute('position', `${p.currentPos.x} ${DRAGGING_Y} ${p.currentPos.z}`);
+     const mesh = el.getObject3D('mesh');
+     if (mesh) mesh.renderOrder = 999; // Φέρνει το κομμάτι πάντα μπροστά κατά τη μετακίνηση
     }
    });
 
@@ -320,12 +322,15 @@
     if (merged) break;
    }
 
-   // Επαναφορά στο ύψος ηρεμίας (RESTING_Y)
+   // Επαναφορά στο ύψος ηρεμίας με ελάχιστο offset για την εξάλειψη του Z-fighting
    group.forEach(p => {
-    p.currentPos.y = RESTING_Y;
+    const restingY = RESTING_Y_BASE + (p.id * 0.0001);
+    p.currentPos.y = restingY;
     const el = document.getElementById(`piece-${p.id}`);
     if (el) {
-     el.setAttribute('position', `${p.currentPos.x} ${RESTING_Y} ${p.currentPos.z}`);
+     el.setAttribute('position', `${p.currentPos.x} ${restingY} ${p.currentPos.z}`);
+     const mesh = el.getObject3D('mesh');
+     if (mesh) mesh.renderOrder = p.id;
     }
    });
 
@@ -448,12 +453,13 @@
    slices.forEach((slice, idx) => {
     let randomX = TABLE_MIN_X + 0.1 + Math.random() * (TABLE_MAX_X - TABLE_MIN_X - 0.2);
     let randomZ = TABLE_MIN_Z + 0.1 + Math.random() * (TABLE_MAX_Z - TABLE_MIN_Z - 0.2);
+    const restingY = RESTING_Y_BASE + (idx * 0.0001);
 
     const pieceData = {
      id: idx,
      row: slice.row,
      col: slice.col,
-     currentPos: {x: randomX, y: RESTING_Y, z: randomZ},
+     currentPos: {x: randomX, y: restingY, z: randomZ},
      group: []
     };
     pieceData.group = [pieceData];
@@ -466,16 +472,18 @@
     pieceEntity.setAttribute('position', `${pieceData.currentPos.x} ${pieceData.currentPos.y} ${pieceData.currentPos.z}`);
     pieceEntity.setAttribute('rotation', '-90 0 0');
 
-    // 2D Plane Geometry με διαφάνεια για τις καμπύλες του παζλ
+    // 2D Plane Geometry με alphaTest: 0.1 ώστε τα διαφανή περιθώρια να ΜΗΝ γράφουν στον Z-Buffer
     const pieceGeom = new THREE.PlaneGeometry(pieceMeshDim, pieceMeshDim);
     const pieceTexture = new THREE.CanvasTexture(slice.canvas);
     if (THREE.SRGBColorSpace) pieceTexture.colorSpace = THREE.SRGBColorSpace;
     const pieceMat = new THREE.MeshBasicMaterial({
      map: pieceTexture,
      transparent: true,
+     alphaTest: 0.1, // <--- ΚΑΘΑΡΙΖΕΙ ΤΑ ΔΙΑΦΑΝΗ ΠΕΡΙΘΩΡΙΑ ΑΠΟ ΤΟΝ Z-BUFFER
      side: THREE.DoubleSide
     });
     const pieceMesh = new THREE.Mesh(pieceGeom, pieceMat);
+    pieceMesh.renderOrder = idx;
     pieceEntity.setObject3D('mesh', pieceMesh);
 
     pieceEntity.addEventListener('mousedown', (e) => {
