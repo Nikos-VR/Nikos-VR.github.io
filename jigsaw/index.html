@@ -184,7 +184,7 @@
   // ==================== UNIVERSAL THREE.JS RAYCASTING DRAG SYSTEM ==================== //
   function pickPiece(pieceId, handEl = null) {
    const piece = window.state.pieces[pieceId];
-   if (!piece || piece.locked) return;
+   if (!piece) return;
 
    window.state.heldPieceId = pieceId;
    window.state.activeVRHand = handEl;
@@ -196,8 +196,12 @@
     camera.setAttribute('look-controls', 'enabled: false');
    }
 
-   // Elevate all pieces in the group during drag (Y = 0.88)
+   // Elevate all pieces in the group during drag & unlock if previously locked on board
    piece.group.forEach(p => {
+    if (p.locked) {
+     p.locked = false;
+     window.state.lockedCount--;
+    }
     p.dragStartPos = { x: p.currentPos.x, z: p.currentPos.z };
     p.currentPos.y = 0.88;
     const el = document.getElementById(`piece-${p.id}`);
@@ -205,11 +209,13 @@
      el.setAttribute('position', `${p.currentPos.x} 0.88 ${p.currentPos.z}`);
     }
    });
+
+   updateUI();
   }
 
   function releasePiece(pieceId) {
    const piece = window.state.pieces[pieceId];
-   if (!piece || piece.locked) return;
+   if (!piece) return;
 
    window.state.heldPieceId = null;
    window.state.activeVRHand = null;
@@ -227,7 +233,7 @@
 
   function checkSnap(pieceId) {
    const piece = window.state.pieces[pieceId];
-   if (!piece || piece.locked) return;
+   if (!piece) return;
 
    let group = piece.group;
 
@@ -252,7 +258,7 @@
 
    for (const p1 of [...group]) {
     for (const p2 of window.state.pieces) {
-     if (p2.locked || group.includes(p2)) continue;
+     if (group.includes(p2)) continue;
 
      const isNeighbor = (Math.abs(p1.row - p2.row) + Math.abs(p1.col - p2.col)) === 1;
      if (isNeighbor) {
@@ -309,18 +315,19 @@
 
   function lockGroup(group) {
    group.forEach(p => {
-    if (p.locked) return;
+    if (!p.locked) {
+     p.locked = true;
+     window.state.lockedCount++;
+    }
     p.currentPos.x = p.targetPos.x;
     p.currentPos.y = p.targetPos.y;
     p.currentPos.z = p.targetPos.z;
-    p.locked = true;
 
     const el = document.getElementById(`piece-${p.id}`);
     if (el) {
      el.setAttribute('position', `${p.targetPos.x} ${p.targetPos.y} ${p.targetPos.z}`);
-     el.classList.remove('pickable');
+     // Keep pickable class so player can re-grab pieces if desired
     }
-    window.state.lockedCount++;
    });
 
    updateUI();
@@ -499,7 +506,6 @@
 
     // Click Fallback (Toggle Pick/Place)
     pieceEntity.addEventListener('click', (e) => {
-     if (pieceData.locked) return;
      if (window.state.heldPieceId === null) {
       pickPiece(idx);
      } else if (window.state.heldPieceId === idx) {
@@ -512,6 +518,9 @@
   }
 
   function updateUI() {
+   if (window.state.lockedCount < window.state.totalPieces) {
+    window.state.isCompleted = false;
+   }
    const valStr = `${window.state.lockedCount} / ${window.state.totalPieces}`;
    const vrHud = document.getElementById('vr-hud-text');
    if (vrHud) {
