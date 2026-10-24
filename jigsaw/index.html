@@ -44,6 +44,12 @@
   let dragStartPoint = null;
   let isInitialized = false;
 
+  // Όρια Επιφάνειας Τραπεζιού
+  const TABLE_MIN_X = -0.85;
+  const TABLE_MAX_X = 0.85;
+  const TABLE_MIN_Z = -1.75;
+  const TABLE_MAX_Z = -0.65;
+
   function loadPuzzleImage() {
    if (isInitialized) return;
 
@@ -213,13 +219,11 @@
    window.state.activeVRHand = handEl;
    dragStartPoint = null;
 
-   // Temporarily disable camera rotation so dragging moves piece smoothly on screen
    const camera = document.getElementById('camera');
    if (camera && !handEl) {
     camera.setAttribute('look-controls', 'enabled: false');
    }
 
-   // Elevate all pieces in the group during drag & unlock if previously locked on board
    piece.group.forEach(p => {
     if (p.locked) {
      p.locked = false;
@@ -228,7 +232,7 @@
     p.currentPos.y = 0.88;
     const el = document.getElementById(`piece-${p.id}`);
     if (el) {
-     el.setAttribute('position', `${p.currentPos.x} 0.88 ${p.currentPos.z}`);
+     el.setAttribute('position', `${p.currentPos.x} 0.88${p.currentPos.z}`);
     }
    });
 
@@ -243,13 +247,11 @@
    window.state.activeVRHand = null;
    dragStartPoint = null;
 
-   // Re-enable camera rotation
    const camera = document.getElementById('camera');
    if (camera) {
     camera.setAttribute('look-controls', 'enabled: true; pointerLockEnabled: false; touchEnabled: false');
    }
 
-   // Check snapping for board & neighbors
    checkSnap(pieceId);
   }
 
@@ -295,315 +297,4 @@
        group.forEach(gp => {
         gp.currentPos.x += shiftX;
         gp.currentPos.z += shiftZ;
-        const el = document.getElementById(`piece-${gp.id}`);
-        if (el) {
-         el.setAttribute('position', `${gp.currentPos.x} ${gp.currentPos.y} ${gp.currentPos.z}`);
-        }
-       });
-
-       const mergedGroup = [...group, ...p2.group];
-       mergedGroup.forEach(gp => gp.group = mergedGroup);
-       group = mergedGroup;
-       merged = true;
-       break;
-      }
-     }
-    }
-    if (merged) break;
-   }
-
-   // 3. If merged with neighbor, re-check if board snap is triggered
-   if (merged) {
-    for (const p of group) {
-     const dist = Math.hypot(p.currentPos.x - p.targetPos.x, p.currentPos.z - p.targetPos.z);
-     if (dist < 0.15) {
-      lockGroup(group);
-      return;
-     }
-    }
-   }
-
-   // 4. Set un-locked group pieces back to table Y (0.802)
-   group.forEach(p => {
-    if (!p.locked) {
-     p.currentPos.y = 0.802;
-     const el = document.getElementById(`piece-${p.id}`);
-     if (el) {
-      el.setAttribute('position', `${p.currentPos.x} 0.802 ${p.currentPos.z}`);
-     }
-    }
-   });
-
-   updateUI();
-  }
-
-  function lockGroup(group) {
-   group.forEach(p => {
-    p.locked = true;
-    p.currentPos.x = p.targetPos.x;
-    p.currentPos.y = p.targetPos.y;
-    p.currentPos.z = p.targetPos.z;
-
-    const el = document.getElementById(`piece-${p.id}`);
-    if (el) {
-     el.setAttribute('position', `${p.targetPos.x} ${p.targetPos.y} ${p.targetPos.z}`);
-    }
-   });
-
-   updateUI();
-  }
-
-  // Move held piece group across table surface using Three.js Plane Intersection
-  function updateDragPosition(clientX, clientY) {
-   if (window.state.heldPieceId === null || window.state.activeVRHand) return;
-
-   const cameraEl = document.getElementById('camera');
-   if (!cameraEl) return;
-   const threeCamera = cameraEl.getObject3D('camera');
-   if (!threeCamera) return;
-
-   // Screen Normalized Device Coordinates (-1 to +1)
-   const mouse = new THREE.Vector2(
-    (clientX / window.innerWidth) * 2 - 1,
-    -(clientY / window.innerHeight) * 2 + 1
-   );
-
-   const raycaster = new THREE.Raycaster();
-   raycaster.setFromCamera(mouse, threeCamera);
-
-   // Horizontal Plane at Table Elevation (Y = 0.88)
-   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.88);
-   const targetPoint = new THREE.Vector3();
-
-   if (raycaster.ray.intersectPlane(plane, targetPoint)) {
-    // Clamp bounds to table area
-    targetPoint.x = Math.max(-1.1, Math.min(1.1, targetPoint.x));
-    targetPoint.z = Math.max(-2.2, Math.min(-0.2, targetPoint.z));
-
-    if (!dragStartPoint) {
-     dragStartPoint = { x: targetPoint.x, z: targetPoint.z };
-    }
-
-    const deltaX = targetPoint.x - dragStartPoint.x;
-    const deltaZ = targetPoint.z - dragStartPoint.z;
-
-    const heldPiece = window.state.pieces[window.state.heldPieceId];
-    heldPiece.group.forEach(p => {
-     p.currentPos.x = p.dragStartPos.x + deltaX;
-     p.currentPos.z = p.dragStartPos.z + deltaZ;
-     p.currentPos.y = 0.88;
-
-     const el = document.getElementById(`piece-${p.id}`);
-     if (el) {
-      el.setAttribute('position', `${p.currentPos.x} 0.88 ${p.currentPos.z}`);
-     }
-    });
-   }
-  }
-
-  // Listeners for Mouse, Touch, & VR Dragging
-  window.addEventListener('mousemove', (e) => {
-   updateDragPosition(e.clientX, e.clientY);
-  });
-
-  window.addEventListener('touchmove', (e) => {
-   if (e.touches && e.touches[0]) {
-    updateDragPosition(e.touches[0].clientX, e.touches[0].clientY);
-   }
-  });
-
-  window.addEventListener('mouseup', () => {
-   if (window.state.heldPieceId !== null && !window.state.activeVRHand) {
-    releasePiece(window.state.heldPieceId);
-   }
-  });
-
-  window.addEventListener('touchend', () => {
-   if (window.state.heldPieceId !== null && !window.state.activeVRHand) {
-    releasePiece(window.state.heldPieceId);
-   }
-  });
-
-  // ==================== GAME SETUP & THREE.MESH BUILDING ==================== //
-  function initPuzzle(loadedImg) {
-   window.state.totalPieces = window.state.gridSize * window.state.gridSize;
-   window.state.heldPieceId = null;
-   window.state.activeVRHand = null;
-   window.state.isCompleted = false;
-
-   // 1. Generate artwork canvas
-   const artCanvas = document.createElement('canvas');
-   artCanvas.width = 800;
-   artCanvas.height = 800;
-   const ctx = artCanvas.getContext('2d');
-   ctx.drawImage(loadedImg, 0, 0, 800, 800);
-
-   // 2. Slice image into pieces & get board canvas
-   const {slices, boardCanvas} = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
-
-   // 3. Build Reference Board Mesh directly with THREE.Mesh
-   const boardEntity = document.getElementById('puzzle-board');
-   const boardGeom = new THREE.PlaneGeometry(0.8, 0.8);
-   const boardTexture = new THREE.CanvasTexture(boardCanvas);
-   if (THREE.SRGBColorSpace) boardTexture.colorSpace = THREE.SRGBColorSpace;
-   const boardMat = new THREE.MeshBasicMaterial({
-    map: boardTexture,
-    transparent: true,
-    opacity: 0.65,
-    side: THREE.DoubleSide
-   });
-   const boardMesh = new THREE.Mesh(boardGeom, boardMat);
-   boardEntity.setObject3D('mesh', boardMesh);
-
-   // 4. Spawn Jigsaw Piece Entities using Pure THREE.Mesh
-   const container = document.getElementById('pieces-container');
-   container.innerHTML = '';
-   window.state.pieces = [];
-
-   const boardSize = 0.8;
-   const pieceSize = boardSize / window.state.gridSize;
-   const pieceMeshDim = pieceSize * 1.56;
-
-   slices.forEach((slice, idx) => {
-    // Target position on board
-    const targetX = -boardSize / 2 + (slice.col + 0.5) * pieceSize;
-    const targetZ = -1.2 - boardSize / 2 + (slice.row + 0.5) * pieceSize;
-    const targetY = 0.802;
-
-    // Scattered start position on table
-    let randomX = (Math.random() - 0.5) * 1.4;
-    let randomZ = -1.2 + (Math.random() - 0.5) * 0.85;
-
-    // Ensure pieces don't spawn right on top of target board
-    if (Math.abs(randomX) < 0.45 && Math.abs(randomZ + 1.2) < 0.45) {
-     randomX += (randomX >= 0 ? 0.48 : -0.48);
-    }
-
-    const pieceData = {
-     id: idx,
-     row: slice.row,
-     col: slice.col,
-     targetPos: {x: targetX, y: targetY, z: targetZ},
-     currentPos: {x: randomX, y: 0.802, z: randomZ},
-     locked: false,
-     group: []
-    };
-    pieceData.group = [pieceData];
-
-    window.state.pieces.push(pieceData);
-
-    // A-Frame Entity Container
-    const pieceEntity = document.createElement('a-entity');
-    pieceEntity.setAttribute('id', `piece-${idx}`);
-    pieceEntity.setAttribute('class', 'pickable');
-    pieceEntity.setAttribute('position', `${pieceData.currentPos.x} ${pieceData.currentPos.y} ${pieceData.currentPos.z}`);
-    pieceEntity.setAttribute('rotation', '-90 0 0');
-
-    // Pure Three.js Mesh Attachment
-    const pieceGeom = new THREE.PlaneGeometry(pieceMeshDim, pieceMeshDim);
-    const pieceTexture = new THREE.CanvasTexture(slice.canvas);
-    if (THREE.SRGBColorSpace) pieceTexture.colorSpace = THREE.SRGBColorSpace;
-    const pieceMat = new THREE.MeshBasicMaterial({
-     map: pieceTexture,
-     transparent: true,
-     side: THREE.DoubleSide
-    });
-    const pieceMesh = new THREE.Mesh(pieceGeom, pieceMat);
-    pieceEntity.setObject3D('mesh', pieceMesh);
-
-    // Drag Listener on Mouse Down
-    pieceEntity.addEventListener('mousedown', (e) => {
-     if (e.target.closest && e.target.closest('#ui-overlay')) return;
-     pickPiece(idx);
-    });
-
-    // Click Fallback (Toggle Pick/Place)
-    pieceEntity.addEventListener('click', (e) => {
-     if (window.state.heldPieceId === null) {
-      pickPiece(idx);
-     } else if (window.state.heldPieceId === idx) {
-      releasePiece(idx);
-     }
-    });
-
-    container.appendChild(pieceEntity);
-   });
-
-   updateUI();
-  }
-
-  function getLargestGroupSize() {
-   if (!window.state.pieces || window.state.pieces.length === 0) return 0;
-   let max = 0;
-   window.state.pieces.forEach(p => {
-    if (p.group && p.group.length > max) {
-     max = p.group.length;
-    }
-   });
-   return max;
-  }
-
-  function updateUI() {
-   const largestGroup = getLargestGroupSize();
-   
-   if (largestGroup >= window.state.totalPieces && window.state.totalPieces > 0) {
-    window.state.isCompleted = true;
-   } else {
-    window.state.isCompleted = false;
-   }
-
-   const vrHud = document.getElementById('vr-hud-text');
-   if (vrHud) {
-    if (window.state.isCompleted) {
-     vrHud.setAttribute('value', 'Completed!');
-     vrHud.setAttribute('color', '#4ade80');
-    } else {
-     vrHud.setAttribute('value', '');
-    }
-   }
-  }
-
-  // ==================== INITIALIZATION & BINDINGS ==================== //
-  function setupApp() {
-   const scene = document.querySelector('a-scene');
-   if (scene && scene.hasLoaded) {
-    loadPuzzleImage();
-   } else if (scene) {
-    scene.addEventListener('loaded', loadPuzzleImage);
-   } else {
-    window.addEventListener('DOMContentLoaded', loadPuzzleImage);
-   }
-
-   // Setup WebXR Controller Event Listeners
-   ['left-hand', 'right-hand'].forEach(handId => {
-    const handEl = document.getElementById(handId);
-    if (handEl) {
-     handEl.addEventListener('selectstart', () => {
-      const rc = handEl.components.raycaster;
-      if (rc && rc.intersections && rc.intersections.length > 0) {
-       const hit = rc.intersections[0].object.el;
-       if (hit && hit.classList.contains('pickable')) {
-        const id = parseInt(hit.id.replace('piece-', ''), 10);
-        if (!isNaN(id)) pickPiece(id, handEl);
-       }
-      }
-     });
-
-     handEl.addEventListener('selectend', () => {
-      if (window.state.heldPieceId !== null && window.state.activeVRHand === handEl) {
-       releasePiece(window.state.heldPieceId);
-      }
-     });
-    }
-   });
-  }
-
-  if (document.readyState === 'loading') {
-   window.addEventListener('DOMContentLoaded', setupApp);
-  } else {
-   setupApp();
-  }
- </script>
-</body>
-
-</html>
+        const el = document.getElementById(`piece-${gp.id}`); if (el) { el.setAttribute('position', `${gp.currentPos.x}
