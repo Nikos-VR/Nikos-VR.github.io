@@ -35,7 +35,6 @@
   window.state = {
    gridSize: 5,
    totalPieces: 25,
-   lockedCount: 0,
    heldPieceId: null,
    activeVRHand: null,
    pieces: [],
@@ -200,7 +199,6 @@
    piece.group.forEach(p => {
     if (p.locked) {
      p.locked = false;
-     window.state.lockedCount--;
     }
     p.dragStartPos = { x: p.currentPos.x, z: p.currentPos.z };
     p.currentPos.y = 0.88;
@@ -311,14 +309,13 @@
      }
     }
    });
+
+   updateUI();
   }
 
   function lockGroup(group) {
    group.forEach(p => {
-    if (!p.locked) {
-     p.locked = true;
-     window.state.lockedCount++;
-    }
+    p.locked = true;
     p.currentPos.x = p.targetPos.x;
     p.currentPos.y = p.targetPos.y;
     p.currentPos.z = p.targetPos.z;
@@ -326,15 +323,10 @@
     const el = document.getElementById(`piece-${p.id}`);
     if (el) {
      el.setAttribute('position', `${p.targetPos.x} ${p.targetPos.y} ${p.targetPos.z}`);
-     // Keep pickable class so player can re-grab pieces if desired
     }
    });
 
    updateUI();
-
-   if (window.state.lockedCount === window.state.totalPieces) {
-    triggerVictory();
-   }
   }
 
   // Move held piece group across table surface using Three.js Plane Intersection
@@ -411,12 +403,9 @@
   // ==================== GAME SETUP & THREE.MESH BUILDING ==================== //
   function initPuzzle(loadedImg) {
    window.state.totalPieces = window.state.gridSize * window.state.gridSize;
-   window.state.lockedCount = 0;
    window.state.heldPieceId = null;
    window.state.activeVRHand = null;
    window.state.isCompleted = false;
-
-   updateUI();
 
    // 1. Generate artwork canvas
    const artCanvas = document.createElement('canvas');
@@ -515,56 +504,17 @@
 
     container.appendChild(pieceEntity);
    });
-  }
 
-  function updateUI() {
-   if (window.state.lockedCount < window.state.totalPieces) {
-    window.state.isCompleted = false;
-   }
-   const valStr = `${window.state.lockedCount} / ${window.state.totalPieces}`;
-   const vrHud = document.getElementById('vr-hud-text');
-   if (vrHud) {
-    if (window.state.isCompleted) {
-     vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\nCompleted!`);
-     vrHud.setAttribute('color', '#4ade80');
-    } else {
-     vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\n${valStr}`);
-     vrHud.setAttribute('color', '#38bdf8');
-    }
-   }
-  }
-
-  function triggerVictory() {
-   window.state.isCompleted = true;
    updateUI();
   }
 
-  // ==================== INITIALIZATION & BINDINGS ==================== //
-  window.addEventListener('load', () => {
-   // Setup WebXR Controller Event Listeners
-   ['left-hand', 'right-hand'].forEach(handId => {
-    const handEl = document.getElementById(handId);
-    if (handEl) {
-     handEl.addEventListener('selectstart', () => {
-      const rc = handEl.components.raycaster;
-      if (rc && rc.intersections && rc.intersections.length > 0) {
-       const hit = rc.intersections[0].object.el;
-       if (hit && hit.classList.contains('pickable')) {
-        const id = parseInt(hit.id.replace('piece-', ''), 10);
-        if (!isNaN(id)) pickPiece(id, handEl);
-       }
-      }
-     });
-
-     handEl.addEventListener('selectend', () => {
-      if (window.state.heldPieceId !== null && window.state.activeVRHand === handEl) {
-       releasePiece(window.state.heldPieceId);
-      }
-     });
+  function getLargestGroupSize() {
+   if (!window.state.pieces || window.state.pieces.length === 0) return 0;
+   let max = 0;
+   window.state.pieces.forEach(p => {
+    if (p.group && p.group.length > max) {
+     max = p.group.length;
     }
    });
-  });
- </script>
-</body>
-
-</html>
+   return max;
+  }
