@@ -12,7 +12,7 @@
  <a-scene>
   <a-sky color="#0f172a"></a-sky>
   <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#1e293b" roughness="0.8"></a-plane>
-  
+
   <!-- Τραπέζι -->
   <a-entity id="table" position="0 0 -1.2">
    <a-box width="1.8" height="0.08" depth="1.2" position="0 0.76 0" color="#5c3a21" roughness="0.5"></a-box>
@@ -43,8 +43,8 @@
 
  <script>
   window.state = {
-   gridSize: 3,
-   totalPieces: 9,
+   gridSize: 5,
+   totalPieces: 25,
    heldPieceId: null,
    activeVRHand: null,
    pieces: [],
@@ -58,10 +58,9 @@
   const TABLE_MAX_X = 0.82;
   const TABLE_MIN_Z = -1.72;
   const TABLE_MAX_Z = -0.68;
-  const RESTING_Y_BASE = 0.805; // Βασικό ύψος ηρεμίας
-  const DRAGGING_Y = 0.88;      // Ύψος κατά τη μετακίνηση
+  const RESTING_Y_BASE = 0.805;
+  const DRAGGING_Y = 0.88;
 
-  // Ασφαλής φόρτωση εικόνας που αποτρέπει Tainted Canvas σφάλματα στο WebGL
   function loadPuzzleImage() {
    fetch('puzzle.jpg')
     .then(res => {
@@ -88,7 +87,7 @@
       try {
        tCtx.getImageData(0, 0, 1, 1);
        initPuzzle(img);
-      } catch(e) {
+      } catch (e) {
        createProceduralFallback();
       }
      };
@@ -250,7 +249,7 @@
    }
 
    piece.group.forEach(p => {
-    p.dragStartPos = { x: p.currentPos.x, z: p.currentPos.z };
+    p.dragStartPos = {x: p.currentPos.x, z: p.currentPos.z};
     p.currentPos.y = DRAGGING_Y;
     const el = document.getElementById(`piece-${p.id}`);
     if (el) {
@@ -279,8 +278,7 @@
    checkSnap(pieceId);
   }
 
-  // Περιστροφή της κρατημένης ομάδας κατά stepDegrees (+90 ή -90)
-  function rotateHeldGroup(stepDegrees = 90) {
+  function rotateHeldGroup(stepDegrees = 10) {
    if (window.state.heldPieceId === null) return;
    const pivotPiece = window.state.pieces[window.state.heldPieceId];
    if (!pivotPiece) return;
@@ -289,8 +287,8 @@
    const pivotZ = pivotPiece.currentPos.z;
    const rad = (stepDegrees * Math.PI) / 180;
 
+   // 1. Περιστροφή θέσεων & γωνιών γύρω από το pivot
    pivotPiece.group.forEach(p => {
-    // 1. Υπολογισμός νέας θέσης γύρω από το pivot
     const relX = p.currentPos.x - pivotX;
     const relZ = p.currentPos.z - pivotZ;
 
@@ -299,18 +297,33 @@
 
     p.currentPos.x = pivotX + newRelX;
     p.currentPos.z = pivotZ + newRelZ;
-    p.dragStartPos = { x: p.currentPos.x, z: p.currentPos.z };
-
-    // 2. Ενημέρωση γωνίας περιστροφής (0, 90, 180, 270)
     p.rotation = (p.rotation + stepDegrees + 360) % 360;
+   });
 
-    // 3. Εφαρμογή στην A-Frame οντότητα
+   // 2. Έλεγχος & διόρθωση ορίων τραπεζιού μετά την περιστροφή
+   let clampShiftX = 0;
+   let clampShiftZ = 0;
+   pivotPiece.group.forEach(p => {
+    if (p.currentPos.x < TABLE_MIN_X) clampShiftX = Math.max(clampShiftX, TABLE_MIN_X - p.currentPos.x);
+    if (p.currentPos.x > TABLE_MAX_X) clampShiftX = Math.min(clampShiftX, TABLE_MAX_X - p.currentPos.x);
+    if (p.currentPos.z < TABLE_MIN_Z) clampShiftZ = Math.max(clampShiftZ, TABLE_MIN_Z - p.currentPos.z);
+    if (p.currentPos.z > TABLE_MAX_Z) clampShiftZ = Math.min(clampShiftZ, TABLE_MAX_Z - p.currentPos.z);
+   });
+
+   // 3. Εφαρμογή τελικών συντεταγμένων & μηδενισμός dragStartPoint (ΔΙΟΡΘΩΝΕΙ ΤΟ ΠΕΤΑΓΜΑ)
+   pivotPiece.group.forEach(p => {
+    p.currentPos.x += clampShiftX;
+    p.currentPos.z += clampShiftZ;
+    p.dragStartPos = {x: p.currentPos.x, z: p.currentPos.z};
+
     const el = document.getElementById(`piece-${p.id}`);
     if (el) {
      el.setAttribute('position', `${p.currentPos.x} ${DRAGGING_Y} ${p.currentPos.z}`);
      el.setAttribute('rotation', `-90 ${p.rotation} 0`);
     }
    });
+
+   dragStartPoint = null; // Επαναφορά σημείου αναφοράς σύρσης
   }
 
   function checkSnap(pieceId) {
@@ -326,13 +339,10 @@
     for (const p2 of window.state.pieces) {
      if (group.includes(p2)) continue;
 
-     // 1. Τα κομμάτια πρέπει να έχουν τον ΙΔΙΟ προσανατολισμό (γωνία)
      if (p1.rotation !== p2.rotation) continue;
 
-     // 2. Έλεγχος αν είναι γείτονες στο grid
      const isNeighbor = (Math.abs(p1.row - p2.row) + Math.abs(p1.col - p2.col)) === 1;
      if (isNeighbor) {
-      // Υπολογισμός αναμενόμενης μετατόπισης βάσει της τρέχουσας γωνίας περιστροφής
       const dc = p1.col - p2.col;
       const dr = p1.row - p2.row;
       const unrotDx = dc * pieceUnitSize;
@@ -370,7 +380,6 @@
     if (merged) break;
    }
 
-   // Επαναφορά στο ύψος ηρεμίας με ελάχιστο offset για την εξάλειψη του Z-fighting
    group.forEach(p => {
     const restingY = RESTING_Y_BASE + (p.id * 0.0001);
     p.currentPos.y = restingY;
@@ -406,7 +415,7 @@
 
    if (raycaster.ray.intersectPlane(plane, targetPoint)) {
     if (!dragStartPoint) {
-     dragStartPoint = { x: targetPoint.x, z: targetPoint.z };
+     dragStartPoint = {x: targetPoint.x, z: targetPoint.z};
     }
 
     const rawDeltaX = targetPoint.x - dragStartPoint.x;
@@ -440,7 +449,7 @@
    }
   }
 
-  // --- LISTENERS ΠΕΡΙΣΤΡΟΦΗΣ & ΜΕΤΑΚΙΝΗΣΗΣ ---
+  // Listeners
   window.addEventListener('mousemove', (e) => {
    updateDragPosition(e.clientX, e.clientY);
   });
@@ -451,26 +460,23 @@
    }
   });
 
-  // Περιστροφή με Ροδέλα Ποντικιού
   window.addEventListener('wheel', (e) => {
    if (window.state.heldPieceId !== null) {
     e.preventDefault();
-    rotateHeldGroup(e.deltaY > 0 ? 90 : -90);
+    rotateHeldGroup(e.deltaY > 0 ? 10 : -10);
    }
-  }, { passive: false });
+  }, {passive: false});
 
-  // Περιστροφή με Πλήκτρο 'R'
   window.addEventListener('keydown', (e) => {
    if ((e.key === 'r' || e.key === 'R') && window.state.heldPieceId !== null) {
-    rotateHeldGroup(90);
+    rotateHeldGroup(10);
    }
   });
 
-  // Περιστροφή με Δεξί Κλικ
   window.addEventListener('contextmenu', (e) => {
    if (window.state.heldPieceId !== null) {
     e.preventDefault();
-    rotateHeldGroup(90);
+    rotateHeldGroup(10);
    }
   });
 
@@ -499,7 +505,6 @@
    const ctx = artCanvas.getContext('2d');
    ctx.drawImage(loadedSource, 0, 0, 800, 800);
 
-   // 1. Εικόνα Προεπισκόπησης στο HUD
    const previewEntity = document.getElementById('reference-preview');
    const previewGeom = new THREE.PlaneGeometry(0.5, 0.5);
    const previewTexture = new THREE.CanvasTexture(artCanvas);
@@ -511,7 +516,6 @@
    const previewMesh = new THREE.Mesh(previewGeom, previewMat);
    previewEntity.setObject3D('mesh', previewMesh);
 
-   // 2. Slicing εικόνας σε καμπύλα κομμάτια παζλ
    const slices = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
 
    const container = document.getElementById('pieces-container');
@@ -521,15 +525,13 @@
    const boardSize = 0.8;
    const pieceSize = boardSize / window.state.gridSize;
    const pieceMeshDim = pieceSize * 1.56;
-   const possibleRotations = [0, 90, 180, 270];
 
    slices.forEach((slice, idx) => {
     let randomX = TABLE_MIN_X + 0.1 + Math.random() * (TABLE_MAX_X - TABLE_MIN_X - 0.2);
     let randomZ = TABLE_MIN_Z + 0.1 + Math.random() * (TABLE_MAX_Z - TABLE_MIN_Z - 0.2);
     const restingY = RESTING_Y_BASE + (idx * 0.0001);
 
-    // Τυχαίος αρχικός προσανατολισμός (0, 90, 180, 270 μοίρες)
-    const initialRot = possibleRotations[Math.floor(Math.random() * 4)];
+    const initialRot = Math.floor(Math.random() * 36) * 10;
 
     const pieceData = {
      id: idx,
@@ -594,7 +596,7 @@
 
   function updateUI() {
    const largestGroup = getLargestGroupSize();
-   
+
    if (largestGroup >= window.state.totalPieces && window.state.totalPieces > 0) {
     window.state.isCompleted = true;
    } else {
@@ -622,7 +624,6 @@
     window.addEventListener('DOMContentLoaded', loadPuzzleImage);
    }
 
-   // VR Hand Controllers - Επιλογή & Περιστροφή
    ['left-hand', 'right-hand'].forEach(handId => {
     const handEl = document.getElementById(handId);
     if (handEl) {
@@ -643,7 +644,6 @@
       }
      });
 
-     // Περιστροφή στο VR με πάτημα κουμπιού στο χειριστήριο
      ['abuttondown', 'bbuttondown', 'xbuttondown', 'ybuttondown', 'thumbstickdown'].forEach(btnEvent => {
       handEl.addEventListener(btnEvent, () => {
        if (window.state.heldPieceId !== null) {
