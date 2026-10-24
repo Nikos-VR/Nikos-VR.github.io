@@ -21,7 +21,7 @@
   </a-entity>
   <a-entity id="pieces-container"></a-entity>
   <a-entity id="vr-hud" position="0 1.6 -1.8">
-   <a-text id="vr-hud-text" value="VR Jigsaw Puzzle\n\n0 / 0" align="center" color="#38bdf8" width="2.8"></a-text>
+   <a-text id="vr-hud-text" value="" align="center" color="#4ade80" width="2.8"></a-text>
   </a-entity>
   <a-entity id="rig" position="0 0 0">
    <a-camera id="camera" position="0 1.55 0" look-controls="pointerLockEnabled: false; touchEnabled: false">
@@ -552,15 +552,13 @@
     window.state.isCompleted = false;
    }
 
-   const valStr = `${largestGroup} / ${window.state.totalPieces}`;
    const vrHud = document.getElementById('vr-hud-text');
    if (vrHud) {
     if (window.state.isCompleted) {
-     vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\nCompleted!`);
+     vrHud.setAttribute('value', 'Completed!');
      vrHud.setAttribute('color', '#4ade80');
     } else {
-     vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\n${valStr}`);
-     vrHud.setAttribute('color', '#38bdf8');
+     vrHud.setAttribute('value', '');
     }
    }
   }
