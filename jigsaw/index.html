@@ -42,6 +42,13 @@
    isCompleted: false
   };
 
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = 'chrome.png';
+  img.onload = () => {
+   initPuzzle(img);
+  };
+
   function generateProceduralArt(width, height) {
    const canvas = document.createElement('canvas');
    canvas.width = width;
@@ -254,6 +261,7 @@
    bctx.drawImage(sourceCanvas, 0, 0, W, H);
    bctx.globalAlpha = 1.0;
    bctx.strokeStyle = 'rgba(255,255,255,0.7)';
+   /* GRID
    bctx.lineWidth = 3;
    for (let i = 1; i < N; i++) {
     bctx.beginPath();
@@ -265,7 +273,7 @@
     bctx.lineTo(W, i * cellH);
     bctx.stroke();
    }
-
+   */
    return {slices, boardCanvas};
   }
 
@@ -401,7 +409,7 @@
   });
 
   // ==================== GAME SETUP & THREE.MESH BUILDING ==================== //
-  function initPuzzle() {
+  function initPuzzle(loadedImg) {
    window.state.totalPieces = window.state.gridSize * window.state.gridSize;
    window.state.lockedCount = 0;
    window.state.heldPieceId = null;
@@ -411,7 +419,11 @@
    updateUI();
 
    // 1. Generate artwork canvas
-   const artCanvas = generateProceduralArt(800, 800);
+   const artCanvas = document.createElement('canvas');
+   artCanvas.width = 800;
+   artCanvas.height = 800;
+   const ctx = artCanvas.getContext('2d');
+   ctx.drawImage(loadedImg, 0, 0, 800, 800);
 
    // 2. Slice image into pieces & get board canvas
    const {slices, boardCanvas} = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
@@ -507,10 +519,10 @@
    const vrHud = document.getElementById('vr-hud-text');
    if (vrHud) {
     if (window.state.isCompleted) {
-     vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\n🎉 ΟΛΟΚΛΗΡΩΘΗΚΕ!`);
+     vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\nCompleted!`);
      vrHud.setAttribute('color', '#4ade80');
     } else {
-     vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\nΚομμάτια: ${valStr}`);
+     vrHud.setAttribute('value', `VR Jigsaw Puzzle\n\n${valStr}`);
      vrHud.setAttribute('color', '#38bdf8');
     }
    }
@@ -545,9 +557,6 @@
      });
     }
    });
-
-   // Launch application
-   initPuzzle();
   });
  </script>
 </body>
