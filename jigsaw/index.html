@@ -26,9 +26,7 @@
 
   <!-- HUD: Εικόνα Αναφοράς & Μήνυμα Ολοκλήρωσης -->
   <a-entity id="vr-hud" position="0 1.65 -1.8">
-   <!-- Πίνακας Προεπισκόπησης Εικόνας -->
    <a-entity id="reference-preview" position="0 0 0"></a-entity>
-   <!-- Κείμενο Ολοκλήρωσης -->
    <a-text id="vr-hud-text" value="" align="center" color="#4ade80" width="3" position="0 0.38 0"></a-text>
   </a-entity>
 
@@ -44,8 +42,8 @@
 
  <script>
   window.state = {
-   gridSize: 3,
-   totalPieces: 9,
+   gridSize: 5,
+   totalPieces: 25,
    heldPieceId: null,
    activeVRHand: null,
    pieces: [],
@@ -59,6 +57,8 @@
   const TABLE_MAX_X = 0.85;
   const TABLE_MIN_Z = -1.75;
   const TABLE_MAX_Z = -0.65;
+  const RESTING_Y = 0.808; // Ύψος ηρεμίας πάνω στο τραπέζι
+  const DRAGGING_Y = 0.88;  // Ύψος ανύψωσης κατά τη μετακίνηση
 
   function loadPuzzleImage() {
    const img = new Image();
@@ -69,7 +69,6 @@
    };
 
    img.onerror = () => {
-    // Fallback Canvas αν λείπει το puzzle.jpg
     const fallbackCanvas = document.createElement('canvas');
     fallbackCanvas.width = 800;
     fallbackCanvas.height = 800;
@@ -173,19 +172,15 @@
      ctx.beginPath();
      ctx.moveTo(0, 0);
 
-     // Top
      const topTab = r === 0 ? 0 : -hEdges[r - 1][c];
      drawJigsawEdge(ctx, 0, 0, cellW, 0, topTab);
 
-     // Right
      const rightTab = c === N - 1 ? 0 : vEdges[r][c];
      drawJigsawEdge(ctx, cellW, 0, cellW, cellH, rightTab);
 
-     // Bottom
      const bottomTab = r === N - 1 ? 0 : hEdges[r][c];
      drawJigsawEdge(ctx, cellW, cellH, 0, cellH, bottomTab);
 
-     // Left
      const leftTab = c === 0 ? 0 : -vEdges[r][c - 1];
      drawJigsawEdge(ctx, 0, cellH, 0, 0, leftTab);
 
@@ -230,10 +225,10 @@
 
    piece.group.forEach(p => {
     p.dragStartPos = { x: p.currentPos.x, z: p.currentPos.z };
-    p.currentPos.y = 0.88;
+    p.currentPos.y = DRAGGING_Y;
     const el = document.getElementById(`piece-${p.id}`);
     if (el) {
-     el.setAttribute('position', `${p.currentPos.x} 0.88 ${p.currentPos.z}`);
+     el.setAttribute('position', `${p.currentPos.x} ${DRAGGING_Y} ${p.currentPos.z}`);
     }
    });
 
@@ -262,10 +257,9 @@
 
    let group = piece.group;
    const SNAP_THRESHOLD = 0.08;
-   const pieceUnitSize = 0.8 / window.state.gridSize; // 0.16m ανά κομμάτι
+   const pieceUnitSize = 0.8 / window.state.gridSize;
    let merged = false;
 
-   // Έλεγχος Κουμπώματος Γειτονικών Κομματιών (Neighbor Snap)
    for (const p1 of [...group]) {
     for (const p2 of window.state.pieces) {
      if (group.includes(p2)) continue;
@@ -300,19 +294,18 @@
     if (merged) break;
    }
 
-   // Επαναφορά Y ύψους στο τραπέζι (0.802)
+   // Επαναφορά στο ύψος ηρεμίας (RESTING_Y)
    group.forEach(p => {
-    p.currentPos.y = 0.802;
+    p.currentPos.y = RESTING_Y;
     const el = document.getElementById(`piece-${p.id}`);
     if (el) {
-     el.setAttribute('position', `${p.currentPos.x} 0.802 ${p.currentPos.z}`);
+     el.setAttribute('position', `${p.currentPos.x} ${RESTING_Y} ${p.currentPos.z}`);
     }
    });
 
    updateUI();
   }
 
-  // Dragging με περιορισμό στα όρια του τραπεζιού
   function updateDragPosition(clientX, clientY) {
    if (window.state.heldPieceId === null || window.state.activeVRHand) return;
 
@@ -329,7 +322,7 @@
    const raycaster = new THREE.Raycaster();
    raycaster.setFromCamera(mouse, threeCamera);
 
-   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.88);
+   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -DRAGGING_Y);
    const targetPoint = new THREE.Vector3();
 
    if (raycaster.ray.intersectPlane(plane, targetPoint)) {
@@ -358,11 +351,11 @@
     heldPiece.group.forEach(p => {
      p.currentPos.x = p.dragStartPos.x + deltaX;
      p.currentPos.z = p.dragStartPos.z + deltaZ;
-     p.currentPos.y = 0.88;
+     p.currentPos.y = DRAGGING_Y;
 
      const el = document.getElementById(`piece-${p.id}`);
      if (el) {
-      el.setAttribute('position', `${p.currentPos.x} 0.88 ${p.currentPos.z}`);
+      el.setAttribute('position', `${p.currentPos.x} ${DRAGGING_Y} ${p.currentPos.z}`);
      }
     });
    }
@@ -403,7 +396,7 @@
    const ctx = artCanvas.getContext('2d');
    ctx.drawImage(loadedSource, 0, 0, 800, 800);
 
-   // 1. Δημιουργία Εικόνας Προεπισκόπησης στο HUD
+   // 1. Εικόνα Προεπισκόπησης στο HUD
    const previewEntity = document.getElementById('reference-preview');
    const previewGeom = new THREE.PlaneGeometry(0.5, 0.5);
    const previewTexture = new THREE.CanvasTexture(artCanvas);
@@ -415,7 +408,7 @@
    const previewMesh = new THREE.Mesh(previewGeom, previewMat);
    previewEntity.setObject3D('mesh', previewMesh);
 
-   // 2. Κοπή εικόνας σε κομμάτια
+   // 2. Slicing εικόνας
    const slices = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
 
    const container = document.getElementById('pieces-container');
@@ -434,7 +427,7 @@
      id: idx,
      row: slice.row,
      col: slice.col,
-     currentPos: {x: randomX, y: 0.802, z: randomZ},
+     currentPos: {x: randomX, y: RESTING_Y, z: randomZ},
      group: []
     };
     pieceData.group = [pieceData];
@@ -447,16 +440,34 @@
     pieceEntity.setAttribute('position', `${pieceData.currentPos.x} ${pieceData.currentPos.y} ${pieceData.currentPos.z}`);
     pieceEntity.setAttribute('rotation', '-90 0 0');
 
+    // --- ΔΗΜΙΟΥΡΓΙΑ 3D ΚΟΜΜΑΤΙΟΥ ΜΕ ΠΑΧΟΣ 8mm ---
+    const pieceGroup = new THREE.Group();
+    const thickness = 0.008; // 8mm πάχος
+
+    // 1. Βάση & Πλευρές (Σκούρο Χαρτόνι)
+    const baseGeom = new THREE.BoxGeometry(pieceMeshDim * 0.98, pieceMeshDim * 0.98, thickness);
+    const baseMat = new THREE.MeshStandardMaterial({
+     color: 0x3d2817,
+     roughness: 0.8
+    });
+    const baseMesh = new THREE.Mesh(baseGeom, baseMat);
+    baseMesh.position.z = 0;
+    pieceGroup.add(baseMesh);
+
+    // 2. Εκτυπωμένη Επιφάνεια Παζλ (Πάνω Όψη)
     const pieceGeom = new THREE.PlaneGeometry(pieceMeshDim, pieceMeshDim);
     const pieceTexture = new THREE.CanvasTexture(slice.canvas);
     if (THREE.SRGBColorSpace) pieceTexture.colorSpace = THREE.SRGBColorSpace;
     const pieceMat = new THREE.MeshBasicMaterial({
      map: pieceTexture,
      transparent: true,
-     side: THREE.DoubleSide
+     side: THREE.FrontSide
     });
     const pieceMesh = new THREE.Mesh(pieceGeom, pieceMat);
-    pieceEntity.setObject3D('mesh', pieceMesh);
+    pieceMesh.position.z = thickness / 2 + 0.0005; // Ελαφρώς πιο πάνω από τη βάση
+    pieceGroup.add(pieceMesh);
+
+    pieceEntity.setObject3D('mesh', pieceGroup);
 
     pieceEntity.addEventListener('mousedown', (e) => {
      if (e.target.closest && e.target.closest('#ui-overlay')) return;
