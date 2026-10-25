@@ -14,12 +14,14 @@
   <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#1e293b" roughness="0.8"></a-plane>
 
   <!-- Τραπέζι -->
-  <a-entity id="table" position="0 0 -1.2">
-   <a-box width="1.8" height="0.08" depth="1.2" position="0 0.76 0" color="#5c3a21" roughness="0.5"></a-box>
-   <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 -0.5" color="#3b2312"></a-cylinder>
-   <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 -0.5" color="#3b2312"></a-cylinder>
-   <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 0.5" color="#3b2312"></a-cylinder>
-   <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 0.5" color="#3b2312"></a-cylinder>
+  <a-entity id="table" position="0 0 -0.83">
+   <a-box width="1.92" height="0.08" depth="0.83" position="0 0.76 0" color="#5c3a21" roughness="0.5"></a-box>
+   <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 -0.3" color="#3b2312"></a-cylinder>
+   <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 -0.3" color="#3b2312"></a-cylinder>
+   <a-cylinder radius="0.04" height="0.75" position="-0.8 0.375 0.3" color="#3b2312"></a-cylinder>
+   <a-cylinder radius="0.04" height="0.75" position="0.8 0.375 0.3" color="#3b2312"></a-cylinder>
+   <!-- Λευκό Χαρτί (Σταθερές Διαστάσεις: 0.84m x 0.59m) -->
+   <a-box width="0.84" height="0.01" depth="0.59" position="0 0.797 0" color="#ffffff" roughness="0.5"></a-box>
   </a-entity>
 
   <!-- Κομμάτια Παζλ -->
@@ -27,7 +29,7 @@
 
   <!-- HUD: Εικόνα Αναφοράς & Μήνυμα Ολοκλήρωσης -->
   <a-entity id="vr-hud" position="0 1.65 -1.8">
-   <a-entity id="reference-preview" position="0 0 0"></a-entity>
+   <a-entity id="reference-preview" position="0 0 0.5"></a-entity>
    <a-text id="vr-hud-text" value="" align="center" color="#4ade80" width="3" position="0 0.38 0"></a-text>
   </a-entity>
 
@@ -48,12 +50,15 @@
 
  <script>
   window.state = {
-   gridSize: 5,
-   totalPieces: 25,
+   gridRows: 10,
+   gridCols: 10,
+   totalPieces: 100,
    heldPieceId: null,
    activeVRHand: null,
    leftPinching: false,
    rightPinching: false,
+   puzzleW: 0.64,
+   puzzleH: 0.46,
    pieces: [],
    isCompleted: false
   };
@@ -62,11 +67,13 @@
   let initialHandAngleZ = 0;
   let lastTwoHandAngle = null;
 
-  // Όρια Επιφάνειας Τραπεζιού & Ύψη
-  const TABLE_MIN_X = -0.82;
-  const TABLE_MAX_X = 0.82;
-  const TABLE_MIN_Z = -1.72;
-  const TABLE_MAX_Z = -0.68;
+  // Σταθερές Διαστάσεις Λευκού Χαρτιού & Όρια Τραπεζιού
+  const PAPER_WIDTH = 0.84;
+  const PAPER_DEPTH = 0.59;
+  const TABLE_MIN_X = -0.84;
+  const TABLE_MAX_X = 0.84;
+  const TABLE_MIN_Z = -1.15;
+  const TABLE_MAX_Z = -0.5;
   const RESTING_Y_BASE = 0.805;
   const DRAGGING_Y = 0.88;
 
@@ -107,25 +114,24 @@
 
   function createProceduralFallback() {
    const fallbackCanvas = document.createElement('canvas');
-   fallbackCanvas.width = 800;
-   fallbackCanvas.height = 800;
+   fallbackCanvas.width = 640;
+   fallbackCanvas.height = 460;
    const ctx = fallbackCanvas.getContext('2d');
 
-   const grad = ctx.createLinearGradient(0, 0, 800, 800);
+   const grad = ctx.createLinearGradient(0, 0, 640, 460);
    grad.addColorStop(0, '#0284c7');
    grad.addColorStop(0.5, '#6366f1');
    grad.addColorStop(1, '#ec4899');
    ctx.fillStyle = grad;
-   ctx.fillRect(0, 0, 800, 800);
+   ctx.fillRect(0, 0, 640, 460);
 
    ctx.fillStyle = '#ffffff';
-   ctx.font = 'bold 150px sans-serif';
+   ctx.font = 'bold 100px sans-serif';
    ctx.textAlign = 'center';
-   ctx.fillText('A B C D E', 400, 150);
-   ctx.fillText('F G H J K', 400, 300);
-   ctx.fillText('L M N O P', 400, 450);
-   ctx.fillText('Q R S T U', 400, 600);
-   ctx.fillText('V W X Y Z', 400, 750);
+   ctx.fillText('A B C D E F', 320, 120);
+   ctx.fillText('G H J K L M', 320, 220);
+   ctx.fillText('N O P Q R S', 320, 320);
+   ctx.fillText('T U V W X Y', 320, 420);
 
    initPuzzle(fallbackCanvas);
   }
@@ -173,37 +179,38 @@
    ctx.lineTo(x2, y2);
   }
 
-  function sliceCanvasToJigsaw(sourceCanvas, N) {
+  function sliceCanvasToJigsaw(sourceCanvas, rows, cols) {
    const W = sourceCanvas.width;
    const H = sourceCanvas.height;
-   const cellW = W / N;
-   const cellH = H / N;
+   const cellW = W / cols;
+   const cellH = H / rows;
 
-   const vEdges = Array.from({length: N}, () => Array(N - 1).fill(0));
-   const hEdges = Array.from({length: N - 1}, () => Array(N).fill(0));
+   const vEdges = Array.from({length: rows}, () => Array(cols - 1).fill(0));
+   const hEdges = Array.from({length: rows - 1}, () => Array(cols).fill(0));
 
-   for (let r = 0; r < N; r++) {
-    for (let c = 0; c < N - 1; c++) {
+   for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols - 1; c++) {
      vEdges[r][c] = Math.random() < 0.5 ? 1 : -1;
     }
    }
-   for (let r = 0; r < N - 1; r++) {
-    for (let c = 0; c < N; c++) {
+   for (let r = 0; r < rows - 1; r++) {
+    for (let c = 0; c < cols; c++) {
      hEdges[r][c] = Math.random() < 0.5 ? 1 : -1;
     }
    }
 
    const slices = [];
-   const margin = cellW * 0.28;
+   const marginX = cellW * 0.28;
+   const marginY = cellH * 0.28;
 
-   for (let r = 0; r < N; r++) {
-    for (let c = 0; c < N; c++) {
+   for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
      const pieceCanvas = document.createElement('canvas');
-     pieceCanvas.width = cellW + margin * 2;
-     pieceCanvas.height = cellH + margin * 2;
+     pieceCanvas.width = cellW + marginX * 2;
+     pieceCanvas.height = cellH + marginY * 2;
      const ctx = pieceCanvas.getContext('2d');
 
-     ctx.translate(margin, margin);
+     ctx.translate(marginX, marginY);
 
      ctx.beginPath();
      ctx.moveTo(0, 0);
@@ -211,10 +218,10 @@
      const topTab = r === 0 ? 0 : -hEdges[r - 1][c];
      drawJigsawEdge(ctx, 0, 0, cellW, 0, topTab);
 
-     const rightTab = c === N - 1 ? 0 : vEdges[r][c];
+     const rightTab = c === cols - 1 ? 0 : vEdges[r][c];
      drawJigsawEdge(ctx, cellW, 0, cellW, cellH, rightTab);
 
-     const bottomTab = r === N - 1 ? 0 : hEdges[r][c];
+     const bottomTab = r === rows - 1 ? 0 : hEdges[r][c];
      drawJigsawEdge(ctx, cellW, cellH, 0, cellH, bottomTab);
 
      const leftTab = c === 0 ? 0 : -vEdges[r][c - 1];
@@ -223,12 +230,12 @@
      ctx.closePath();
      ctx.clip();
 
-     const sx = c * cellW - margin;
-     const sy = r * cellH - margin;
-     const sw = cellW + margin * 2;
-     const sh = cellH + margin * 2;
+     const sx = c * cellW - marginX;
+     const sy = r * cellH - marginY;
+     const sw = cellW + marginX * 2;
+     const sh = cellH + marginY * 2;
 
-     ctx.drawImage(sourceCanvas, sx, sy, sw, sh, -margin, -margin, sw, sh);
+     ctx.drawImage(sourceCanvas, sx, sy, sw, sh, -marginX, -marginY, sw, sh);
 
      ctx.strokeStyle = 'rgba(0,0,0,0.6)';
      ctx.lineWidth = 4;
@@ -339,13 +346,11 @@
    dragStartPoint = null;
   }
 
-  // --- ΕΛΕΓΧΟΣ ΠΕΡΙΣΤΡΟΦΗΣ: ΜΕ ΤΑ ΔΥΟ ΧΕΡΙΑ (2-HAND PINCH) Η ΜΕ ΤΟΝ ΚΑΡΠΟ (WRIST ROLL) ---
   function checkHandGestures() {
    if (window.state.heldPieceId !== null) {
     const leftHand = document.getElementById('left-hand');
     const rightHand = document.getElementById('right-hand');
 
-    // 1. Περιστροφή με τα ΔΥΟ ΧΕΡΙΑ (Όταν και τα δύο χέρια κάνουν Pinch)
     if (window.state.leftPinching && window.state.rightPinching) {
      if (leftHand && rightHand && leftHand.object3D && rightHand.object3D) {
       const pL = new THREE.Vector3();
@@ -373,7 +378,6 @@
     } else {
      lastTwoHandAngle = null;
 
-     // 2. Περιστροφή με το ΕΝΑ ΧΕΡΙ (Wrist Roll)
      const handEl = window.state.activeVRHand;
      if (handEl && handEl.object3D) {
       const currentAngleZ = handEl.object3D.rotation.z;
@@ -401,7 +405,8 @@
 
    let group = piece.group;
    const SNAP_THRESHOLD = 0.08;
-   const pieceUnitSize = 0.8 / window.state.gridSize;
+   const unitW = window.state.puzzleW / window.state.gridCols;
+   const unitH = window.state.puzzleH / window.state.gridRows;
    let merged = false;
 
    for (const p1 of [...group]) {
@@ -414,8 +419,8 @@
      if (isNeighbor) {
       const dc = p1.col - p2.col;
       const dr = p1.row - p2.row;
-      const unrotDx = dc * pieceUnitSize;
-      const unrotDz = dr * pieceUnitSize;
+      const unrotDx = dc * unitW;
+      const unrotDz = dr * unitH;
 
       const rad = (p1.rotation * Math.PI) / 180;
       const rotDx = unrotDx * Math.cos(rad) + unrotDz * Math.sin(rad);
@@ -533,6 +538,7 @@
 
   window.addEventListener('keydown', (e) => {
    if ((e.key === 'r' || e.key === 'R') && window.state.heldPieceId !== null) rotateHeldGroup(10);
+   else if ((e.key === 't' || e.key === 'T') && window.state.heldPieceId !== null) rotateHeldGroup(-10);
   });
 
   window.addEventListener('contextmenu', (e) => {
@@ -551,34 +557,60 @@
 
   // ==================== GAME SETUP ==================== //
   function initPuzzle(loadedSource) {
-   window.state.totalPieces = window.state.gridSize * window.state.gridSize;
+   window.state.totalPieces = window.state.gridRows * window.state.gridCols;
    window.state.heldPieceId = null;
    window.state.activeVRHand = null;
    window.state.isCompleted = false;
 
+   const imgW = loadedSource.width || loadedSource.naturalWidth || 640;
+   const imgH = loadedSource.height || loadedSource.naturalHeight || 460;
+
    const artCanvas = document.createElement('canvas');
-   artCanvas.width = 800;
-   artCanvas.height = 800;
+   artCanvas.width = imgW;
+   artCanvas.height = imgH;
    const ctx = artCanvas.getContext('2d');
-   ctx.drawImage(loadedSource, 0, 0, 800, 800);
+   ctx.drawImage(loadedSource, 0, 0, imgW, imgH);
+
+   // 1. Μετατροπή pixels σε μέτρα (1px = 0.001m)
+   let pW = imgW / 1000;
+   let pH = imgH / 1000;
+
+   // 2. Αν η εικόνα υπερβαίνει τις διαστάσεις του χαρτιού (0.84m x 0.59m), κλιμακώνεται αναλογικά
+   const maxW = PAPER_WIDTH - 0.04; // 0.80m
+   const maxH = PAPER_DEPTH - 0.04; // 0.55m
+
+   if (pW > maxW || pH > maxH) {
+    const scale = Math.min(maxW / pW, maxH / pH);
+    pW *= scale;
+    pH *= scale;
+   }
+
+   window.state.puzzleW = pW;
+   window.state.puzzleH = pH;
+
+   // Προεπισκόπηση HUD
+   const aspect = imgW / imgH;
+   const previewH = 0.46;
+   const previewW = previewH * aspect;
 
    const previewEntity = document.getElementById('reference-preview');
-   const previewGeom = new THREE.PlaneGeometry(0.5, 0.5);
+   const previewGeom = new THREE.PlaneGeometry(previewW, previewH);
    const previewTexture = new THREE.CanvasTexture(artCanvas);
    if (THREE.SRGBColorSpace) previewTexture.colorSpace = THREE.SRGBColorSpace;
    const previewMat = new THREE.MeshBasicMaterial({map: previewTexture, side: THREE.DoubleSide});
    const previewMesh = new THREE.Mesh(previewGeom, previewMat);
    previewEntity.setObject3D('mesh', previewMesh);
 
-   const slices = sliceCanvasToJigsaw(artCanvas, window.state.gridSize);
+   const slices = sliceCanvasToJigsaw(artCanvas, window.state.gridRows, window.state.gridCols);
 
    const container = document.getElementById('pieces-container');
    container.innerHTML = '';
    window.state.pieces = [];
 
-   const boardSize = 0.8;
-   const pieceSize = boardSize / window.state.gridSize;
-   const pieceMeshDim = pieceSize * 1.56;
+   const unitW = window.state.puzzleW / window.state.gridCols;
+   const unitH = window.state.puzzleH / window.state.gridRows;
+   const pieceMeshW = unitW * 1.56;
+   const pieceMeshH = unitH * 1.56;
 
    slices.forEach((slice, idx) => {
     let randomX = TABLE_MIN_X + 0.1 + Math.random() * (TABLE_MAX_X - TABLE_MIN_X - 0.2);
@@ -604,7 +636,7 @@
     pieceEntity.setAttribute('position', `${pieceData.currentPos.x} ${pieceData.currentPos.y} ${pieceData.currentPos.z}`);
     pieceEntity.setAttribute('rotation', `-90 ${initialRot} 0`);
 
-    const pieceGeom = new THREE.PlaneGeometry(pieceMeshDim, pieceMeshDim);
+    const pieceGeom = new THREE.PlaneGeometry(pieceMeshW, pieceMeshH);
     const pieceTexture = new THREE.CanvasTexture(slice.canvas);
     if (THREE.SRGBColorSpace) pieceTexture.colorSpace = THREE.SRGBColorSpace;
     const pieceMat = new THREE.MeshBasicMaterial({
@@ -703,9 +735,15 @@
     handEl.addEventListener('selectend', handleRelease);
     handEl.addEventListener('pinchend', handleRelease);
 
-    ['abuttondown', 'bbuttondown', 'xbuttondown', 'ybuttondown', 'thumbstickdown'].forEach(btnEvent => {
+    ['abuttondown', 'xbuttondown', 'thumbstickdown'].forEach(btnEvent => {
      handEl.addEventListener(btnEvent, () => {
       if (window.state.heldPieceId !== null) rotateHeldGroup(10);
+     });
+    });
+
+    ['bbuttondown', 'ybuttondown'].forEach(btnEvent => {
+     handEl.addEventListener(btnEvent, () => {
+      if (window.state.heldPieceId !== null) rotateHeldGroup(-10);
      });
     });
    });
